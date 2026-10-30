@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
+        android:name=".EskwelaApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -39,6 +40,9 @@
         <activity android:name=".AddClassActivity" />
         <activity android:name=".TasksActivity" />
         <activity android:name=".StudyActivity" />
+        <activity android:name=".AdminDashboardActivity" />
+        <activity android:name=".AiQuizActivity" />
+        <activity android:name=".AnnouncementActivity" />
     </application>
 
 </manifest>

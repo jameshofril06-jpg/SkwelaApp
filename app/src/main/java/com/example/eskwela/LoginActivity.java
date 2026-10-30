@@ -62,16 +62,40 @@ public class LoginActivity extends AppCompatActivity {
 
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, task -> {
-                        // 2. Turn off Loading State
-                        setLoading(false);
-
                         if (task.isSuccessful()) {
-                            Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
-                            finish();
+                            String userId = mAuth.getCurrentUser().getUid();
+                            com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                                    .collection("users").document(userId).get()
+                                    .addOnSuccessListener(doc -> {
+                                        setLoading(false);
+                                        if (doc.exists()) {
+                                            String status = doc.getString("status");
+                                            if ("suspended".equalsIgnoreCase(status) || "deactivated".equalsIgnoreCase(status) || "archived".equalsIgnoreCase(status)) {
+                                                mAuth.signOut();
+                                                new androidx.appcompat.app.AlertDialog.Builder(LoginActivity.this)
+                                                        .setTitle("Account " + status.toUpperCase())
+                                                        .setMessage("Your ESKWELA account is currently " + status + ". Please contact the system administrator.")
+                                                        .setPositiveButton("OK", null)
+                                                        .show();
+                                                return;
+                                            }
+                                        }
+                                        Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                                        Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        startActivity(intent);
+                                        finish();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        setLoading(false);
+                                        Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                                        Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        startActivity(intent);
+                                        finish();
+                                    });
                         } else {
+                            setLoading(false);
                             Toast.makeText(LoginActivity.this, "Login Failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                         }
                     });

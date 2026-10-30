@@ -5,7 +5,7 @@
     android:id="@+id/dashboard_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F3F6FA"
+    android:background="@color/app_bg"
     tools:context=".DashboardActivity">
 
     <androidx.core.widget.NestedScrollView
@@ -36,8 +36,9 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="Good morning!"
-                    android:textColor="#0F172A"
+                    android:textColor="@color/text_primary"
                     android:textSize="24sp"
+                    android:textStyle="bold"
                     app:layout_constraintEnd_toStartOf="@+id/ivProfileIcon"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -48,12 +49,12 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:text="Loading date..."
-                    android:textColor="#64748B"
+                    android:textColor="@color/text_secondary"
                     android:textSize="14sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tvGreeting" />
 
-                <!-- Profile Icon (Replaced the notification badge) -->
+                <!-- Profile Icon -->
                 <ImageView
                     android:id="@+id/ivProfileIcon"
                     android:layout_width="40dp"
@@ -138,8 +139,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Today's classes"
-                    android:textColor="#0F172A"
-                    android:textSize="18sp" />
+                    android:textColor="@color/text_primary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvSeeAll"
@@ -147,7 +149,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:text="See all"
-                    android:textColor="#1D4ED8"
+                    android:textColor="@color/eskwela_text_blue"
                     android:textSize="14sp"
                     android:textStyle="bold" />
             </RelativeLayout>
@@ -166,7 +168,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="No classes scheduled for today."
-                android:textColor="#64748B"
+                android:textColor="@color/text_secondary"
                 android:textSize="14sp"
                 android:visibility="gone" />
 
@@ -181,8 +183,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Due soon"
-                    android:textColor="#0F172A"
-                    android:textSize="18sp" />
+                    android:textColor="@color/text_primary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvViewTasks"
@@ -190,7 +193,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:text="View tasks"
-                    android:textColor="#1D4ED8"
+                    android:textColor="@color/eskwela_text_blue"
                     android:textSize="14sp"
                     android:textStyle="bold" />
             </RelativeLayout>
@@ -203,7 +206,7 @@
                 android:clipToPadding="false"
                 android:nestedScrollingEnabled="false" />
 
-            <!-- Empty State for Tasks (Wrapped in CardView for better look) -->
+            <!-- Empty State for Tasks -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardNoTasks"
                 android:layout_width="match_parent"
@@ -235,7 +238,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="No tasks due today. You are all caught up! 🎉"
-                        android:textColor="#0F172A"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp"
                         android:textStyle="bold"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -247,7 +250,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:text="Enjoy your free time!"
-                        android:textColor="#64748B"
+                        android:textColor="@color/text_secondary"
                         android:textSize="12sp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="@+id/tvNoTasks"
@@ -287,8 +290,9 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:text="Add class"
-                            android:textColor="#334155"
-                            android:textSize="13sp" />
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
@@ -316,8 +320,9 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:text="New task"
-                            android:textColor="#334155"
-                            android:textSize="13sp" />
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
@@ -345,8 +350,9 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:text="Start focus"
-                            android:textColor="#334155"
-                            android:textSize="13sp" />
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
             </LinearLayout>

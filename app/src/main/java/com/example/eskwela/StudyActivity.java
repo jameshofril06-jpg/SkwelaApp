@@ -109,9 +109,9 @@ public class StudyActivity extends AppCompatActivity {
         CardView cardAI = findViewById(R.id.cardAI);
         CardView cardNotes = findViewById(R.id.cardNotes);
 
-        cardAI.setOnClickListener(v ->
-                Toast.makeText(this, "AI Quiz Generator coming soon!", Toast.LENGTH_SHORT).show()
-        );
+        cardAI.setOnClickListener(v -> {
+            startActivity(new Intent(StudyActivity.this, AiQuizActivity.class));
+        });
 
         cardNotes.setOnClickListener(v ->
                 Toast.makeText(this, "Study Notes coming soon!", Toast.LENGTH_SHORT).show()

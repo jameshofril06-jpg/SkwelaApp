@@ -5,7 +5,7 @@
     android:id="@+id/study_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F3F6FA"
+    android:background="@color/app_bg"
     tools:context=".StudyActivity">
 
     <androidx.core.widget.NestedScrollView
@@ -31,15 +31,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Study Space"
-                android:textColor="#0F172A"
-                android:textSize="28sp" />
+                android:textColor="@color/text_primary"
+                android:textSize="28sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Focus, learn, and test yourself."
-                android:textColor="#64748B"
+                android:textColor="@color/text_secondary"
                 android:textSize="14sp" />
 
             <!-- Focus Timer Card -->
@@ -102,7 +103,6 @@
                 android:orientation="horizontal">
 
                 <!-- AI Quiz Card -->
-                <!-- Fixed: Changed height to wrap_content, adjusted elevation, added compat padding -->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardAI"
                     android:layout_width="0dp"
@@ -138,7 +138,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
                             android:text="AI Quiz Generator"
-                            android:textColor="#0F172A"
+                            android:textColor="@color/text_primary"
                             android:textSize="15sp"
                             android:textStyle="bold" />
 
@@ -148,8 +148,8 @@
                             android:layout_marginTop="6dp"
                             android:gravity="center"
                             android:lineSpacingExtra="2dp"
-                            android:text="Turn study photos into a quiz"
-                            android:textColor="#64748B"
+                            android:text="Generate 5-15 AI quizzes"
+                            android:textColor="@color/text_secondary"
                             android:textSize="11sp" />
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
@@ -190,7 +190,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
                             android:text="Study Notes"
-                            android:textColor="#0F172A"
+                            android:textColor="@color/text_primary"
                             android:textSize="15sp"
                             android:textStyle="bold" />
 
@@ -201,7 +201,7 @@
                             android:gravity="center"
                             android:lineSpacingExtra="2dp"
                             android:text="Write and organize notes"
-                            android:textColor="#64748B"
+                            android:textColor="@color/text_secondary"
                             android:textSize="11sp" />
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
@@ -216,21 +216,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Recent quizzes"
-                    android:textColor="#0F172A"
-                    android:textSize="18sp" />
+                    android:textColor="@color/text_primary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:text="History"
-                    android:textColor="#1D4ED8"
+                    android:textColor="@color/eskwela_text_blue"
                     android:textSize="14sp"
                     android:textStyle="bold" />
             </RelativeLayout>
 
             <!-- Recent Quiz Item -->
-            <!-- Fixed: Changed to CardView for cleaner shadow -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -250,7 +250,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:text="Biology: Cell Structure"
-                        android:textColor="#0F172A"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp"
                         android:textStyle="bold"
                         app:layout_constraintEnd_toStartOf="@+id/tvQuizScore"
@@ -263,7 +263,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="10 questions · Yesterday"
-                        android:textColor="#64748B"
+                        android:textColor="@color/text_secondary"
                         android:textSize="12sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/tvQuizTitle" />
@@ -273,7 +273,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="8/10"
-                        android:textColor="#1D4ED8"
+                        android:textColor="@color/eskwela_text_blue"
                         android:textSize="18sp"
                         android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="parent"

@@ -5,7 +5,7 @@
     android:id="@+id/profile_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F3F6FA"
+    android:background="@color/app_bg"
     tools:context=".ProfileActivity">
 
     <!-- Scrollable Content Area -->
@@ -31,7 +31,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="My Profile"
-                android:textColor="#0F172A"
+                android:textColor="@color/text_primary"
                 android:textSize="28sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -42,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Account and preferences"
-                android:textColor="#64748B"
+                android:textColor="@color/text_secondary"
                 android:textSize="14sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvProfileHeader" />
@@ -92,7 +92,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="Loading..."
-                        android:textColor="#0F172A"
+                        android:textColor="@color/text_primary"
                         android:textSize="18sp"
                         android:textStyle="bold"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -105,7 +105,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text=""
-                        android:textColor="#475569"
+                        android:textColor="@color/text_secondary"
                         android:textSize="13sp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="@+id/tvUserFullName"
@@ -117,7 +117,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text=""
-                        android:textColor="#94A3B8"
+                        android:textColor="@color/text_secondary"
                         android:textSize="12sp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="@+id/tvUserFullName"
@@ -138,6 +138,69 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Admin Control Center Card -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardAdminCenter"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:cardBackgroundColor="#1D4ED8"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="3dp"
+                app:cardUseCompatPadding="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cardUserInfo">
+
+                <LinearLayout
+                    android:id="@+id/btnAdminControlDashboard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_security"
+                        app:tint="#FFFFFF" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Admin Control Dashboard"
+                            android:textColor="#FFFFFF"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Manage users, schedules, and system stats"
+                            android:textColor="#93C5FD"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_arrow_right"
+                        app:tint="#FFFFFF" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
             <!-- Settings Menu Card (Updated to CardView) -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardSettingsMenu"
@@ -150,7 +213,7 @@
                 app:cardUseCompatPadding="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cardUserInfo">
+                app:layout_constraintTop_toBottomOf="@+id/cardAdminCenter">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -168,7 +231,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
                         <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_edit_profile" />
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="16dp" android:text="Edit profile" android:textColor="#0F172A" android:textSize="15sp" android:textStyle="bold"/>
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="16dp" android:text="Edit profile" android:textColor="@color/text_primary" android:textSize="15sp" android:textStyle="bold"/>
                         <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_arrow_right" />
                     </LinearLayout>
                     <View android:layout_width="0dp" android:layout_height="1dp" android:layout_marginStart="60dp" android:background="#F1F5F9" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/rowEditProfile"/>
@@ -185,7 +248,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/rowEditProfile">
                         <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_reminder" />
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="16dp" android:text="Reminder preferences" android:textColor="#0F172A" android:textSize="15sp" android:textStyle="bold"/>
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="16dp" android:text="Reminder preferences" android:textColor="@color/text_primary" android:textSize="15sp" android:textStyle="bold"/>
                         <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_arrow_right" />
                     </LinearLayout>
                     <View android:layout_width="0dp" android:layout_height="1dp" android:layout_marginStart="60dp" android:background="#F1F5F9" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/rowReminders"/>
@@ -194,7 +257,6 @@
                         android:id="@+id/rowOffline"
                         android:layout_width="0dp"
                         android:layout_height="60dp"
-                        android:background="?attr/selectableItemBackground"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:paddingHorizontal="20dp"
@@ -202,10 +264,49 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/rowReminders">
                         <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_offline" />
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="16dp" android:text="Offline settings" android:textColor="#0F172A" android:textSize="15sp" android:textStyle="bold"/>
-                        <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_arrow_right" />
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="16dp"
+                            android:orientation="vertical">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Online Auto-Sync" android:textColor="@color/text_primary" android:textSize="15sp" android:textStyle="bold"/>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Sync data when device is connected" android:textColor="@color/text_secondary" android:textSize="11sp"/>
+                        </LinearLayout>
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/switchOnlineSync"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true" />
                     </LinearLayout>
                     <View android:layout_width="0dp" android:layout_height="1dp" android:layout_marginStart="60dp" android:background="#F1F5F9" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/rowOffline"/>
+
+                    <LinearLayout
+                        android:id="@+id/rowDarkMode"
+                        android:layout_width="0dp"
+                        android:layout_height="60dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="20dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/rowOffline">
+                        <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_ai" />
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="16dp"
+                            android:orientation="vertical">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Dark Theme" android:textColor="@color/text_primary" android:textSize="15sp" android:textStyle="bold"/>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Toggle dark appearance" android:textColor="@color/text_secondary" android:textSize="11sp"/>
+                        </LinearLayout>
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/switchDarkMode"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+                    <View android:layout_width="0dp" android:layout_height="1dp" android:layout_marginStart="60dp" android:background="#F1F5F9" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/rowDarkMode"/>
 
                     <LinearLayout
                         android:id="@+id/rowSecurity"
@@ -217,9 +318,9 @@
                         android:paddingHorizontal="20dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/rowOffline">
+                        app:layout_constraintTop_toBottomOf="@+id/rowDarkMode">
                         <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_security" />
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="16dp" android:text="Account &amp; security" android:textColor="#0F172A" android:textSize="15sp" android:textStyle="bold"/>
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="16dp" android:text="Account &amp; security" android:textColor="@color/text_primary" android:textSize="15sp" android:textStyle="bold"/>
                         <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_arrow_right" />
                     </LinearLayout>
                     <View android:layout_width="0dp" android:layout_height="1dp" android:layout_marginStart="60dp" android:background="#F1F5F9" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/rowSecurity"/>
@@ -236,7 +337,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/rowSecurity">
                         <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_ai" />
-                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="16dp" android:text="Check for update (OTA)" android:textColor="#0F172A" android:textSize="15sp" android:textStyle="bold"/>
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="16dp" android:text="Check for update (OTA)" android:textColor="@color/text_primary" android:textSize="15sp" android:textStyle="bold"/>
                         <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_arrow_right" />
                     </LinearLayout>
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -266,7 +367,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Device storage"
-                        android:textColor="#0F172A"
+                        android:textColor="@color/text_primary"
                         android:textSize="15sp"
                         android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="parent"
@@ -278,7 +379,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="0 classes · 0 tasks · 0 saved quizzes"
-                        android:textColor="#64748B"
+                        android:textColor="@color/text_secondary"
                         android:textSize="12sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/tvStorageTitle" />
