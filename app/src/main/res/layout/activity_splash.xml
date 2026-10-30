@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/eskwela_blue_bg"
+    android:fitsSystemWindows="true">
+
+    <!-- ANIMATED BUBBLE 1 (Top Right) -->
+    <View
+        android:id="@+id/bubbleSplashTop"
+        android:layout_width="280dp"
+        android:layout_height="280dp"
+        android:background="@drawable/bg_single_bubble"
+        android:translationX="80dp"
+        android:translationY="-80dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- ANIMATED BUBBLE 2 (Bottom Left) -->
+    <View
+        android:id="@+id/bubbleSplashBottom"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:background="@drawable/bg_single_bubble"
+        android:translationX="-50dp"
+        android:translationY="50dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Centered Logo -->
+    <ImageView
+        android:id="@+id/ivSplashLogo"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:elevation="12dp"
+        android:src="@drawable/ic_school_logo"
+        app:layout_constraintBottom_toTopOf="@+id/tvSplashTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <!-- App Name -->
+    <TextView
+        android:id="@+id/tvSplashTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:letterSpacing="0.1"
+        android:text="ESKWELA"
+        android:textColor="@color/white"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/tvSplashTagline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivSplashLogo" />
+
+    <!-- Tagline -->
+    <TextView
+        android:id="@+id/tvSplashTagline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Your smarter school companion."
+        android:textColor="#93C5FD"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvSplashTitle" />
+
+    <!-- Custom Loading Indicator -->
+    <ProgressBar
+        android:id="@+id/splashProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="100dp"
+        android:layout_height="3dp"
+        android:layout_marginBottom="48dp"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/white"
+        android:progressTint="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/add_class_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F3F6FA"
+    android:fillViewport="true"
+    tools:context=".AddClassActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="32dp"
+        android:paddingBottom="32dp">
+
+        <!-- Header -->
+        <TextView
+            android:id="@+id/tvAddClassTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add a class"
+            android:textColor="#0F172A"
+            android:textSize="28sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvAddClassSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Build your schedule."
+            android:textColor="#64748B"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvAddClassTitle" />
+
+        <!-- CLASS NAME -->
+        <TextView
+            android:id="@+id/lblClassName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="CLASS NAME"
+            android:textColor="#334155"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvAddClassSubtitle" />
+
+        <EditText
+            android:id="@+id/etClassName"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="Data Structures"
+            android:inputType="textCapWords"
+            android:paddingHorizontal="16dp"
+            android:textColor="#0F172A"
+            android:textColorHint="#94A3B8"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblClassName" />
+
+        <!-- CLASS CODE -->
+        <TextView
+            android:id="@+id/lblClassCode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="CLASS CODE"
+            android:textColor="#334155"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/etClassName" />
+
+        <EditText
+            android:id="@+id/etClassCode"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="CS 201"
+            android:inputType="text"
+            android:paddingHorizontal="16dp"
+            android:textColor="#0F172A"
+            android:textColorHint="#94A3B8"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblClassCode" />
+
+        <!-- SCHOOL -->
+        <TextView
+            android:id="@+id/lblAddSchool"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="SCHOOL"
+            android:textColor="#334155"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/etClassCode" />
+
+        <EditText
+            android:id="@+id/etAddSchool"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="University of the Philippines"
+            android:inputType="text"
+            android:paddingHorizontal="16dp"
+            android:textColor="#0F172A"
+            android:textColorHint="#94A3B8"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblAddSchool" />
+
+        <!-- STARTS & ENDS (Side by Side) -->
+        <TextView
+            android:id="@+id/lblStarts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="STARTS"
+            android:textColor="#334155"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/etAddSchool" />
+
+        <TextView
+            android:id="@+id/lblEnds"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="ENDS"
+            android:textColor="#334155"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            app:layout_constraintStart_toStartOf="@+id/etEndTime"
+            app:layout_constraintTop_toBottomOf="@+id/etAddSchool" />
+
+        <EditText
+            android:id="@+id/etStartTime"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="9:30 AM"
+            android:inputType="text"
+            android:paddingHorizontal="16dp"
+            android:textColor="#0F172A"
+            android:textColorHint="#94A3B8"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toStartOf="@+id/etEndTime"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblStarts" />
+
+        <EditText
+            android:id="@+id/etEndTime"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="11:00 AM"
+            android:inputType="text"
+            android:paddingHorizontal="16dp"
+            android:textColor="#0F172A"
+            android:textColorHint="#94A3B8"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/etStartTime"
+            app:layout_constraintTop_toBottomOf="@+id/lblEnds" />
+
+        <!-- ROOM -->
+        <TextView
+            android:id="@+id/lblRoom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="ROOM"
+            android:textColor="#334155"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/etStartTime" />
+
+        <EditText
+            android:id="@+id/etRoom"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="Room 304"
+            android:inputType="text"
+            android:paddingHorizontal="16dp"
+            android:textColor="#0F172A"
+            android:textColorHint="#94A3B8"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblRoom" />
+
+        <!-- INSTRUCTOR -->
+        <TextView
+            android:id="@+id/lblInstructor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="INSTRUCTOR"
+            android:textColor="#334155"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/etRoom" />
+
+        <EditText
+            android:id="@+id/etInstructor"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="Prof. Santos"
+            android:inputType="textPersonName"
+            android:paddingHorizontal="16dp"
+            android:textColor="#0F172A"
+            android:textColorHint="#94A3B8"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblInstructor" />
+
+        <!-- ADD CLASS BUTTON -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnAddClassSubmit"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/bg_button_orange"
+            android:elevation="4dp"
+            android:text="Add class"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/etInstructor" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

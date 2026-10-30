@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/profile_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F3F6FA"
+    android:fillViewport="true"
+    tools:context=".ProfileSetupActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="32dp"
+        android:paddingBottom="32dp">
+
+        <!-- Header Title -->
+        <TextView
+            android:id="@+id/tvProfileTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Let's set up your profile"
+            android:textColor="#0F172A"
+            android:textSize="26sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Subtitle -->
+        <TextView
+            android:id="@+id/tvProfileSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Add details so we can make ESKWELA more personal."
+            android:textColor="#64748B"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvProfileTitle" />
+
+        <!-- Avatar Initials Circle -->
+        <FrameLayout
+            android:id="@+id/frameAvatar"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_avatar_circle"
+            android:elevation="6dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvProfileSubtitle">
+
+            <TextView
+                android:id="@+id/tvAvatarInitials"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="JD"
+                android:textColor="#1D4ED8"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+        </FrameLayout>
+
+        <!-- FULL NAME LABEL -->
+        <TextView
+            android:id="@+id/lblProfFullName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="FULL NAME"
+            android:textColor="#334155"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/frameAvatar" />
+
+        <!-- FULL NAME INPUT -->
+        <EditText
+            android:id="@+id/etProfFullName"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="Juan Dela Cruz"
+            android:inputType="textPersonName"
+            android:paddingHorizontal="16dp"
+            android:textColor="#0F172A"
+            android:textColorHint="#94A3B8"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblProfFullName" />
+
+        <!-- SCHOOL LABEL -->
+        <TextView
+            android:id="@+id/lblSchool"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="SCHOOL"
+            android:textColor="#334155"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/etProfFullName" />
+
+        <!-- SCHOOL INPUT -->
+        <EditText
+            android:id="@+id/etSchool"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="University of the Philippines"
+            android:inputType="text"
+            android:paddingHorizontal="16dp"
+            android:textColor="#0F172A"
+            android:textColorHint="#94A3B8"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblSchool" />
+
+        <!-- COURSE LABEL -->
+        <TextView
+            android:id="@+id/lblCourse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="COURSE"
+            android:textColor="#334155"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/etSchool" />
+
+        <!-- COURSE INPUT -->
+        <EditText
+            android:id="@+id/etCourse"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="BS Computer Science"
+            android:inputType="text"
+            android:paddingHorizontal="16dp"
+            android:textColor="#0F172A"
+            android:textColorHint="#94A3B8"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblCourse" />
+
+        <!-- YEAR LABEL (Left half) -->
+        <TextView
+            android:id="@+id/lblYear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="YEAR"
+            android:textColor="#334155"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/etCourse" />
+
+        <!-- SECTION LABEL (Right half) -->
+        <TextView
+            android:id="@+id/lblSection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="SECTION"
+            android:textColor="#334155"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            app:layout_constraintStart_toStartOf="@+id/etSection"
+            app:layout_constraintTop_toBottomOf="@+id/etCourse" />
+
+        <!-- YEAR INPUT -->
+        <EditText
+            android:id="@+id/etYear"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="3rd Year"
+            android:inputType="text"
+            android:paddingHorizontal="16dp"
+            android:textColor="#0F172A"
+            android:textColorHint="#94A3B8"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toStartOf="@+id/etSection"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblYear" />
+
+        <!-- SECTION INPUT -->
+        <EditText
+            android:id="@+id/etSection"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="A-2"
+            android:inputType="text"
+            android:paddingHorizontal="16dp"
+            android:textColor="#0F172A"
+            android:textColorHint="#94A3B8"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/etYear"
+            app:layout_constraintTop_toBottomOf="@+id/lblSection" />
+
+        <!-- CONTINUE BUTTON -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnContinue"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/bg_button_orange"
+            android:elevation="4dp"
+            android:text="Continue"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/etYear" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

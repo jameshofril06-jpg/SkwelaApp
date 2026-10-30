@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 1. The base solid blue background -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/eskwela_blue_bg" />
+        </shape>
+    </item>
+
+    <!-- 2. Top Right Bubble (Made smaller) -->
+    <item
+        android:width="280dp"
+        android:height="280dp"
+        android:gravity="top|end"
+        android:right="-80dp"
+        android:top="-80dp">
+        <shape android:shape="oval">
+            <solid android:color="#1AFFFFFF" /> <!-- 10% opacity white -->
+        </shape>
+    </item>
+
+    <!-- 3. Bottom Left Bubble -->
+    <item
+        android:width="250dp"
+        android:height="250dp"
+        android:gravity="bottom|start"
+        android:bottom="-50dp"
+        android:left="-80dp">
+        <shape android:shape="oval">
+            <solid android:color="#0DFFFFFF" /> <!-- 5% opacity white -->
+        </shape>
+    </item>
+
+</layer-list>

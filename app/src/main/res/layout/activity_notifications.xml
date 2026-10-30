@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/notif_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F3F6FA"
+    android:fillViewport="true"
+    tools:context=".NotificationsActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="32dp"
+        android:paddingBottom="32dp">
+
+        <!-- Header Title -->
+        <TextView
+            android:id="@+id/tvNotifTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Stay on track"
+            android:textColor="#0F172A"
+            android:textSize="28sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Subtitle -->
+        <TextView
+            android:id="@+id/tvNotifSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Choose the reminders that work for you."
+            android:textColor="#64748B"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvNotifTitle" />
+
+        <!-- White Card Container -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cardCheckboxes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_input_field"
+            android:elevation="2dp"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvNotifSubtitle">
+
+            <TextView
+                android:id="@+id/tvReminderPref"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reminder preferences"
+                android:textColor="#334155"
+                android:textSize="14sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- ITEM 1: Class Reminders -->
+            <TextView
+                android:id="@+id/tvClassReminders"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:drawablePadding="12dp"
+                android:text="Class reminders"
+                android:textColor="#0F172A"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:drawableStartCompat="@drawable/checkbox_checked"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvReminderPref" />
+
+            <TextView
+                android:id="@+id/tvSub1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="36dp"
+                android:text="Timely alerts based on your schedule"
+                android:textColor="#64748B"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvClassReminders" />
+
+            <View
+                android:id="@+id/div1"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:background="#E2E8F0"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvSub1" />
+
+            <!-- ITEM 2: Task Deadlines -->
+            <TextView
+                android:id="@+id/tvTaskDeadlines"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:drawablePadding="12dp"
+                android:text="Task deadlines"
+                android:textColor="#0F172A"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:drawableStartCompat="@drawable/checkbox_checked"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/div1" />
+
+            <TextView
+                android:id="@+id/tvSub2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="36dp"
+                android:text="Timely alerts based on your schedule"
+                android:textColor="#64748B"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvTaskDeadlines" />
+
+            <View
+                android:id="@+id/div2"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:background="#E2E8F0"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvSub2" />
+
+            <!-- ITEM 3: Study Reminder (Starts Unchecked) -->
+            <TextView
+                android:id="@+id/tvStudyReminder"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:drawablePadding="12dp"
+                android:text="Study reminder"
+                android:textColor="#0F172A"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:drawableStartCompat="@drawable/checkbox_unchecked"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/div2" />
+
+            <TextView
+                android:id="@+id/tvSub3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="36dp"
+                android:text="Timely alerts based on your schedule"
+                android:textColor="#64748B"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvStudyReminder" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Segmented Control Container -->
+        <LinearLayout
+            android:id="@+id/segmentContainer"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_segment_inactive"
+            android:orientation="horizontal"
+            android:padding="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cardCheckboxes">
+
+            <TextView
+                android:id="@+id/segDay"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_segment_active"
+                android:elevation="2dp"
+                android:gravity="center"
+                android:text="1 day"
+                android:textColor="#1D4ED8"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/seg15Min"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="15 min"
+                android:textColor="#475569"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/segAtTime"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="At time"
+                android:textColor="#475569"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnAllowNotifications"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_button_orange"
+            android:elevation="4dp"
+            android:text="Allow notifications"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/segmentContainer" />
+
+        <TextView
+            android:id="@+id/tvSkipForNow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Skip for now"
+            android:textColor="#1D4ED8"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnAllowNotifications" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
