@@ -151,14 +151,18 @@ public class AddClassActivity extends AppCompatActivity {
 
     private int parseTimeToMinutes(String timeStr) {
         try {
-            String[] parts = timeStr.split(" ");
-            String[] hm = parts[0].split(":");
+            String clean = timeStr.trim().toUpperCase();
+            boolean isPm = clean.contains("PM") || clean.contains("P");
+            boolean isAm = clean.contains("AM") || clean.contains("A");
+
+            String digits = clean.replaceAll("[^0-9:]", "");
+            String[] hm = digits.split(":");
             int hour = Integer.parseInt(hm[0]);
-            int minute = Integer.parseInt(hm[1]);
-            if (parts.length > 1 && parts[1].equalsIgnoreCase("PM") && hour < 12) {
+            int minute = hm.length > 1 ? Integer.parseInt(hm[1]) : 0;
+
+            if (isPm && hour < 12) {
                 hour += 12;
-            }
-            if (parts.length > 1 && parts[1].equalsIgnoreCase("AM") && hour == 12) {
+            } else if (isAm && hour == 12) {
                 hour = 0;
             }
             return hour * 60 + minute;
