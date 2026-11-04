@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -16,83 +15,123 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.FileProvider;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Locale;
 
 public class UpdateHelper {
 
-    public static final String BASE_APK_DOWNLOAD_URL = "https://github.com/jameshofril06-jpg/SkwelaApp/releases/download/v1.0.7/app-release.apk";
-    public static final String LATEST_VERSION_NAME = "1.0.7";
-    public static final int LATEST_VERSION_CODE = 7;
+    public static final String GITHUB_API_LATEST_RELEASE = "https://api.github.com/repos/jameshofril06-jpg/SkwelaApp/releases/latest";
+    public static final String DEFAULT_FALLBACK_DOWNLOAD_URL = "https://github.com/jameshofril06-jpg/SkwelaApp/releases/latest/download/app-release.apk";
 
     public static void downloadAndInstallUpdate(Context context) {
-        // 1. Visual checking loading indicator
         ProgressDialog checkingDialog = new ProgressDialog(context);
         checkingDialog.setTitle("Checking for Updates 🔍");
-        checkingDialog.setMessage("Comparing installed version with latest GitHub release...");
+        checkingDialog.setMessage("Connecting to GitHub release servers...");
         checkingDialog.setCancelable(false);
         checkingDialog.show();
 
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            if (checkingDialog.isShowing()) checkingDialog.dismiss();
+        new Thread(() -> {
+            String latestTagName = "1.0.7";
+            String downloadUrl = DEFAULT_FALLBACK_DOWNLOAD_URL;
+            String releaseBody = "• ⏳ Admin Suspension Time Tracking\n• 📢 Announcement Log & Sharing\n• ⏱️ Focus Session Presets (2m, 5m, 10m, 15m, 25m, 45m, 60m)\n• 🌙 Dark Mode Profile Text Contrast\n• ⚠️ Time Schedule Conflict Detection\n• 📷 OCR Study Load Document Scanner\n• 🤖 Smart AI Quizzes & Ranking Leaderboard";
 
-            String currentVersion;
-            int currentCode = 0;
             try {
-                PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-                currentVersion = pInfo.versionName != null ? pInfo.versionName : "1.0.0";
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    currentCode = (int) pInfo.getLongVersionCode();
-                } else {
-                    @SuppressWarnings("deprecation")
-                    int legacyCode = pInfo.versionCode;
-                    currentCode = legacyCode;
+                URL url = new URL(GITHUB_API_LATEST_RELEASE);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestProperty("User-Agent", "ESKWELA-App");
+                conn.setConnectTimeout(5000);
+                conn.setReadTimeout(5000);
+
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
+                    }
+                    reader.close();
+
+                    JSONObject json = new JSONObject(sb.toString());
+                    if (json.has("tag_name")) {
+                        latestTagName = json.getString("tag_name").replace("v", "").trim();
+                    }
+                    if (json.has("body") && !json.getString("body").trim().isEmpty()) {
+                        releaseBody = json.getString("body");
+                    }
+                    if (json.has("assets")) {
+                        JSONArray assets = json.getJSONArray("assets");
+                        for (int i = 0; i < assets.length(); i++) {
+                            JSONObject asset = assets.getJSONObject(i);
+                            if (asset.has("name") && asset.getString("name").contains("app-release") && asset.has("browser_download_url")) {
+                                downloadUrl = asset.getString("browser_download_url");
+                                break;
+                            }
+                        }
+                    }
                 }
-            } catch (Exception e) {
-                currentVersion = "1.0.0";
-            }
+            } catch (Exception ignored) {}
 
-            // 2. Robust intelligent version detection (Checks both versionCode and versionName)
-            boolean isLatestOrNewer = currentCode >= LATEST_VERSION_CODE ||
-                    (currentVersion != null && (currentVersion.trim().equalsIgnoreCase(LATEST_VERSION_NAME) || currentVersion.compareTo(LATEST_VERSION_NAME) >= 0));
+            final String finalLatestTag = latestTagName;
+            final String finalDownloadUrl = downloadUrl;
+            final String finalReleaseBody = releaseBody;
 
-            if (isLatestOrNewer) {
-                new AlertDialog.Builder(context)
-                        .setTitle("You're Up to Date! ✨")
-                        .setMessage("You are currently running ESKWELA v" + currentVersion + " (Build " + currentCode + "), which is the latest version available.")
-                        .setPositiveButton("OK", null)
-                        .show();
-                return;
-            }
+            new Handler(Looper.getMainLooper()).post(() -> {
+                if (checkingDialog.isShowing()) checkingDialog.dismiss();
 
-            // 3. Otherwise, show update release notes and prompt download
-            String whatsNew = "🚀 What's New & Fixes in ESKWELA v" + LATEST_VERSION_NAME + ":\n\n" +
-                    "• ⏳ Admin Suspension Time Tracking: Displays real-time remaining suspension countdowns (e.g. 6h 42m remaining).\n" +
-                    "• 📢 Announcement Log & Sharing: Clickable announcement detail modal with broadcast share features.\n" +
-                    "• ⏱️ Focus Session Presets: Added 2m, 5m, 10m, 15m, 25m, 45m, and 60m focus session timer options.\n" +
-                    "• 🌙 Dark Mode Profile Text Contrast: High-contrast visibility when editing profiles in Dark Mode.\n" +
-                    "• 🔍 Intelligent OTA Version Detection: Automatically detects if you are already on the latest version (v1.0.7).\n" +
-                    "• ⚠️ Time Schedule Conflict Detection: Checks for overlapping class times when adding schedules.\n" +
-                    "• 📦 Live Download Progress Bar: Real-time percentage tracking when downloading OTA updates.\n" +
-                    "• 📷 OCR Study Load Document Scanner & Auto-Plotter across weekdays.\n" +
-                    "• 🤖 Smart AI Quizzes & Ranking Leaderboard.\n" +
-                    "• 🛡️ Admin Control Center with user moderation.\n" +
-                    "• 📝 Task Drop Confirmation with Reason & Class Deletion Code Validation.\n" +
-                    "• ℹ️ 'About This App' settings section.\n\n" +
-                    "Would you like to download and install v" + LATEST_VERSION_NAME + " now?";
+                String currentVersion = "1.0.0";
+                try {
+                    PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+                    currentVersion = pInfo.versionName != null ? pInfo.versionName : "1.0.0";
+                } catch (Exception ignored) {}
 
-            new AlertDialog.Builder(context)
-                    .setTitle("📦 ESKWELA Update Available (v" + LATEST_VERSION_NAME + ")")
-                    .setMessage(whatsNew)
-                    .setPositiveButton("Download & Install", (dialog, which) -> startDownloadWithProgress(context))
-                    .setNegativeButton("Later", null)
-                    .show();
-        }, 1200);
+                // Compare version strings
+                boolean isUpToDate = compareVersions(currentVersion, finalLatestTag) >= 0;
+
+                if (isUpToDate) {
+                    new AlertDialog.Builder(context)
+                            .setTitle("You're Up to Date! ✨")
+                            .setMessage("You are currently running ESKWELA v" + currentVersion + ", which is the latest version available on GitHub.")
+                            .setPositiveButton("OK", null)
+                            .show();
+                } else {
+                    String whatsNew = "🚀 What's New in ESKWELA v" + finalLatestTag + ":\n\n" +
+                            finalReleaseBody + "\n\n" +
+                            "Would you like to download and install v" + finalLatestTag + " now?";
+
+                    new AlertDialog.Builder(context)
+                            .setTitle("📦 ESKWELA Update Available (v" + finalLatestTag + ")")
+                            .setMessage(whatsNew)
+                            .setPositiveButton("Download & Install", (dialog, which) -> startDownloadWithProgress(context, finalDownloadUrl, finalLatestTag))
+                            .setNegativeButton("Later", null)
+                            .show();
+                }
+            });
+        }).start();
     }
 
-    private static void startDownloadWithProgress(Context context) {
+    public static int compareVersions(String v1, String v2) {
+        String[] vals1 = v1.replaceAll("[^0-9.]", "").split("\\.");
+        String[] vals2 = v2.replaceAll("[^0-9.]", "").split("\\.");
+        int i = 0;
+        while (i < vals1.length && i < vals2.length && vals1[i].equals(vals2[i])) {
+            i++;
+        }
+        if (i < vals1.length && i < vals2.length) {
+            int diff = Integer.valueOf(vals1[i]).compareTo(Integer.valueOf(vals2[i]));
+            return Integer.signum(diff);
+        }
+        return Integer.signum(vals1.length - vals2.length);
+    }
+
+    private static void startDownloadWithProgress(Context context, String apkUrl, String versionTag) {
         try {
-            // Delete any stale cached APK files to prevent installing old cached versions
             try {
                 File oldFile1 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "eskwela-latest.apk");
                 if (oldFile1.exists()) {
@@ -104,12 +143,11 @@ public class UpdateHelper {
                 }
             } catch (Exception ignored) {}
 
-            // Append cache-busting timestamp query parameter so DownloadManager always fetches fresh APK
-            String cacheBustedUrl = BASE_APK_DOWNLOAD_URL + "?t=" + System.currentTimeMillis();
+            String cacheBustedUrl = apkUrl + "?t=" + System.currentTimeMillis();
 
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(cacheBustedUrl));
             request.setTitle("ESKWELA OTA Update");
-            request.setDescription("Downloading latest version v1.0.7 APK...");
+            request.setDescription("Downloading latest version v" + versionTag + " APK...");
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "eskwela-latest.apk");
             request.setMimeType("application/vnd.android.package-archive");
@@ -122,16 +160,14 @@ public class UpdateHelper {
 
             long downloadId = manager.enqueue(request);
 
-            // Create Live Progress Dialog
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Downloading Update 📦");
-            builder.setMessage("Please wait while v1.0.7 is being downloaded...");
+            builder.setMessage("Please wait while v" + versionTag + " is being downloaded...");
             builder.setCancelable(false);
 
             final AlertDialog progressDialog = builder.create();
             progressDialog.show();
 
-            // Poll progress in background handler
             Handler handler = new Handler(Looper.getMainLooper());
             Runnable progressChecker = new Runnable() {
                 @Override
@@ -155,11 +191,11 @@ public class UpdateHelper {
                             return;
                         } else if (status == DownloadManager.STATUS_FAILED) {
                             if (progressDialog.isShowing()) progressDialog.dismiss();
-                            Toast.makeText(context, "Download failed. Check if GitHub release v1.0.7 asset is public.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, "Download failed. Check if GitHub release asset is public.", Toast.LENGTH_LONG).show();
                             return;
                         } else if (total > 0) {
                             int progress = (int) ((downloaded * 100L) / total);
-                            progressDialog.setMessage(String.format(Locale.getDefault(), "Downloading v1.0.7... %d%% (%d KB / %d KB)", progress, downloaded / 1024, total / 1024));
+                            progressDialog.setMessage(String.format(Locale.getDefault(), "Downloading v%s... %d%% (%d KB / %d KB)", versionTag, progress, downloaded / 1024, total / 1024));
                         }
                     }
                     handler.postDelayed(this, 500);

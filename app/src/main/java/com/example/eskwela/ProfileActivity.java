@@ -129,12 +129,20 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void showAboutAppDialog() {
-        String aboutMsg = "🎓 ESKWELA v1.0.5\n\n" +
+        String currentVersion = "1.0.7";
+        try {
+            currentVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+        } catch (Exception ignored) {}
+
+        String aboutMsg = "🎓 ESKWELA v" + currentVersion + "\n\n" +
                 "Smart Student Productivity & Academic Management System designed for students and academic administrators.\n\n" +
-                "🚀 What's New & Changelog (v1.0.5):\n" +
-                "• 🌙 Dark Mode Profile Text Contrast: Fixed text colors for high-contrast visibility when editing profiles in Dark Mode.\n" +
-                "• 🔍 Intelligent OTA Version Detection: Automatically detects if you are already on the latest version (v1.0.5).\n" +
-                "• ⚠️ Time Schedule Conflict Detection: Automatically checks for overlapping class times when adding schedules.\n" +
+                "🚀 What's New & Changelog (v" + currentVersion + "):\n" +
+                "• ⏳ Admin Suspension Time Tracking: Displays real-time remaining suspension countdowns (e.g. 6h 42m remaining).\n" +
+                "• 📢 Announcement Log & Sharing: Clickable announcement detail modal with broadcast share features.\n" +
+                "• ⏱️ Focus Session Presets: Added 2m, 5m, 10m, 15m, 25m, 45m, and 60m focus session timer options.\n" +
+                "• 🌙 Dark Mode Profile Text Contrast: High-contrast visibility when editing profiles in Dark Mode.\n" +
+                "• 🔍 Intelligent Live OTA Version Detection: Automatically checks GitHub releases API for latest versions.\n" +
+                "• ⚠️ Time Schedule Conflict Detection: Checks for overlapping class times when adding schedules.\n" +
                 "• 📦 Live Download Progress Bar: Real-time percentage tracking when downloading OTA updates.\n" +
                 "• 📷 OCR Study Load Document Scanner & Auto-Plotter across weekdays.\n" +
                 "• 🤖 Smart AI Quizzes & Ranking Leaderboard.\n" +
@@ -143,7 +151,7 @@ public class ProfileActivity extends AppCompatActivity {
                 "© 2025 ESKWELA Team. All rights reserved.";
 
         new AlertDialog.Builder(this)
-                .setTitle("About ESKWELA & Changelog")
+                .setTitle("About ESKWELA & Changelog (v" + currentVersion + ")")
                 .setMessage(aboutMsg)
                 .setPositiveButton("Close", (dialog, which) -> dialog.dismiss())
                 .show();
