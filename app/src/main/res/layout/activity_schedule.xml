@@ -5,7 +5,7 @@
     android:id="@+id/schedule_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F3F6FA"
+    android:background="@color/app_bg"
     android:fillViewport="true"
     tools:context=".ScheduleActivity">
 
@@ -22,8 +22,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Build your schedule"
-            android:textColor="#0F172A"
+            android:textColor="@color/text_primary"
             android:textSize="28sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -34,13 +35,12 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="Add classes now or come back later."
-            android:textColor="#64748B"
+            android:textColor="@color/text_secondary"
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvScheduleTitle" />
 
         <!-- Horizontal Card Container -->
-        <!-- Using a horizontal LinearLayout for equal weight distribution of the 3 cards -->
         <LinearLayout
             android:id="@+id/cardsContainer"
             android:layout_width="0dp"
@@ -80,7 +80,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
                         android:text="Camera"
-                        android:textColor="#0F172A"
+                        android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -90,7 +90,7 @@
                         android:layout_marginTop="4dp"
                         android:gravity="center"
                         android:text="Scan your timetable"
-                        android:textColor="#64748B"
+                        android:textColor="@color/text_secondary"
                         android:textSize="11sp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -124,7 +124,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
                         android:text="Gallery"
-                        android:textColor="#0F172A"
+                        android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -134,7 +134,7 @@
                         android:layout_marginTop="4dp"
                         android:gravity="center"
                         android:text="Choose a photo"
-                        android:textColor="#64748B"
+                        android:textColor="@color/text_secondary"
                         android:textSize="11sp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -167,7 +167,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
                         android:text="Manual"
-                        android:textColor="#0F172A"
+                        android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -177,7 +177,7 @@
                         android:layout_marginTop="4dp"
                         android:gravity="center"
                         android:text="Add one by one"
-                        android:textColor="#64748B"
+                        android:textColor="@color/text_secondary"
                         android:textSize="11sp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>

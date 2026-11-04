@@ -16,14 +16,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Inside res/layout/item_schedule_card.xml -->
     <TextView
         android:id="@+id/tvItemTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:text=""
-        android:textColor="#0F172A"
+        android:textColor="@color/text_primary"
         android:textSize="15sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -36,7 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text=""
-        android:textColor="#475569"
+        android:textColor="@color/text_secondary"
         android:textSize="13sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/tvItemTitle"
