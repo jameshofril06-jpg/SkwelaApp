@@ -219,7 +219,13 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
         tvName.setText(name);
         tvDetails.setText((user.email != null ? user.email : "No Email") + " • " + (user.studentId != null ? "ID: " + user.studentId : "N/A"));
-        tvStatus.setText("STATUS: " + currentStatus.toUpperCase());
+        if ("suspended".equalsIgnoreCase(currentStatus)) {
+            String remainingTime = AdminUserAdapter.calculateRemainingSuspensionTime(user.suspensionDuration, user.suspendedAt);
+            tvStatus.setText("STATUS: SUSPENDED\n⏳ Remaining: " + remainingTime);
+            tvStatus.setTextColor(0xFFEF4444);
+        } else {
+            tvStatus.setText("STATUS: " + currentStatus.toUpperCase());
+        }
 
         btnToggleActive.setText("active".equalsIgnoreCase(currentStatus) ? "Deactivate Account" : "Activate Account");
 

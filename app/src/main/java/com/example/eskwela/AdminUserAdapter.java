@@ -28,6 +28,8 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
         public String course;
         public String year;
         public String status; // "active", "suspended", "deactivated", "archived"
+        public String suspensionDuration; // "24 Hours", "7 Days", "30 Days", "Indefinite"
+        public Long suspendedAt; // Milliseconds timestamp
 
         public UserItem() {}
     }
@@ -52,12 +54,18 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
         holder.tvUserStudentId.setText(user.studentId != null ? "ID: " + user.studentId : "ID: N/A");
 
         String statusStr = user.status != null ? user.status.toUpperCase() : "ACTIVE";
-        holder.tvUserStatus.setText(statusStr);
-        if ("SUSPENDED".equals(statusStr) || "DEACTIVATED".equals(statusStr)) {
+        if ("SUSPENDED".equals(statusStr)) {
+            String remaining = calculateRemainingSuspensionTime(user.suspensionDuration, user.suspendedAt);
+            holder.tvUserStatus.setText("SUSPENDED (" + remaining + ")");
+            holder.tvUserStatus.setTextColor(0xFFEF4444); // Red
+        } else if ("DEACTIVATED".equals(statusStr)) {
+            holder.tvUserStatus.setText(statusStr);
             holder.tvUserStatus.setTextColor(0xFFEF4444); // Red
         } else if ("ARCHIVED".equals(statusStr)) {
+            holder.tvUserStatus.setText(statusStr);
             holder.tvUserStatus.setTextColor(0xFF64748B); // Slate
         } else {
+            holder.tvUserStatus.setText(statusStr);
             holder.tvUserStatus.setTextColor(0xFF16A34A); // Green
         }
 
@@ -73,6 +81,38 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onUserClick(user);
         });
+    }
+
+    public static String calculateRemainingSuspensionTime(String duration, Long suspendedAt) {
+        if (suspendedAt == null || suspendedAt <= 0) {
+            return duration != null ? duration : "Suspended";
+        }
+        if ("Indefinite".equalsIgnoreCase(duration)) {
+            return "Indefinite";
+        }
+
+        long durationMs = 24 * 60 * 60 * 1000L; // default 24h
+        if ("7 Days".equalsIgnoreCase(duration)) {
+            durationMs = 7 * 24 * 60 * 60 * 1000L;
+        } else if ("30 Days".equalsIgnoreCase(duration)) {
+            durationMs = 30 * 24 * 60 * 60 * 1000L;
+        }
+
+        long remainingMs = (suspendedAt + durationMs) - System.currentTimeMillis();
+        if (remainingMs <= 0) {
+            return "Expired (Pending Activation)";
+        }
+
+        long hours = remainingMs / (1000 * 60 * 60);
+        long minutes = (remainingMs / (1000 * 60)) % 60;
+        long days = hours / 24;
+
+        if (days > 0) {
+            long remHours = hours % 24;
+            return days + "d " + remHours + "h remaining";
+        } else {
+            return hours + "h " + minutes + "m remaining";
+        }
     }
 
     @Override
