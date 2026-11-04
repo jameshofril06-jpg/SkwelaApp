@@ -361,63 +361,6 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Device Storage Card (Updated to CardView) -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardStorage"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:cardUseCompatPadding="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cardSettingsMenu">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="20dp">
-
-                    <TextView
-                        android:id="@+id/tvStorageTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Device storage"
-                        android:textColor="@color/text_primary"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/tvStorageDetails"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="0 classes · 0 tasks · 0 saved quizzes"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/tvStorageTitle" />
-
-                    <ProgressBar
-                        android:id="@+id/storageProgressBar"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="0dp"
-                        android:layout_height="6dp"
-                        android:layout_marginTop="12dp"
-                        android:max="100"
-                        android:progress="35"
-                        android:progressTint="#1D4ED8"
-                        android:progressBackgroundTint="#E2E8F0"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/tvStorageDetails" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </androidx.cardview.widget.CardView>
-
             <!-- Logout Button (Updated to CardView for shadow) -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardLogout"
@@ -430,7 +373,7 @@
                 app:cardUseCompatPadding="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cardStorage">
+                app:layout_constraintTop_toBottomOf="@+id/cardSettingsMenu">
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btnLogout"

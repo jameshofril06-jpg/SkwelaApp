@@ -227,7 +227,6 @@ public class ProfileActivity extends AppCompatActivity {
         TextView tvCourseYear = findViewById(R.id.tvUserCourseYear);
         TextView tvSchool = findViewById(R.id.tvUserSchool);
         TextView tvStudentId = findViewById(R.id.tvUserStudentId);
-        TextView tvStorageDetails = findViewById(R.id.tvStorageDetails);
 
         if (mAuth.getCurrentUser() != null) {
             String userId = mAuth.getCurrentUser().getUid();
@@ -282,16 +281,6 @@ public class ProfileActivity extends AppCompatActivity {
                                 cardAdmin.setVisibility(View.VISIBLE);
                             }
                         }
-                    });
-
-            // 2. Fetch Dynamic Storage Info
-            db.collection("schedules").whereEqualTo("userId", userId).get()
-                    .addOnSuccessListener(scheduleSnap -> {
-                        db.collection("tasks").whereEqualTo("userId", userId).get()
-                                .addOnSuccessListener(taskSnap -> {
-                                    if (isFinishing() || tvStorageDetails == null) return;
-                                    tvStorageDetails.setText(scheduleSnap.size() + " classes · " + taskSnap.size() + " tasks");
-                                });
                     });
         }
     }
