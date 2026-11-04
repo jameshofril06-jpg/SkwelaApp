@@ -102,16 +102,6 @@ public class AiQuizActivity extends AppCompatActivity {
         ImageView ivBack = findViewById(R.id.ivBack);
         ivBack.setOnClickListener(v -> finish());
 
-        // Pro Upgrade Listeners
-        View cardPro = findViewById(R.id.cardProUpgrade);
-        View btnProTrigger = findViewById(R.id.btnProUpgradeTrigger);
-        View btnProAction = findViewById(R.id.btnProUpgradeAction);
-        View.OnClickListener proListener = v -> showProUpgradeDialog();
-
-        if (cardPro != null) cardPro.setOnClickListener(proListener);
-        if (btnProTrigger != null) btnProTrigger.setOnClickListener(proListener);
-        if (btnProAction != null) btnProAction.setOnClickListener(proListener);
-
         // Question Count Selection
         btnCount5.setOnClickListener(v -> selectQuestionCount(5));
         btnCount10.setOnClickListener(v -> selectQuestionCount(10));
@@ -123,24 +113,6 @@ public class AiQuizActivity extends AppCompatActivity {
 
         autoPrefillStudyLoadCourse();
         loadLeaderboardAndHistory();
-    }
-
-    private void showProUpgradeDialog() {
-        String proDetails = "✨ Unlock ESKWELA AI Quiz Pro!\n\n" +
-                "• 💡 Instant Step-by-Step Answer Explanations\n" +
-                "• 🎯 Custom Enrolled Study Load Focus Mode\n" +
-                "• 📊 In-Depth Course Weakness Analysis\n" +
-                "• 🏆 Double Leaderboard Points Bonus\n\n" +
-                "Pro Status: Activated for All Enrolled Students!";
-
-        new AlertDialog.Builder(this)
-                .setTitle("✨ AI Quiz Pro Features")
-                .setMessage(proDetails)
-                .setPositiveButton("Activate Pro Free", (dialog, which) -> {
-                    Toast.makeText(this, "AI Quiz Pro Features Activated! 🎉", Toast.LENGTH_SHORT).show();
-                })
-                .setNegativeButton("Close", null)
-                .show();
     }
 
     private void autoPrefillStudyLoadCourse() {
@@ -273,7 +245,7 @@ public class AiQuizActivity extends AppCompatActivity {
         int total = generatedQuestions.size();
         int percent = Math.round(((float) scoreCount / total) * 100);
 
-        String resultMsg = "Quiz Complete!\n\nTopic: " + currentTopic + "\nScore: " + scoreCount + " / " + total + " (" + percent + "%)\n\n💡 AI Diagnostic: Excellent mastery of " + currentTopic + "!";
+        String resultMsg = "Quiz Complete!\n\nTopic: " + currentTopic + "\nScore: " + scoreCount + " / " + total + " (" + percent + "%)\n\n💡 Diagnostic: Excellent mastery of " + currentTopic + "!";
         new AlertDialog.Builder(this)
                 .setTitle("🎉 Quiz Results & Diagnostics")
                 .setMessage(resultMsg)
@@ -377,7 +349,7 @@ public class AiQuizActivity extends AppCompatActivity {
                     }
                 });
 
-        // 2. Load Leaderboard (Top Scores across users)
+        // 2. Load Leaderboard (Top Scores across users with medals)
         db.collection("ai_quizzes")
                 .orderBy("percentage", Query.Direction.DESCENDING)
                 .limit(5)
@@ -394,13 +366,13 @@ public class AiQuizActivity extends AppCompatActivity {
                             String medal = rank == 1 ? "🥇 " : rank == 2 ? "🥈 " : rank == 3 ? "🥉 " : rank + ". ";
                             String name = email != null ? email.split("@")[0] : "Student";
 
-                            sb.append(medal).append(name).append(" - ").append(pct != null ? pct : 0)
+                            sb.append(medal).append(name).append(" — ").append(pct != null ? pct : 0)
                                     .append("% on ").append(topic != null ? topic : "Quiz").append("\n");
                             rank++;
                         }
                         tvLeaderboardContent.setText(sb.toString().trim());
                     } else {
-                        tvLeaderboardContent.setText("1st Place 🥇 Student - 100% on Practice Quiz");
+                        tvLeaderboardContent.setText("🥇 Student — 100% on LOAD TESTING\n🥈 Student — 90% on SOFTWARE ENGINEERING\n🥉 Student — 80% on CAPSTONE PROJECT 1");
                     }
                 });
     }
