@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -28,7 +27,7 @@ import java.util.Locale;
 
 public class UpdateHelper {
 
-    public static final String GITHUB_API_LATEST_RELEASE = "https://api.github.com/repos/jameshofril06-jpg/SkwelaApp/releases/latest";
+    public static final String GITHUB_API_RELEASES = "https://api.github.com/repos/jameshofril06-jpg/SkwelaApp/releases";
     public static final String DEFAULT_FALLBACK_DOWNLOAD_URL = "https://github.com/jameshofril06-jpg/SkwelaApp/releases/download/v1.0.8/app-release.apk";
     public static final String LATEST_VERSION_NAME = "1.0.8";
 
@@ -45,7 +44,7 @@ public class UpdateHelper {
             String releaseBody = "• 🤖 Enrolled Study Load AI Quiz Generator & Leaderboard Polish\n• ⏳ Admin Suspension Time Tracking (e.g. 6h 42m remaining)\n• 📢 Announcement Log Detail Modal & Share Feature\n• ⏱️ Focus Session Presets (2m, 5m, 10m, 15m, 25m, 45m, 60m)\n• 🌙 Global Dark Mode Text Contrast Fixes\n• ⚠️ Time Schedule Conflict Detection\n• 📷 OCR Study Load Document Scanner & Auto-Plotter";
 
             try {
-                URL url = new URL(GITHUB_API_LATEST_RELEASE);
+                URL url = new URL(GITHUB_API_RELEASES);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestProperty("User-Agent", "ESKWELA-App");
                 conn.setConnectTimeout(5000);
@@ -60,20 +59,23 @@ public class UpdateHelper {
                     }
                     reader.close();
 
-                    JSONObject json = new JSONObject(sb.toString());
-                    if (json.has("tag_name")) {
-                        latestTagName = json.getString("tag_name").replace("v", "").trim();
-                    }
-                    if (json.has("body") && !json.getString("body").trim().isEmpty()) {
-                        releaseBody = json.getString("body");
-                    }
-                    if (json.has("assets")) {
-                        JSONArray assets = json.getJSONArray("assets");
-                        for (int i = 0; i < assets.length(); i++) {
-                            JSONObject asset = assets.getJSONObject(i);
-                            if (asset.has("name") && asset.getString("name").contains("app-release") && asset.has("browser_download_url")) {
-                                downloadUrl = asset.getString("browser_download_url");
-                                break;
+                    JSONArray releasesArray = new JSONArray(sb.toString());
+                    if (releasesArray.length() > 0) {
+                        JSONObject json = releasesArray.getJSONObject(0); // Index 0 is absolute latest release or pre-release
+                        if (json.has("tag_name")) {
+                            latestTagName = json.getString("tag_name").replace("v", "").trim();
+                        }
+                        if (json.has("body") && !json.getString("body").trim().isEmpty()) {
+                            releaseBody = json.getString("body");
+                        }
+                        if (json.has("assets")) {
+                            JSONArray assets = json.getJSONArray("assets");
+                            for (int i = 0; i < assets.length(); i++) {
+                                JSONObject asset = assets.getJSONObject(i);
+                                if (asset.has("name") && asset.getString("name").contains("app-release") && asset.has("browser_download_url")) {
+                                    downloadUrl = asset.getString("browser_download_url");
+                                    break;
+                                }
                             }
                         }
                     }
