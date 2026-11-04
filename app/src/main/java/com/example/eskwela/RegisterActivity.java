@@ -25,7 +25,8 @@ public class RegisterActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
-    private EditText etEmail, etPassword, etConfirmPassword;
+    private EditText etFullName, etEmail, etPassword, etConfirmPassword;
+    private Button btnCreateAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,22 +47,28 @@ public class RegisterActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         // Bind Views
+        etFullName = findViewById(R.id.etFullName);
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
-        Button btnCreateAccount = findViewById(R.id.btnCreateAccount);
+        btnCreateAccount = findViewById(R.id.btnCreateAccount);
         TextView tvLoginLink = findViewById(R.id.tvLoginLink);
 
         // Trigger Animations
         setupAnimations();
 
         btnCreateAccount.setOnClickListener(v -> {
+            String fullName = etFullName != null ? etFullName.getText().toString().trim() : "";
             String email = etEmail.getText().toString().trim();
             String password = etPassword.getText().toString().trim();
             String confirmPassword = etConfirmPassword.getText().toString().trim();
 
-            if (email.isEmpty() || password.isEmpty()) {
+            if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
                 Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (password.length() < 6) {
+                Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
                 return;
             }
             if (!password.equals(confirmPassword)) {
@@ -69,32 +76,47 @@ public class RegisterActivity extends AppCompatActivity {
                 return;
             }
 
+            btnCreateAccount.setEnabled(false);
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, task -> {
+                        if (isFinishing()) return;
                         if (task.isSuccessful()) {
+                            if (mAuth.getCurrentUser() == null) {
+                                btnCreateAccount.setEnabled(true);
+                                Toast.makeText(RegisterActivity.this, "Account created, but session is missing. Please log in.", Toast.LENGTH_LONG).show();
+                                return;
+                            }
                             String userId = mAuth.getCurrentUser().getUid();
-
-                            String uniqueSuffix = userId.substring(0, 4).toUpperCase();
+                            String uniqueSuffix = userId.length() >= 4 ? userId.substring(0, 4).toUpperCase() : userId.toUpperCase();
                             String generatedId = "STU-" + uniqueSuffix;
 
                             Map<String, Object> initialData = new HashMap<>();
                             initialData.put("studentId", generatedId);
                             initialData.put("email", email);
+                            initialData.put("fullName", fullName);
+                            initialData.put("status", "active");
 
                             db.collection("users").document(userId).set(initialData)
                                     .addOnSuccessListener(aVoid -> {
                                         Toast.makeText(RegisterActivity.this, "Account Created!", Toast.LENGTH_SHORT).show();
                                         Intent intent = new Intent(RegisterActivity.this, ProfileSetupActivity.class);
+                                        intent.putExtra("fullName", fullName);
                                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                         startActivity(intent);
                                         finish();
                                     })
                                     .addOnFailureListener(e -> {
-                                        Toast.makeText(RegisterActivity.this, "Failed to save ID: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                        btnCreateAccount.setEnabled(true);
+                                        Toast.makeText(RegisterActivity.this, "Failed to save profile: " + e.getMessage(), Toast.LENGTH_LONG).show();
                                     });
 
                         } else {
-                            Toast.makeText(RegisterActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                            btnCreateAccount.setEnabled(true);
+                            Exception exception = task.getException();
+                            String message = exception != null && exception.getMessage() != null
+                                    ? exception.getMessage()
+                                    : "Could not create account.";
+                            Toast.makeText(RegisterActivity.this, "Error: " + message, Toast.LENGTH_LONG).show();
                         }
                     });
         });

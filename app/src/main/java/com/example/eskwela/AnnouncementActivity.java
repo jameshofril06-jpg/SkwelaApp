@@ -1,9 +1,14 @@
 package com.example.eskwela;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -12,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -21,7 +27,8 @@ public class AnnouncementActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private RecyclerView rvAnnouncements;
-    private List<String> announcementList = new ArrayList<>();
+    private final List<String> announcementList = new ArrayList<>();
+    private AnnouncementAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,53 +50,82 @@ public class AnnouncementActivity extends AppCompatActivity {
 
         ivBack.setOnClickListener(v -> finish());
 
+        adapter = new AnnouncementAdapter(announcementList);
         rvAnnouncements.setLayoutManager(new LinearLayoutManager(this));
+        rvAnnouncements.setAdapter(adapter);
         loadAnnouncements();
     }
 
     private void loadAnnouncements() {
         db.collection("announcements")
+                .orderBy("postedAt", Query.Direction.DESCENDING)
                 .get()
                 .addOnCompleteListener(task -> {
+                    if (isFinishing()) return;
                     if (task.isSuccessful()) {
-                        announcementList.clear();
-                        for (QueryDocumentSnapshot doc : task.getResult()) {
-                            String message = doc.getString("message");
-                            if (message != null) {
-                                announcementList.add(message);
+                        bindAnnouncements(task.getResult());
+                    } else {
+                        db.collection("announcements").get().addOnCompleteListener(fallback -> {
+                            if (isFinishing()) return;
+                            if (fallback.isSuccessful()) {
+                                bindAnnouncements(fallback.getResult());
+                            } else {
+                                announcementList.clear();
+                                announcementList.add("Welcome to ESKWELA! Stay tuned for official school announcements and updates.");
+                                adapter.notifyDataSetChanged();
                             }
-                        }
-                        if (announcementList.isEmpty()) {
-                            announcementList.add("Welcome to ESKWELA! Stay tuned for official school announcements and updates.");
-                        }
-                        android.widget.ArrayAdapter<String> adapter = new android.widget.ArrayAdapter<>(this, android.R.layout.simple_list_item_1, announcementList);
-                        rvAnnouncements.setAdapter(new RecyclerViewAdapterWrapper(adapter));
+                        });
                     }
                 });
     }
 
-    // Simple adapter wrapper for ArrayAdapter in RecyclerView
-    private static class RecyclerViewAdapterWrapper extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-        private final android.widget.ArrayAdapter<String> arrayAdapter;
+    private void bindAnnouncements(com.google.firebase.firestore.QuerySnapshot result) {
+        announcementList.clear();
+        for (QueryDocumentSnapshot doc : result) {
+            String message = doc.getString("message");
+            if (message != null && !message.isEmpty()) {
+                announcementList.add(message);
+            }
+        }
+        if (announcementList.isEmpty()) {
+            announcementList.add("Welcome to ESKWELA! Stay tuned for official school announcements and updates.");
+        }
+        adapter.notifyDataSetChanged();
+    }
 
-        public RecyclerViewAdapterWrapper(android.widget.ArrayAdapter<String> arrayAdapter) {
-            this.arrayAdapter = arrayAdapter;
+    private static class AnnouncementAdapter extends RecyclerView.Adapter<AnnouncementAdapter.Holder> {
+        private final List<String> items;
+
+        AnnouncementAdapter(List<String> items) {
+            this.items = items;
+        }
+
+        @NonNull
+        @Override
+        public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(android.R.layout.simple_list_item_1, parent, false);
+            return new Holder(view);
         }
 
         @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(android.view.ViewGroup parent, int viewType) {
-            android.view.View view = arrayAdapter.getView(0, null, parent);
-            return new RecyclerView.ViewHolder(view) {};
-        }
-
-        @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-            // bound via getView
+        public void onBindViewHolder(@NonNull Holder holder, int position) {
+            holder.text.setText(items.get(position));
+            holder.text.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.text_primary, null));
         }
 
         @Override
         public int getItemCount() {
-            return arrayAdapter.getCount();
+            return items.size();
+        }
+
+        static class Holder extends RecyclerView.ViewHolder {
+            final TextView text;
+
+            Holder(@NonNull View itemView) {
+                super(itemView);
+                text = itemView.findViewById(android.R.id.text1);
+            }
         }
     }
 }

@@ -66,33 +66,159 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <!-- Presets Row (2, 5, 10, 15, 25, 45, 60 minutes) -->
+                <HorizontalScrollView
+                    android:id="@+id/scrollTimerPresets"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:scrollbars="none"
+                    app:layout_constraintTop_toBottomOf="@+id/tvFocusLabel">
+
+                    <LinearLayout
+                        android:id="@+id/layoutTimerPresets"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/btnPreset2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_pill_translucent"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="4dp"
+                            android:text="2m"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/btnPreset5"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_pill_translucent"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="4dp"
+                            android:text="5m"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/btnPreset10"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_pill_translucent"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="4dp"
+                            android:text="10m"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/btnPreset15"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_pill_translucent"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="4dp"
+                            android:text="15m"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/btnPreset25"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_pill_translucent"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="4dp"
+                            android:text="25m"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/btnPreset45"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_pill_translucent"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="4dp"
+                            android:text="45m"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/btnPreset60"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_pill_translucent"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="4dp"
+                            android:text="60m"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </HorizontalScrollView>
+
                 <TextView
                     android:id="@+id/tvTimer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="12dp"
                     android:text="25:00"
                     android:textColor="@color/white"
-                    android:textSize="56sp"
+                    android:textSize="52sp"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tvFocusLabel" />
+                    app:layout_constraintTop_toBottomOf="@+id/scrollTimerPresets" />
 
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btnStartFocus"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_marginTop="24dp"
-                    android:background="@drawable/bg_button_orange"
-                    android:text="Start focus"
-                    android:textAllCaps="false"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tvTimer" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:orientation="horizontal"
+                    app:layout_constraintTop_toBottomOf="@+id/tvTimer">
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnStartFocus"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_weight="2"
+                        android:background="@drawable/bg_button_orange"
+                        android:text="Start focus"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnResetFocus"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_button_white"
+                        android:text="Reset"
+                        android:textAllCaps="false"
+                        android:textColor="#0F172A"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <!-- AI & Notes Cards Row -->
@@ -207,79 +333,57 @@
                 </androidx.cardview.widget.CardView>
             </LinearLayout>
 
-            <!-- Recent Quizzes Header -->
+            <!-- Leaderboard Header -->
             <RelativeLayout
+                android:id="@+id/layoutLeaderboardHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp">
+                android:layout_marginTop="20dp">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Recent quizzes"
+                    android:text="🏆 Student Quiz Leaderboard"
                     android:textColor="@color/text_primary"
                     android:textSize="18sp"
                     android:textStyle="bold" />
                 <TextView
+                    android:id="@+id/tvTakeQuizLeaderboard"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:text="History"
+                    android:text="Take AI Quiz ➔"
                     android:textColor="@color/eskwela_text_blue"
-                    android:textSize="14sp"
+                    android:textSize="13sp"
                     android:textStyle="bold" />
             </RelativeLayout>
 
-            <!-- Recent Quiz Item -->
+            <!-- Live Leaderboard Card -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardStudyLeaderboard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="12dp"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:cardUseCompatPadding="true">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="16dp">
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
                     <TextView
-                        android:id="@+id/tvQuizTitle"
-                        android:layout_width="0dp"
+                        android:id="@+id/tvLeaderboardScores"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Biology: Cell Structure"
+                        android:lineSpacingExtra="6dp"
+                        android:text="Loading leaderboard scores..."
                         android:textColor="@color/text_primary"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        app:layout_constraintEnd_toStartOf="@+id/tvQuizScore"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/tvQuizDate"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="10 questions · Yesterday"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/tvQuizTitle" />
-
-                    <TextView
-                        android:id="@+id/tvQuizScore"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="8/10"
-                        android:textColor="@color/eskwela_text_blue"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        android:textSize="14sp" />
+                </LinearLayout>
             </androidx.cardview.widget.CardView>
 
         </LinearLayout>

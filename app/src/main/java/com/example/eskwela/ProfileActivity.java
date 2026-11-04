@@ -42,9 +42,6 @@ public class ProfileActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        // Load User Data
-        loadProfileData();
-
         // Setup Logout Button
         Button btnLogout = findViewById(R.id.btnLogout);
         btnLogout.setOnClickListener(v -> {
@@ -53,10 +50,19 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         // Setup Menu Row Click Listeners
-        findViewById(R.id.rowEditProfile).setOnClickListener(v -> startActivity(new Intent(ProfileActivity.this, ProfileSetupActivity.class)));
-        findViewById(R.id.rowReminders).setOnClickListener(v -> startActivity(new Intent(ProfileActivity.this, NotificationsActivity.class)));
+        findViewById(R.id.rowEditProfile).setOnClickListener(v -> {
+            Intent intent = new Intent(ProfileActivity.this, ProfileSetupActivity.class);
+            intent.putExtra("EDIT_MODE", true);
+            startActivity(intent);
+        });
+        findViewById(R.id.rowReminders).setOnClickListener(v -> {
+            Intent intent = new Intent(ProfileActivity.this, NotificationsActivity.class);
+            intent.putExtra("FROM_PROFILE", true);
+            startActivity(intent);
+        });
         findViewById(R.id.rowSecurity).setOnClickListener(v -> showAccountSecurityDialog());
         findViewById(R.id.rowUpdate).setOnClickListener(v -> UpdateHelper.downloadAndInstallUpdate(this));
+        findViewById(R.id.rowAboutApp).setOnClickListener(v -> showAboutAppDialog());
 
         // Setup Online Sync Toggle
         SwitchMaterial switchSync = findViewById(R.id.switchOnlineSync);
@@ -116,6 +122,33 @@ public class ProfileActivity extends AppCompatActivity {
 
 
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadProfileData();
+    }
+
+    private void showAboutAppDialog() {
+        String aboutMsg = "🎓 ESKWELA v1.0.5\n\n" +
+                "Smart Student Productivity & Academic Management System designed for students and academic administrators.\n\n" +
+                "🚀 What's New & Changelog (v1.0.5):\n" +
+                "• 🌙 Dark Mode Profile Text Contrast: Fixed text colors for high-contrast visibility when editing profiles in Dark Mode.\n" +
+                "• 🔍 Intelligent OTA Version Detection: Automatically detects if you are already on the latest version (v1.0.5).\n" +
+                "• ⚠️ Time Schedule Conflict Detection: Automatically checks for overlapping class times when adding schedules.\n" +
+                "• 📦 Live Download Progress Bar: Real-time percentage tracking when downloading OTA updates.\n" +
+                "• 📷 OCR Study Load Document Scanner & Auto-Plotter across weekdays.\n" +
+                "• 🤖 Smart AI Quizzes & Ranking Leaderboard.\n" +
+                "• 🛡️ Admin Control Center with user moderation.\n" +
+                "• 📝 Task Drop Confirmation with Reason & Class Deletion Code Validation.\n\n" +
+                "© 2025 ESKWELA Team. All rights reserved.";
+
+        new AlertDialog.Builder(this)
+                .setTitle("About ESKWELA & Changelog")
+                .setMessage(aboutMsg)
+                .setPositiveButton("Close", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
     private void showAccountSecurityDialog() {
         String email = mAuth.getCurrentUser() != null ? mAuth.getCurrentUser().getEmail() : "N/A";
         new AlertDialog.Builder(this)
@@ -164,25 +197,16 @@ public class ProfileActivity extends AppCompatActivity {
         bottomNav.setSelectedItemId(R.id.nav_profile);
 
         bottomNav.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
+            int targetIndex = NavigationHelper.getTabIndex(item.getItemId());
+            Class<?> targetClass = null;
+            if (targetIndex == 4) return true;
+            if (targetIndex == 0) targetClass = DashboardActivity.class;
+            else if (targetIndex == 1) targetClass = MyScheduleActivity.class;
+            else if (targetIndex == 2) targetClass = TasksActivity.class;
+            else if (targetIndex == 3) targetClass = StudyActivity.class;
 
-            if (itemId == R.id.nav_home) {
-                startActivity(new Intent(ProfileActivity.this, DashboardActivity.class));
-                finish();
-                return true;
-            } else if (itemId == R.id.nav_schedule) {
-                startActivity(new Intent(ProfileActivity.this, MyScheduleActivity.class));
-                finish();
-                return true;
-            } else if (itemId == R.id.nav_tasks) {
-                startActivity(new Intent(ProfileActivity.this, TasksActivity.class));
-                finish();
-                return true;
-            } else if (itemId == R.id.nav_study) {
-                startActivity(new Intent(ProfileActivity.this, StudyActivity.class));
-                finish();
-                return true;
-            } else if (itemId == R.id.nav_profile) {
+            if (targetClass != null) {
+                NavigationHelper.navigateWithTabAnimation(this, 4, targetIndex, targetClass);
                 return true;
             }
             return false;
@@ -201,17 +225,18 @@ public class ProfileActivity extends AppCompatActivity {
             String userId = mAuth.getCurrentUser().getUid();
             String email = mAuth.getCurrentUser().getEmail();
 
-            // Check admin email immediately
-            if (email != null && (email.toLowerCase().contains("admin") || email.equals("admin@eskwela.com"))) {
-                View cardAdmin = findViewById(R.id.cardAdminCenter);
-                if (cardAdmin != null) {
-                    cardAdmin.setVisibility(View.VISIBLE);
-                }
+            View cardAdmin = findViewById(R.id.cardAdminCenter);
+            if (cardAdmin != null) {
+                cardAdmin.setVisibility(View.GONE);
             }
 
             // 1. Fetch User Profile Data
             db.collection("users").document(userId).get()
                     .addOnSuccessListener(documentSnapshot -> {
+                        if (isFinishing()) return;
+                        if (AccountGuard.blockIfRestricted(ProfileActivity.this, mAuth, documentSnapshot)) {
+                            return;
+                        }
                         if (documentSnapshot.exists()) {
                             String fullName = documentSnapshot.getString("fullName");
                             String course = documentSnapshot.getString("course");
@@ -245,20 +270,20 @@ public class ProfileActivity extends AppCompatActivity {
                                 tvStudentId.setText("ID: " + studentId);
                             }
 
-                            if ("admin".equals(role) || (email != null && (email.toLowerCase().contains("admin") || email.equals("admin@eskwela.com")))) {
-                                View cardAdmin = findViewById(R.id.cardAdminCenter);
-                                if (cardAdmin != null) {
-                                    cardAdmin.setVisibility(View.VISIBLE);
-                                }
+                            if (AccountGuard.isAdmin(email, role) && cardAdmin != null) {
+                                cardAdmin.setVisibility(View.VISIBLE);
                             }
                         }
                     });
 
             // 2. Fetch Dynamic Storage Info
             db.collection("schedules").whereEqualTo("userId", userId).get()
-                    .addOnSuccessListener(queryDocumentSnapshots -> {
-                        int classCount = queryDocumentSnapshots.size();
-                        tvStorageDetails.setText(classCount + " classes · 0 tasks · 0 saved quizzes");
+                    .addOnSuccessListener(scheduleSnap -> {
+                        db.collection("tasks").whereEqualTo("userId", userId).get()
+                                .addOnSuccessListener(taskSnap -> {
+                                    if (isFinishing() || tvStorageDetails == null) return;
+                                    tvStorageDetails.setText(scheduleSnap.size() + " classes · " + taskSnap.size() + " tasks");
+                                });
                     });
         }
     }

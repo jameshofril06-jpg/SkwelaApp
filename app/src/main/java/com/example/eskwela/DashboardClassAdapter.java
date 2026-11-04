@@ -42,8 +42,7 @@ public class DashboardClassAdapter extends RecyclerView.Adapter<DashboardClassAd
         if ("ORANGE".equals(item.colorType)) {
             holder.dotView.setBackgroundResource(R.drawable.bg_dot_orange);
         } else if ("GREEN".equals(item.colorType)) {
-            // Assuming you might have a green dot drawable, otherwise default to blue
-            holder.dotView.setBackgroundResource(R.drawable.bg_dot_blue);
+            holder.dotView.setBackgroundResource(R.drawable.bg_dot_green);
         } else {
             holder.dotView.setBackgroundResource(R.drawable.bg_dot_blue);
         }

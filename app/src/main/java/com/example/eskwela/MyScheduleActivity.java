@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -70,9 +72,84 @@ public class MyScheduleActivity extends AppCompatActivity implements ScheduleCar
         adapter = new ScheduleCardAdapter(dailyList, this); // Pass 'this' for delete listener
         rvDailySchedule.setAdapter(adapter);
 
+        View cardScanBanner = findViewById(R.id.cardScanStudyLoadBanner);
+        if (cardScanBanner != null) {
+            cardScanBanner.setOnClickListener(v -> startActivity(new Intent(MyScheduleActivity.this, ScheduleActivity.class)));
+        }
+        View btnScanTrigger = findViewById(R.id.btnScanStudyLoadTrigger);
+        if (btnScanTrigger != null) {
+            btnScanTrigger.setOnClickListener(v -> startActivity(new Intent(MyScheduleActivity.this, ScheduleActivity.class)));
+        }
+
+        setupViewToggles();
         generateRealTimeDates();
         setupAddButton();
         setupBottomNavigation();
+    }
+
+    private void setupViewToggles() {
+        TextView tabDay = findViewById(R.id.tabScheduleDay);
+        TextView tabWeek = findViewById(R.id.tabScheduleWeek);
+        TextView tabMonth = findViewById(R.id.tabScheduleMonth);
+
+        if (tabDay != null) {
+            tabDay.setOnClickListener(v -> {
+                tabDay.setBackgroundResource(R.drawable.bg_segment_active);
+                tabDay.setTextColor(0xFF1D4ED8);
+                tabDay.setTypeface(null, android.graphics.Typeface.BOLD);
+                if (tabWeek != null) { tabWeek.setBackgroundColor(0); tabWeek.setTextColor(ContextCompat.getColor(this, R.color.text_secondary)); tabWeek.setTypeface(null, android.graphics.Typeface.NORMAL); }
+                if (tabMonth != null) { tabMonth.setBackgroundColor(0); tabMonth.setTextColor(ContextCompat.getColor(this, R.color.text_secondary)); tabMonth.setTypeface(null, android.graphics.Typeface.NORMAL); }
+                fetchScheduleForDate(selectedDateString);
+            });
+        }
+
+        if (tabWeek != null) {
+            tabWeek.setOnClickListener(v -> {
+                tabWeek.setBackgroundResource(R.drawable.bg_segment_active);
+                tabWeek.setTextColor(0xFF1D4ED8);
+                tabWeek.setTypeface(null, android.graphics.Typeface.BOLD);
+                if (tabDay != null) { tabDay.setBackgroundColor(0); tabDay.setTextColor(ContextCompat.getColor(this, R.color.text_secondary)); tabDay.setTypeface(null, android.graphics.Typeface.NORMAL); }
+                if (tabMonth != null) { tabMonth.setBackgroundColor(0); tabMonth.setTextColor(ContextCompat.getColor(this, R.color.text_secondary)); tabMonth.setTypeface(null, android.graphics.Typeface.NORMAL); }
+                fetchAllSchedulesForWeek();
+            });
+        }
+
+        if (tabMonth != null) {
+            tabMonth.setOnClickListener(v -> {
+                tabMonth.setBackgroundResource(R.drawable.bg_segment_active);
+                tabMonth.setTextColor(0xFF1D4ED8);
+                tabMonth.setTypeface(null, android.graphics.Typeface.BOLD);
+                if (tabDay != null) { tabDay.setBackgroundColor(0); tabDay.setTextColor(ContextCompat.getColor(this, R.color.text_secondary)); tabDay.setTypeface(null, android.graphics.Typeface.NORMAL); }
+                if (tabWeek != null) { tabWeek.setBackgroundColor(0); tabWeek.setTextColor(ContextCompat.getColor(this, R.color.text_secondary)); tabWeek.setTypeface(null, android.graphics.Typeface.NORMAL); }
+                fetchAllSchedulesForMonth();
+            });
+        }
+    }
+
+    private void fetchAllSchedulesForWeek() {
+        if (mAuth.getCurrentUser() == null) return;
+        String userId = mAuth.getCurrentUser().getUid();
+
+        db.collection("schedules")
+                .whereEqualTo("userId", userId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        dailyList.clear();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            ScheduleCardAdapter.ScheduleItem item = document.toObject(ScheduleCardAdapter.ScheduleItem.class);
+                            item.id = document.getId();
+                            dailyList.add(item);
+                        }
+                        adapter.notifyDataSetChanged();
+                        tvEmptyState.setVisibility(dailyList.isEmpty() ? View.VISIBLE : View.GONE);
+                        tvSubtitle.setText("All Week Classes (" + dailyList.size() + ")");
+                    }
+                });
+    }
+
+    private void fetchAllSchedulesForMonth() {
+        fetchAllSchedulesForWeek();
     }
 
     private void generateRealTimeDates() {
@@ -88,11 +165,7 @@ public class MyScheduleActivity extends AppCompatActivity implements ScheduleCar
 
         String startOfWeek = subtitleFormat.format(cal.getTime());
 
-        // Default to today's date, but if today is Sunday, default to Monday
         Calendar todayCal = Calendar.getInstance();
-        if (todayCal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
-            todayCal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        }
         selectedDateString = dbFormat.format(todayCal.getTime());
 
         // Loop for 7 days (Mon - Sun)
@@ -160,8 +233,8 @@ public class MyScheduleActivity extends AppCompatActivity implements ScheduleCar
 
     private void styleUnselectedDate(LinearLayout layout, TextView day, TextView num) {
         layout.setBackgroundColor(android.graphics.Color.TRANSPARENT);
-        day.setTextColor(android.graphics.Color.parseColor("#94A3B8"));
-        num.setTextColor(android.graphics.Color.parseColor("#0F172A"));
+        day.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        num.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
     }
 
     private void fetchScheduleForDate(String date) {
@@ -187,24 +260,57 @@ public class MyScheduleActivity extends AppCompatActivity implements ScheduleCar
                 });
     }
 
-    // Handle long press to delete
+    // Handle long press to delete with professional validation
     @Override
     public void onScheduleLongClick(ScheduleCardAdapter.ScheduleItem item, int position) {
-        new AlertDialog.Builder(this)
-                .setTitle("Delete Class")
-                .setMessage("Are you sure you want to delete " + item.className + "?")
-                .setPositiveButton("Delete", (dialog, which) -> {
-                    db.collection("schedules").document(item.id).delete()
-                            .addOnSuccessListener(aVoid -> {
-                                dailyList.remove(position);
-                                adapter.notifyItemRemoved(position);
-                                adapter.notifyItemRangeChanged(position, dailyList.size());
-                                tvEmptyState.setVisibility(dailyList.isEmpty() ? View.VISIBLE : View.GONE);
-                                Toast.makeText(this, "Class deleted", Toast.LENGTH_SHORT).show();
-                            });
-                })
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        layout.setPadding(48, 24, 48, 24);
+
+        TextView tvWarning = new TextView(this);
+        String code = item.classCode != null && !item.classCode.isEmpty() ? item.classCode : "CONFIRM";
+        tvWarning.setText("⚠️ Warning: Removing " + (item.className != null ? item.className : "this class") + " (" + code + ") is permanent.\n\nPlease type the Class Code (" + code + ") below to confirm deletion:");
+        tvWarning.setTextColor(0xFF0F172A);
+        tvWarning.setTextSize(14f);
+        layout.addView(tvWarning);
+
+        EditText etConfirm = new EditText(this);
+        etConfirm.setHint("Type class code (" + code + ") to confirm...");
+        etConfirm.setPadding(24, 24, 24, 24);
+        layout.addView(etConfirm);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Professional Class Deletion")
+                .setView(layout)
+                .setPositiveButton("Confirm Delete", null)
                 .setNegativeButton("Cancel", null)
-                .show();
+                .create();
+
+        dialog.setOnShowListener(d -> {
+            Button positiveBtn = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            positiveBtn.setOnClickListener(v -> {
+                String input = etConfirm.getText().toString().trim();
+                String expectedCode = code.trim();
+
+                if (!input.equalsIgnoreCase(expectedCode)) {
+                    Toast.makeText(this, "Validation failed: Entered code does not match (" + expectedCode + ")", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                dialog.dismiss();
+                db.collection("schedules").document(item.id).delete()
+                        .addOnSuccessListener(aVoid -> {
+                            dailyList.remove(position);
+                            adapter.notifyItemRemoved(position);
+                            adapter.notifyItemRangeChanged(position, dailyList.size());
+                            tvEmptyState.setVisibility(dailyList.isEmpty() ? View.VISIBLE : View.GONE);
+                            Toast.makeText(this, "Class successfully removed from schedule", Toast.LENGTH_SHORT).show();
+                        })
+                        .addOnFailureListener(e -> Toast.makeText(this, "Error deleting class: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+            });
+        });
+
+        dialog.show();
     }
 
     private void setupAddButton() {
@@ -227,25 +333,16 @@ public class MyScheduleActivity extends AppCompatActivity implements ScheduleCar
         bottomNav.setSelectedItemId(R.id.nav_schedule);
 
         bottomNav.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.nav_home) {
-                startActivity(new Intent(MyScheduleActivity.this, DashboardActivity.class));
-                finish();
-                return true;
-            } else if (itemId == R.id.nav_schedule) {
-                return true;
-            } else if (itemId == R.id.nav_tasks) {
-                startActivity(new Intent(MyScheduleActivity.this, TasksActivity.class));
-                finish();
-                return true;
-            } else if (itemId == R.id.nav_study) {
-                // FIXED: Now directs to StudyActivity
-                startActivity(new Intent(MyScheduleActivity.this, StudyActivity.class));
-                finish();
-                return true;
-            } else if (itemId == R.id.nav_profile) {
-                startActivity(new Intent(MyScheduleActivity.this, ProfileActivity.class));
-                finish();
+            int targetIndex = NavigationHelper.getTabIndex(item.getItemId());
+            Class<?> targetClass = null;
+            if (targetIndex == 1) return true;
+            if (targetIndex == 0) targetClass = DashboardActivity.class;
+            else if (targetIndex == 2) targetClass = TasksActivity.class;
+            else if (targetIndex == 3) targetClass = StudyActivity.class;
+            else if (targetIndex == 4) targetClass = ProfileActivity.class;
+
+            if (targetClass != null) {
+                NavigationHelper.navigateWithTabAnimation(this, 1, targetIndex, targetClass);
                 return true;
             }
             return false;

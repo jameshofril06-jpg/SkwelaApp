@@ -34,10 +34,14 @@ public class ScheduleCardAdapter extends RecyclerView.Adapter<ScheduleCardAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ScheduleItem item = scheduleList.get(position);
-        holder.tvTitle.setText(item.className);
-        holder.tvTime.setText(item.startTime + " - " + item.endTime + " · " + item.room);
+        holder.tvTitle.setText(item.className != null ? item.className : "Untitled class");
+        String start = item.startTime != null ? item.startTime : "";
+        String end = item.endTime != null ? item.endTime : "";
+        String room = item.room != null ? item.room : "";
+        holder.tvTime.setText((start + " - " + end + " · " + room).replace(" -  · ", " · ").trim());
 
-        switch (item.colorType) {
+        String colorType = item.colorType != null ? item.colorType : "BLUE";
+        switch (colorType) {
             case "ORANGE":
                 holder.itemView.setBackgroundResource(R.drawable.bg_schedule_orange);
                 holder.viewColorBar.setBackgroundColor(0xFFF59E0B);
@@ -55,8 +59,9 @@ public class ScheduleCardAdapter extends RecyclerView.Adapter<ScheduleCardAdapte
 
         // Set Long Click Listener for deletion
         holder.itemView.setOnLongClickListener(v -> {
-            if (longClickListener != null) {
-                longClickListener.onScheduleLongClick(item, position);
+            int adapterPosition = holder.getBindingAdapterPosition();
+            if (longClickListener != null && adapterPosition != RecyclerView.NO_POSITION) {
+                longClickListener.onScheduleLongClick(scheduleList.get(adapterPosition), adapterPosition);
             }
             return true;
         });

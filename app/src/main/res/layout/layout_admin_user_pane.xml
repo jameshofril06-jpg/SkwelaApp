@@ -18,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="User Name"
-        android:textColor="#0F172A"
+        android:textColor="@color/text_primary"
         android:textSize="20sp"
         android:textStyle="bold" />
 
@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text="email@example.com · STU-1234"
-        android:textColor="#64748B"
+        android:textColor="@color/text_secondary"
         android:textSize="14sp" />
 
     <TextView
@@ -54,7 +54,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="ADMIN ACTIONS"
-        android:textColor="#94A3B8"
+        android:textColor="@color/text_secondary"
         android:textSize="12sp"
         android:textStyle="bold" />
 
@@ -80,7 +80,7 @@
         android:background="@drawable/bg_button_white"
         android:text="Deactivate Account"
         android:textAllCaps="false"
-        android:textColor="#0F172A"
+        android:textColor="@color/text_primary"
         android:textSize="15sp"
         android:textStyle="bold" />
 

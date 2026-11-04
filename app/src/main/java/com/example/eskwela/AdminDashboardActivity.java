@@ -1,7 +1,12 @@
 package com.example.eskwela;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -29,8 +35,10 @@ public class AdminDashboardActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private TextView tvTotalUsers, tvTotalSchedules;
     private RecyclerView rvAdminUsers;
+    private EditText etSearchUsers;
     private AdminUserAdapter userAdapter;
     private List<AdminUserAdapter.UserItem> userList = new ArrayList<>();
+    private List<AdminUserAdapter.UserItem> allUserList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,10 +55,32 @@ public class AdminDashboardActivity extends AppCompatActivity {
         });
 
         db = FirebaseFirestore.getInstance();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        if (auth.getCurrentUser() == null) {
+            AccountGuard.goLogin(this);
+            return;
+        }
+        String adminEmail = auth.getCurrentUser().getEmail();
+        db.collection("users").document(auth.getCurrentUser().getUid()).get()
+                .addOnSuccessListener(doc -> {
+                    if (isFinishing()) return;
+                    String role = doc.getString("role");
+                    if (!AccountGuard.isAdmin(adminEmail, role)) {
+                        Toast.makeText(this, "Admin access only", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    if (!AccountGuard.isAdmin(adminEmail, null)) {
+                        Toast.makeText(this, "Admin access only", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                });
 
         tvTotalUsers = findViewById(R.id.tvTotalUsers);
         tvTotalSchedules = findViewById(R.id.tvTotalSchedules);
         rvAdminUsers = findViewById(R.id.rvAdminUsers);
+        etSearchUsers = findViewById(R.id.etSearchUsers);
         ImageView ivBack = findViewById(R.id.ivBack);
 
         ivBack.setOnClickListener(v -> finish());
@@ -59,16 +89,68 @@ public class AdminDashboardActivity extends AppCompatActivity {
         userAdapter = new AdminUserAdapter(userList, this::showUserActionDialog);
         rvAdminUsers.setAdapter(userAdapter);
 
-        android.view.View btnPostAnn = findViewById(R.id.btnAdminPostAnnouncement);
+        if (etSearchUsers != null) {
+            etSearchUsers.addTextChangedListener(new TextWatcher() {
+                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    filterUserList(s.toString().trim());
+                }
+                @Override public void afterTextChanged(Editable s) {}
+            });
+        }
+
+        View btnPostAnn = findViewById(R.id.btnAdminPostAnnouncement);
         if (btnPostAnn != null) {
             btnPostAnn.setOnClickListener(v -> showPostAnnouncementDialog());
         }
 
+        setupEntranceAnimations();
         loadAdminData();
     }
 
+    private void setupEntranceAnimations() {
+        View cardStats = findViewById(R.id.cardStats);
+        View cardPost = findViewById(R.id.cardPostAnnouncement);
+        View headerUsers = findViewById(R.id.tvUsersHeader);
+
+        View[] viewsToAnimate = {cardStats, cardPost, headerUsers, etSearchUsers, rvAdminUsers};
+        long delay = 100;
+        for (View v : viewsToAnimate) {
+            if (v != null) {
+                v.setAlpha(0f);
+                v.setTranslationY(40f);
+                v.animate()
+                        .alpha(1f)
+                        .translationY(0f)
+                        .setDuration(500)
+                        .setStartDelay(delay)
+                        .setInterpolator(new DecelerateInterpolator())
+                        .start();
+                delay += 80;
+            }
+        }
+    }
+
+    private void filterUserList(String query) {
+        userList.clear();
+        if (query.isEmpty()) {
+            userList.addAll(allUserList);
+        } else {
+            String lowerQuery = query.toLowerCase();
+            for (AdminUserAdapter.UserItem item : allUserList) {
+                boolean matchName = item.fullName != null && item.fullName.toLowerCase().contains(lowerQuery);
+                boolean matchEmail = item.email != null && item.email.toLowerCase().contains(lowerQuery);
+                boolean matchId = item.studentId != null && item.studentId.toLowerCase().contains(lowerQuery);
+                if (matchName || matchEmail || matchId) {
+                    userList.add(item);
+                }
+            }
+        }
+        userAdapter.notifyDataSetChanged();
+    }
+
     private void showPostAnnouncementDialog() {
-        android.widget.EditText etMessage = new android.widget.EditText(this);
+        EditText etMessage = new EditText(this);
         etMessage.setHint("Type official announcement message...");
         etMessage.setPadding(32, 32, 32, 32);
 
@@ -97,14 +179,14 @@ public class AdminDashboardActivity extends AppCompatActivity {
         db.collection("users").get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        userList.clear();
+                        allUserList.clear();
                         for (QueryDocumentSnapshot doc : task.getResult()) {
                             AdminUserAdapter.UserItem item = doc.toObject(AdminUserAdapter.UserItem.class);
                             item.id = doc.getId();
-                            userList.add(item);
+                            allUserList.add(item);
                         }
-                        userAdapter.notifyDataSetChanged();
-                        tvTotalUsers.setText(String.valueOf(userList.size()));
+                        tvTotalUsers.setText(String.valueOf(allUserList.size()));
+                        filterUserList(etSearchUsers != null ? etSearchUsers.getText().toString().trim() : "");
                     } else {
                         Toast.makeText(this, "Failed to load users", Toast.LENGTH_SHORT).show();
                     }
@@ -125,7 +207,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         String currentStatus = user.status != null ? user.status : "active";
 
         BottomSheetDialog bottomSheet = new BottomSheetDialog(this);
-        android.view.View paneView = getLayoutInflater().inflate(R.layout.layout_admin_user_pane, null);
+        View paneView = getLayoutInflater().inflate(R.layout.layout_admin_user_pane, null);
         bottomSheet.setContentView(paneView);
 
         TextView tvName = paneView.findViewById(R.id.tvPaneUserName);

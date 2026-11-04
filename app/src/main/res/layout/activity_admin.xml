@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:text="Admin Control Center"
             android:textColor="@color/text_primary"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -200,7 +200,7 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Users List Section Header -->
+            <!-- Users Section Header & Search Field -->
             <TextView
                 android:id="@+id/tvUsersHeader"
                 android:layout_width="wrap_content"
@@ -213,6 +213,22 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/cardPostAnnouncement" />
 
+            <EditText
+                android:id="@+id/etSearchUsers"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_input_field"
+                android:hint="Search student by name, email, ID..."
+                android:inputType="text"
+                android:paddingHorizontal="12dp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary"
+                android:textSize="13sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvUsersHeader" />
+
             <!-- RecyclerView for Users -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvAdminUsers"
@@ -222,7 +238,7 @@
                 android:nestedScrollingEnabled="false"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvUsersHeader"
+                app:layout_constraintTop_toBottomOf="@+id/etSearchUsers"
                 tools:itemCount="3"
                 tools:listitem="@layout/item_admin_user" />
 

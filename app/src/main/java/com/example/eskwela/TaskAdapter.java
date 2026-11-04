@@ -38,10 +38,23 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         TaskItem task = taskList.get(position);
 
-        holder.tvName.setText(task.title);
-        holder.tvDate.setText(task.dateString);
+        holder.tvName.setText(task.title != null ? task.title : "Task");
+        holder.tvDate.setText(task.dateString != null ? "Due: " + task.dateString : "Due: No deadline");
 
-        // Update UI based on the boolean value
+        String course = task.courseName != null && !task.courseName.isEmpty() ? task.courseName : "General";
+        holder.tvCourseTag.setText("Course: " + course);
+
+        String priority = task.priority != null ? task.priority.toUpperCase() : "MEDIUM";
+        holder.tvPriority.setText(priority);
+        if ("HIGH".equals(priority)) {
+            holder.tvPriority.setTextColor(0xFFEF4444); // Red
+        } else if ("LOW".equals(priority)) {
+            holder.tvPriority.setTextColor(0xFF16A34A); // Green
+        } else {
+            holder.tvPriority.setTextColor(0xFFF59E0B); // Amber
+        }
+
+        // Update UI based on completed status
         if (task.completed) {
             holder.ivStatus.setImageResource(R.drawable.ic_check_circle_green);
             holder.tvName.setPaintFlags(holder.tvName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
@@ -50,16 +63,22 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         } else {
             holder.ivStatus.setImageResource(R.drawable.ic_task_circle);
             holder.tvName.setPaintFlags(holder.tvName.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
-            holder.tvName.setTextColor(0xFF0F172A);
+            holder.tvName.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.text_primary, null));
             holder.itemView.setAlpha(1f);
         }
 
         holder.ivStatus.setOnClickListener(v -> {
-            if (listener != null) listener.onTaskCheck(task, position);
+            int adapterPosition = holder.getBindingAdapterPosition();
+            if (listener != null && adapterPosition != RecyclerView.NO_POSITION) {
+                listener.onTaskCheck(taskList.get(adapterPosition), adapterPosition);
+            }
         });
 
         holder.ivDelete.setOnClickListener(v -> {
-            if (listener != null) listener.onTaskDelete(task, position);
+            int adapterPosition = holder.getBindingAdapterPosition();
+            if (listener != null && adapterPosition != RecyclerView.NO_POSITION) {
+                listener.onTaskDelete(taskList.get(adapterPosition), adapterPosition);
+            }
         });
     }
 
@@ -69,24 +88,27 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvName, tvDate;
+        TextView tvName, tvDate, tvPriority, tvCourseTag;
         ImageView ivStatus, ivDelete;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tvTaskItemName);
             tvDate = itemView.findViewById(R.id.tvTaskItemDate);
+            tvPriority = itemView.findViewById(R.id.tvTaskPriority);
+            tvCourseTag = itemView.findViewById(R.id.tvTaskCourseTag);
             ivStatus = itemView.findViewById(R.id.ivTaskStatus);
             ivDelete = itemView.findViewById(R.id.ivTaskDelete);
         }
     }
 
     public static class TaskItem {
-        // Ensure these variables match the field names in your Firestore database exactly!
         public String id;
         public String title;
         public String dateString;
-        public boolean completed; // Must be 'completed', not 'isCompleted'
+        public String courseName;
+        public String priority; // "HIGH", "MEDIUM", "LOW"
+        public boolean completed;
 
         public TaskItem() {}
     }

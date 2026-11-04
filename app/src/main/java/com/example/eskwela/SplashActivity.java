@@ -20,6 +20,9 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class SplashActivity extends AppCompatActivity {
 
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private final Runnable navigationTask = this::navigateAfterSplash;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,44 +95,43 @@ public class SplashActivity extends AppCompatActivity {
 
         // --- NAVIGATION LOGIC ---
         // Wait for animations to finish, then check session and navigate
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        mainHandler.postDelayed(navigationTask, 2800);
+    }
 
-            if (currentUser != null) {
-                com.google.firebase.firestore.FirebaseFirestore.getInstance()
-                        .collection("users").document(currentUser.getUid()).get()
-                        .addOnSuccessListener(documentSnapshot -> {
-                            if (documentSnapshot.exists()) {
-                                String status = documentSnapshot.getString("status");
-                                if ("suspended".equalsIgnoreCase(status) || "deactivated".equalsIgnoreCase(status) || "archived".equalsIgnoreCase(status)) {
-                                    FirebaseAuth.getInstance().signOut();
-                                    new androidx.appcompat.app.AlertDialog.Builder(SplashActivity.this)
-                                            .setTitle("Account " + status.toUpperCase())
-                                            .setMessage("Your ESKWELA account is currently " + status + ". Please contact the system administrator.")
-                                            .setPositiveButton("OK", (dialog, which) -> {
-                                                startActivity(new Intent(SplashActivity.this, LoginActivity.class));
-                                                finish();
-                                            })
-                                            .setCancelable(false)
-                                            .show();
-                                    return;
-                                }
-                            }
-                            startActivity(new Intent(SplashActivity.this, DashboardActivity.class));
-                            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                            finish();
-                        })
-                        .addOnFailureListener(e -> {
-                            startActivity(new Intent(SplashActivity.this, DashboardActivity.class));
-                            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                            finish();
-                        });
-            } else {
-                startActivity(new Intent(SplashActivity.this, MainActivity.class));
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                finish();
-            }
-        }, 2800); // 2.8 seconds gives enough time for the staggered animations
+    private void navigateAfterSplash() {
+        if (isFinishing() || isDestroyed()) return;
+
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (currentUser != null) {
+            com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                    .collection("users").document(currentUser.getUid()).get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (isFinishing() || isDestroyed()) return;
+                        if (AccountGuard.blockIfRestricted(SplashActivity.this, FirebaseAuth.getInstance(), documentSnapshot)) {
+                            return;
+                        }
+                        goTo(DashboardActivity.class);
+                    })
+                    .addOnFailureListener(e -> {
+                        if (isFinishing() || isDestroyed()) return;
+                        goTo(DashboardActivity.class);
+                    });
+        } else {
+            goTo(MainActivity.class);
+        }
+    }
+
+    private void goTo(Class<?> destination) {
+        startActivity(new Intent(SplashActivity.this, destination));
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mainHandler.removeCallbacks(navigationTask);
+        super.onDestroy();
     }
 
     private void startBubbleAnimations() {

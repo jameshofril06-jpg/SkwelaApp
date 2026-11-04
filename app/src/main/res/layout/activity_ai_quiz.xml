@@ -36,7 +36,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Smart AI Quiz &amp; Leaderboard"
-            android:textColor="#0F172A"
+            android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -82,28 +82,47 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Create AI Practice Quiz"
-                        android:textColor="#0F172A"
+                        android:textColor="@color/text_primary"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
-                    <EditText
-                        android:id="@+id/etQuizTopic"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="70dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:background="@drawable/bg_input_field"
-                        android:gravity="top|start"
-                        android:hint="Enter topic (e.g. Biology, Derivatives, World War II)..."
-                        android:padding="12dp"
-                        android:textColor="#0F172A"
-                        android:textSize="14sp" />
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/etQuizTopic"
+                            android:layout_width="0dp"
+                            android:layout_height="60dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_input_field"
+                            android:gravity="center_vertical|start"
+                            android:hint="Topic or select enrolled course..."
+                            android:paddingHorizontal="12dp"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp" />
+
+                        <Button
+                            android:id="@+id/btnPickStudyLoad"
+                            android:layout_width="wrap_content"
+                            android:layout_height="60dp"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_button_white"
+                            android:text="Study Load 📚"
+                            android:textAllCaps="false"
+                            android:textColor="#1D4ED8"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
                         android:text="Number of Questions:"
-                        android:textColor="#475569"
+                        android:textColor="@color/text_secondary"
                         android:textSize="13sp"
                         android:textStyle="bold" />
 
@@ -133,7 +152,7 @@
                             android:background="@drawable/bg_segment_inactive"
                             android:gravity="center"
                             android:text="10 Qs"
-                            android:textColor="#475569"
+                            android:textColor="@color/text_secondary"
                             android:textStyle="bold" />
 
                         <TextView
@@ -145,7 +164,7 @@
                             android:background="@drawable/bg_segment_inactive"
                             android:gravity="center"
                             android:text="15 Qs"
-                            android:textColor="#475569"
+                            android:textColor="@color/text_secondary"
                             android:textStyle="bold" />
                     </LinearLayout>
 
@@ -163,7 +182,7 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Interactive Quiz Card (Visible when quiz is running) -->
+            <!-- Interactive Quiz Card -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardActiveQuiz"
                 android:layout_width="0dp"
@@ -198,7 +217,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="What is the main function of mitochondria?"
-                        android:textColor="#0F172A"
+                        android:textColor="@color/text_primary"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -214,7 +233,7 @@
                             android:layout_height="wrap_content"
                             android:padding="8dp"
                             android:text="Option A"
-                            android:textColor="#334155" />
+                            android:textColor="@color/text_primary" />
 
                         <RadioButton
                             android:id="@+id/rbOption1"
@@ -222,7 +241,7 @@
                             android:layout_height="wrap_content"
                             android:padding="8dp"
                             android:text="Option B"
-                            android:textColor="#334155" />
+                            android:textColor="@color/text_primary" />
 
                         <RadioButton
                             android:id="@+id/rbOption2"
@@ -230,7 +249,7 @@
                             android:layout_height="wrap_content"
                             android:padding="8dp"
                             android:text="Option C"
-                            android:textColor="#334155" />
+                            android:textColor="@color/text_primary" />
 
                         <RadioButton
                             android:id="@+id/rbOption3"
@@ -238,7 +257,7 @@
                             android:layout_height="wrap_content"
                             android:padding="8dp"
                             android:text="Option D"
-                            android:textColor="#334155" />
+                            android:textColor="@color/text_primary" />
                     </RadioGroup>
 
                     <Button
@@ -277,7 +296,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="🏆 Top Quiz Leaderboard"
-                        android:textColor="#0F172A"
+                        android:textColor="@color/text_primary"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -288,7 +307,7 @@
                         android:layout_marginTop="12dp"
                         android:lineSpacingExtra="4dp"
                         android:text="Loading high scores..."
-                        android:textColor="#475569"
+                        android:textColor="@color/text_secondary"
                         android:textSize="13sp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -300,7 +319,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:text="My Quiz History"
-                android:textColor="#0F172A"
+                android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
@@ -313,7 +332,7 @@
                 android:layout_marginTop="8dp"
                 android:lineSpacingExtra="4dp"
                 android:text="No quiz history yet. Take a quiz above!"
-                android:textColor="#64748B"
+                android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

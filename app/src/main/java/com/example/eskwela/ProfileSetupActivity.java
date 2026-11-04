@@ -27,6 +27,7 @@ public class ProfileSetupActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private EditText etFullName, etSchool, etCourse, etYear, etSection;
+    private boolean editMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +56,16 @@ public class ProfileSetupActivity extends AppCompatActivity {
         TextView tvInitials = findViewById(R.id.tvAvatarInitials);
         Button btnContinue = findViewById(R.id.btnContinue);
 
+        editMode = getIntent().getBooleanExtra("EDIT_MODE", false);
+        String passedName = getIntent().getStringExtra("fullName");
+        if (passedName != null && !passedName.isEmpty()) {
+            etFullName.setText(passedName);
+        }
+        if (editMode) {
+            btnContinue.setText("Save changes");
+            prefillExistingProfile();
+        }
+
         // Live initials update logic
         etFullName.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -80,10 +91,12 @@ public class ProfileSetupActivity extends AppCompatActivity {
                 return;
             }
 
-            // Get current user UID
+            if (mAuth.getCurrentUser() == null) {
+                AccountGuard.goLogin(this);
+                return;
+            }
             String userId = mAuth.getCurrentUser().getUid();
 
-            // Create a Map to store user data
             Map<String, Object> user = new HashMap<>();
             user.put("fullName", fullName);
             user.put("school", etSchool.getText().toString().trim());
@@ -91,19 +104,43 @@ public class ProfileSetupActivity extends AppCompatActivity {
             user.put("year", etYear.getText().toString().trim());
             user.put("section", etSection.getText().toString().trim());
 
-            // Save to Firestore using SetOptions.merge()
-            // This is CRITICAL so it doesn't overwrite the studentId we generated in RegisterActivity
+            btnContinue.setEnabled(false);
             db.collection("users").document(userId).set(user, SetOptions.merge())
                     .addOnSuccessListener(aVoid -> {
                         Toast.makeText(ProfileSetupActivity.this, "Profile Saved!", Toast.LENGTH_SHORT).show();
-                        // Redirect to Notifications or directly to Dashboard
+                        if (editMode) {
+                            finish();
+                            return;
+                        }
                         Intent intent = new Intent(ProfileSetupActivity.this, NotificationsActivity.class);
+                        intent.putExtra("FROM_ONBOARDING", true);
                         startActivity(intent);
                         finish();
                     })
                     .addOnFailureListener(e -> {
+                        btnContinue.setEnabled(true);
                         Toast.makeText(ProfileSetupActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                     });
         });
+    }
+
+    private void prefillExistingProfile() {
+        if (mAuth.getCurrentUser() == null) return;
+        db.collection("users").document(mAuth.getCurrentUser().getUid()).get()
+                .addOnSuccessListener(doc -> {
+                    if (!doc.exists()) return;
+                    setIfEmpty(etFullName, doc.getString("fullName"));
+                    setIfEmpty(etSchool, doc.getString("school"));
+                    setIfEmpty(etCourse, doc.getString("course"));
+                    setIfEmpty(etYear, doc.getString("year"));
+                    setIfEmpty(etSection, doc.getString("section"));
+                });
+    }
+
+    private void setIfEmpty(EditText field, String value) {
+        if (field != null && (field.getText() == null || field.getText().toString().trim().isEmpty())
+                && value != null && !value.isEmpty()) {
+            field.setText(value);
+        }
     }
 }

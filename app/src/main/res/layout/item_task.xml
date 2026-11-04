@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
     android:background="@drawable/bg_input_field"
-    android:elevation="1dp"
+    android:elevation="2dp"
     android:padding="16dp">
 
     <ImageView
@@ -24,27 +24,52 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:text="Task Name"
-        android:textColor="#0F172A"
+        android:textColor="@color/text_primary"
         android:textSize="15sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/tvTaskItemDate"
-        app:layout_constraintEnd_toStartOf="@+id/ivTaskDelete"
+        app:layout_constraintEnd_toStartOf="@+id/tvTaskPriority"
         app:layout_constraintStart_toEndOf="@+id/ivTaskStatus"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvTaskPriority"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/bg_pill_translucent"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="2dp"
+        android:text="HIGH"
+        android:textColor="#EF4444"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/ivTaskDelete"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tvTaskItemDate"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="Today · 11:59 PM"
-        android:textColor="#64748B"
+        android:text="Due: Today · 11:59 PM"
+        android:textColor="@color/text_secondary"
         android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/tvTaskItemName"
         app:layout_constraintStart_toStartOf="@+id/tvTaskItemName"
         app:layout_constraintTop_toBottomOf="@+id/tvTaskItemName" />
+
+    <TextView
+        android:id="@+id/tvTaskCourseTag"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Course: General"
+        android:textColor="#1D4ED8"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/tvTaskItemName"
+        app:layout_constraintStart_toStartOf="@+id/tvTaskItemName"
+        app:layout_constraintTop_toBottomOf="@+id/tvTaskItemDate" />
 
     <ImageView
         android:id="@+id/ivTaskDelete"

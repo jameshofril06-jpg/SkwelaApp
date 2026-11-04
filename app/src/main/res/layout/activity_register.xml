@@ -5,7 +5,7 @@
     android:id="@+id/register_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F3F6FA"
+    android:background="@color/app_bg"
     android:fillViewport="true"
     tools:context=".RegisterActivity">
 
@@ -174,7 +174,7 @@
             android:elevation="4dp"
             android:text="Create account"
             android:textAllCaps="false"
-            android:textColor="@color/white"
+            android:textColor="@color/always_white"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"

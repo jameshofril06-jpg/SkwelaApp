@@ -48,6 +48,11 @@ public class LoginActivity extends AppCompatActivity {
         // Trigger Entrance Animations
         setupAnimations();
 
+        TextView tvForgotPassword = findViewById(R.id.tvForgotPassword);
+        if (tvForgotPassword != null) {
+            tvForgotPassword.setOnClickListener(v -> sendPasswordReset());
+        }
+
         btnSubmitLogin.setOnClickListener(v -> {
             String email = etEmail.getText().toString().trim();
             String password = etPassword.getText().toString().trim();
@@ -57,46 +62,40 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
-            // 1. Turn on Loading State
             setLoading(true);
 
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, task -> {
+                        if (isFinishing()) return;
                         if (task.isSuccessful()) {
+                            if (mAuth.getCurrentUser() == null) {
+                                setLoading(false);
+                                Toast.makeText(LoginActivity.this, "Login failed. Please try again.", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
                             String userId = mAuth.getCurrentUser().getUid();
                             com.google.firebase.firestore.FirebaseFirestore.getInstance()
                                     .collection("users").document(userId).get()
                                     .addOnSuccessListener(doc -> {
+                                        if (isFinishing()) return;
                                         setLoading(false);
-                                        if (doc.exists()) {
-                                            String status = doc.getString("status");
-                                            if ("suspended".equalsIgnoreCase(status) || "deactivated".equalsIgnoreCase(status) || "archived".equalsIgnoreCase(status)) {
-                                                mAuth.signOut();
-                                                new androidx.appcompat.app.AlertDialog.Builder(LoginActivity.this)
-                                                        .setTitle("Account " + status.toUpperCase())
-                                                        .setMessage("Your ESKWELA account is currently " + status + ". Please contact the system administrator.")
-                                                        .setPositiveButton("OK", null)
-                                                        .show();
-                                                return;
-                                            }
+                                        if (AccountGuard.blockIfRestricted(LoginActivity.this, mAuth, doc)) {
+                                            return;
                                         }
-                                        Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                                        Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
-                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                        startActivity(intent);
-                                        finish();
+                                        goToDashboard();
                                     })
                                     .addOnFailureListener(e -> {
+                                        if (isFinishing()) return;
                                         setLoading(false);
-                                        Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                                        Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
-                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                        startActivity(intent);
-                                        finish();
+                                        goToDashboard();
                                     });
                         } else {
                             setLoading(false);
-                            Toast.makeText(LoginActivity.this, "Login Failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                            Exception exception = task.getException();
+                            String message = exception != null && exception.getMessage() != null
+                                    ? exception.getMessage()
+                                    : "Please check your credentials and try again.";
+                            Toast.makeText(LoginActivity.this, "Login Failed: " + message, Toast.LENGTH_LONG).show();
                         }
                     });
         });
@@ -104,8 +103,26 @@ public class LoginActivity extends AppCompatActivity {
         tvGoToRegister.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
-            finish();
         });
+    }
+
+    private void sendPasswordReset() {
+        String email = etEmail.getText().toString().trim();
+        if (email.isEmpty()) {
+            Toast.makeText(this, "Enter your email first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        mAuth.sendPasswordResetEmail(email)
+                .addOnSuccessListener(aVoid -> Toast.makeText(this, "Password reset email sent to " + email, Toast.LENGTH_LONG).show())
+                .addOnFailureListener(e -> Toast.makeText(this, "Could not send reset email: " + e.getMessage(), Toast.LENGTH_LONG).show());
+    }
+
+    private void goToDashboard() {
+        Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     /**

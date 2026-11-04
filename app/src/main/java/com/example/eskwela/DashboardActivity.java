@@ -47,6 +47,7 @@ public class DashboardActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private String todayDateString;
+    private boolean initialResumeSkipped;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,50 +105,62 @@ public class DashboardActivity extends AppCompatActivity {
 
         // Profile Icon Navigation
         findViewById(R.id.ivProfileIcon).setOnClickListener(v -> {
-            startActivity(new Intent(DashboardActivity.this, ProfileActivity.class));
-            finish();
+            NavigationHelper.navigateWithTabAnimation(DashboardActivity.this, 0, 4, ProfileActivity.class);
         });
 
         // See All Classes
         findViewById(R.id.tvSeeAll).setOnClickListener(v -> {
-            startActivity(new Intent(DashboardActivity.this, MyScheduleActivity.class));
-            finish();
+            NavigationHelper.navigateWithTabAnimation(DashboardActivity.this, 0, 1, MyScheduleActivity.class);
         });
 
         // View All Tasks
         findViewById(R.id.tvViewTasks).setOnClickListener(v -> {
-            startActivity(new Intent(DashboardActivity.this, TasksActivity.class));
-            finish();
+            NavigationHelper.navigateWithTabAnimation(DashboardActivity.this, 0, 2, TasksActivity.class);
         });
 
         // Quick Actions
         CardView btnQuickAddClass = findViewById(R.id.btnQuickAddClass);
-        btnQuickAddClass.setOnClickListener(v -> {
-            Intent intent = new Intent(DashboardActivity.this, AddClassActivity.class);
-            intent.putExtra("SELECTED_DATE", todayDateString);
-            startActivity(intent);
-        });
+        if (btnQuickAddClass != null) {
+            btnQuickAddClass.setOnClickListener(v -> {
+                Intent intent = new Intent(DashboardActivity.this, AddClassActivity.class);
+                intent.putExtra("SELECTED_DATE", todayDateString);
+                startActivity(intent);
+            });
+        }
 
         CardView btnQuickNewTask = findViewById(R.id.btnQuickNewTask);
-        btnQuickNewTask.setOnClickListener(v -> {
-            startActivity(new Intent(DashboardActivity.this, TasksActivity.class));
-        });
+        if (btnQuickNewTask != null) {
+            btnQuickNewTask.setOnClickListener(v -> {
+                NavigationHelper.navigateWithTabAnimation(DashboardActivity.this, 0, 2, TasksActivity.class);
+            });
+        }
 
         CardView btnQuickStartFocus = findViewById(R.id.btnQuickStartFocus);
-        btnQuickStartFocus.setOnClickListener(v -> {
-            startActivity(new Intent(DashboardActivity.this, StudyActivity.class));
-        });
+        if (btnQuickStartFocus != null) {
+            btnQuickStartFocus.setOnClickListener(v -> {
+                NavigationHelper.navigateWithTabAnimation(DashboardActivity.this, 0, 3, StudyActivity.class);
+            });
+        }
+
+
 
         setupBottomNavigation();
     }
 
     private void loadData() {
-        if (mAuth.getCurrentUser() == null) return;
+        if (mAuth.getCurrentUser() == null) {
+            AccountGuard.goLogin(this);
+            return;
+        }
         String userId = mAuth.getCurrentUser().getUid();
 
         // 1. Fetch Greeting Name & Calculate Time of Day
         db.collection("users").document(userId).get()
                 .addOnSuccessListener(documentSnapshot -> {
+                    if (isFinishing()) return;
+                    if (AccountGuard.blockIfRestricted(DashboardActivity.this, mAuth, documentSnapshot)) {
+                        return;
+                    }
                     if (documentSnapshot.exists()) {
                         String fullName = documentSnapshot.getString("fullName");
                         if (fullName != null && !fullName.isEmpty()) {
@@ -163,6 +176,7 @@ public class DashboardActivity extends AppCompatActivity {
                 .whereEqualTo("dateString", todayDateString)
                 .get()
                 .addOnCompleteListener(task -> {
+                    if (isFinishing()) return;
                     if (task.isSuccessful()) {
                         todayClasses.clear();
                         for (QueryDocumentSnapshot document : task.getResult()) {
@@ -185,6 +199,34 @@ public class DashboardActivity extends AppCompatActivity {
                     }
                 });
 
+        // 4. Fetch Latest Announcement for Banner
+        db.collection("announcements")
+                .orderBy("postedAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (isFinishing()) return;
+                    View cardAnnounce = findViewById(R.id.cardDashboardAnnouncement);
+                    TextView tvAnnounceText = findViewById(R.id.tvAnnouncementBannerText);
+
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        String msg = queryDocumentSnapshots.getDocuments().get(0).getString("message");
+                        if (msg != null && !msg.isEmpty()) {
+                            if (cardAnnounce != null) cardAnnounce.setVisibility(View.VISIBLE);
+                            if (tvAnnounceText != null) tvAnnounceText.setText(msg);
+                            if (cardAnnounce != null) {
+                                cardAnnounce.setOnClickListener(v -> startActivity(new Intent(DashboardActivity.this, AnnouncementActivity.class)));
+                            }
+                            View btnAnnounceBanner = findViewById(R.id.btnAnnouncementBanner);
+                            if (btnAnnounceBanner != null) {
+                                btnAnnounceBanner.setOnClickListener(v -> startActivity(new Intent(DashboardActivity.this, AnnouncementActivity.class)));
+                            }
+                        }
+                    } else {
+                        if (cardAnnounce != null) cardAnnounce.setVisibility(View.GONE);
+                    }
+                });
+
         // 3. Fetch Due Tasks (Not completed)
         db.collection("tasks")
                 .whereEqualTo("userId", userId)
@@ -192,6 +234,7 @@ public class DashboardActivity extends AppCompatActivity {
                 .limit(3)
                 .get()
                 .addOnCompleteListener(task -> {
+                    if (isFinishing()) return;
                     if (task.isSuccessful()) {
                         dueTasks.clear();
                         for (QueryDocumentSnapshot document : task.getResult()) {
@@ -273,6 +316,10 @@ public class DashboardActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (!initialResumeSkipped) {
+            initialResumeSkipped = true;
+            return;
+        }
         loadData();
     }
 
@@ -288,9 +335,10 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private long parseTimeToMillis(String timeString) {
+        if (timeString == null || timeString.trim().isEmpty()) return 0;
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("h:mm a", Locale.getDefault());
-            Date date = sdf.parse(timeString);
+            Date date = sdf.parse(timeString.trim());
             if (date != null) {
                 Calendar cal = Calendar.getInstance();
                 Calendar timeCal = Calendar.getInstance();
@@ -330,7 +378,10 @@ public class DashboardActivity extends AppCompatActivity {
         if (nextClass != null) {
             tvNextClassLabel.setText("NEXT CLASS • " + nextClass.startTime);
             tvNextClassName.setText(nextClass.className);
-            tvNextClassDetails.setText(nextClass.room + " • " + nextClass.instructor);
+            String room = nextClass.room != null ? nextClass.room : "";
+            String instructor = nextClass.instructor != null ? nextClass.instructor : "";
+            String details = (room + " • " + instructor).replaceAll("(^\\s•\\s)|(\\s•\\s$)", "").trim();
+            tvNextClassDetails.setText(details.isEmpty() ? "See schedule for details" : details);
         } else {
             tvNextClassLabel.setText("ALL DONE");
             tvNextClassName.setText("Classes finished");
@@ -343,24 +394,16 @@ public class DashboardActivity extends AppCompatActivity {
         bottomNav.setSelectedItemId(R.id.nav_home);
 
         bottomNav.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.nav_home) {
-                return true;
-            } else if (itemId == R.id.nav_schedule) {
-                startActivity(new Intent(DashboardActivity.this, MyScheduleActivity.class));
-                finish();
-                return true;
-            } else if (itemId == R.id.nav_tasks) {
-                startActivity(new Intent(DashboardActivity.this, TasksActivity.class));
-                finish();
-                return true;
-            } else if (itemId == R.id.nav_study) {
-                startActivity(new Intent(DashboardActivity.this, StudyActivity.class));
-                finish();
-                return true;
-            } else if (itemId == R.id.nav_profile) {
-                startActivity(new Intent(DashboardActivity.this, ProfileActivity.class));
-                finish();
+            int targetIndex = NavigationHelper.getTabIndex(item.getItemId());
+            Class<?> targetClass = null;
+            if (targetIndex == 0) return true;
+            if (targetIndex == 1) targetClass = MyScheduleActivity.class;
+            else if (targetIndex == 2) targetClass = TasksActivity.class;
+            else if (targetIndex == 3) targetClass = StudyActivity.class;
+            else if (targetIndex == 4) targetClass = ProfileActivity.class;
+
+            if (targetClass != null) {
+                NavigationHelper.navigateWithTabAnimation(this, 0, targetIndex, targetClass);
                 return true;
             }
             return false;

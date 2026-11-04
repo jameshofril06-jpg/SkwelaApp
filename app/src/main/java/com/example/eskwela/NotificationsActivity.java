@@ -100,20 +100,22 @@ public class NotificationsActivity extends AppCompatActivity {
             seg15Min.setTextColor(0xFF475569);
         });
 
-        // Continue Actions
-        btnAllow.setOnClickListener(v -> {
-            // Navigate to ScheduleActivity
-            android.content.Intent intent = new android.content.Intent(NotificationsActivity.this, ScheduleActivity.class);
-            startActivity(intent);
-            finish();
-        });
+        boolean fromProfile = getIntent().getBooleanExtra("FROM_PROFILE", false);
+        boolean fromOnboarding = getIntent().getBooleanExtra("FROM_ONBOARDING", false);
 
-        tvSkip.setOnClickListener(v -> {
-            // Navigate to ScheduleActivity
-            android.content.Intent intent = new android.content.Intent(NotificationsActivity.this, ScheduleActivity.class);
-            startActivity(intent);
+        btnAllow.setOnClickListener(v -> continueFromNotifications(fromProfile, fromOnboarding));
+        tvSkip.setOnClickListener(v -> continueFromNotifications(fromProfile, fromOnboarding));
+    }
+
+    private void continueFromNotifications(boolean fromProfile, boolean fromOnboarding) {
+        if (fromProfile) {
             finish();
-        });
+            return;
+        }
+        android.content.Intent intent = new android.content.Intent(NotificationsActivity.this,
+                fromOnboarding ? ScheduleActivity.class : DashboardActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     // Helper method to change the drawable icon

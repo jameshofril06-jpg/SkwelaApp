@@ -1,16 +1,17 @@
 package com.example.eskwela;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
@@ -39,7 +40,8 @@ public class TasksActivity extends AppCompatActivity implements TaskAdapter.OnTa
     private RecyclerView rvTasks;
     private TextView tvEmptyTasks, tabAll, tabToDo, tabDone;
     private CardView cardAddTaskForm;
-    private EditText etNewTaskName;
+    private EditText etNewTaskName, etTaskCourseName;
+    private TextView btnPriorityHigh, btnPriorityMed, btnPriorityLow;
 
     private TaskAdapter adapter;
     private List<TaskAdapter.TaskItem> allTasks = new ArrayList<>();
@@ -49,8 +51,9 @@ public class TasksActivity extends AppCompatActivity implements TaskAdapter.OnTa
     private FirebaseFirestore db;
 
     private String currentFilter = "ALL";
+    private String selectedPriority = "MEDIUM";
     private boolean isFormVisible = false;
-    private boolean isDataLoaded = false; // Prevents double-loading on resume
+    private boolean isDataLoaded = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +77,12 @@ public class TasksActivity extends AppCompatActivity implements TaskAdapter.OnTa
         tvEmptyTasks = findViewById(R.id.tvEmptyTasks);
         cardAddTaskForm = findViewById(R.id.cardAddTaskForm);
         etNewTaskName = findViewById(R.id.etNewTaskName);
+        etTaskCourseName = findViewById(R.id.etTaskCourseName);
         Button btnCreateTask = findViewById(R.id.btnCreateTask);
+
+        btnPriorityHigh = findViewById(R.id.btnPriorityHigh);
+        btnPriorityMed = findViewById(R.id.btnPriorityMed);
+        btnPriorityLow = findViewById(R.id.btnPriorityLow);
 
         tabAll = findViewById(R.id.tabAll);
         tabToDo = findViewById(R.id.tabToDo);
@@ -87,9 +95,13 @@ public class TasksActivity extends AppCompatActivity implements TaskAdapter.OnTa
         setupFilters();
         setupBottomNavigation();
 
-        CardView btnAddTask = findViewById(R.id.btnAddTask);
-        btnAddTask.setOnClickListener(v -> toggleAddForm());
+        ImageView btnAddTaskToggle = findViewById(R.id.btnAddTaskToggle);
+        if (btnAddTaskToggle != null) btnAddTaskToggle.setOnClickListener(v -> toggleAddForm());
         btnCreateTask.setOnClickListener(v -> saveNewTask());
+
+        if (btnPriorityHigh != null) btnPriorityHigh.setOnClickListener(v -> selectPriority("HIGH"));
+        if (btnPriorityMed != null) btnPriorityMed.setOnClickListener(v -> selectPriority("MEDIUM"));
+        if (btnPriorityLow != null) btnPriorityLow.setOnClickListener(v -> selectPriority("LOW"));
 
         etNewTaskName.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -99,15 +111,25 @@ public class TasksActivity extends AppCompatActivity implements TaskAdapter.OnTa
             return false;
         });
 
-        // Initial Load
         loadTasks();
+    }
+
+    private void selectPriority(String priority) {
+        selectedPriority = priority;
+        if (btnPriorityHigh != null) {
+            btnPriorityHigh.setBackgroundResource("HIGH".equals(priority) ? R.drawable.bg_segment_active : R.drawable.bg_segment_inactive);
+        }
+        if (btnPriorityMed != null) {
+            btnPriorityMed.setBackgroundResource("MEDIUM".equals(priority) ? R.drawable.bg_segment_active : R.drawable.bg_segment_inactive);
+        }
+        if (btnPriorityLow != null) {
+            btnPriorityLow.setBackgroundResource("LOW".equals(priority) ? R.drawable.bg_segment_active : R.drawable.bg_segment_inactive);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        // FIX: Only reload from Firestore if we haven't loaded yet (e.g. coming from another Activity).
-        // This prevents the "unchecking" bug when navigating.
         if (!isDataLoaded) {
             loadTasks();
         }
@@ -128,49 +150,60 @@ public class TasksActivity extends AppCompatActivity implements TaskAdapter.OnTa
                             item.id = document.getId();
                             allTasks.add(item);
                         }
-                        isDataLoaded = true; // Mark as loaded
+                        isDataLoaded = true;
                         applyFilter();
                     }
                 });
     }
 
-    // --- CRITICAL FIX: Update ONLY local UI, do NOT reload from Firestore ---
     @Override
     public void onTaskCheck(TaskAdapter.TaskItem task, int position) {
         boolean newStatus = !task.completed;
-
-        // 1. Update local model object
         task.completed = newStatus;
-
-        // 2. Update UI instantly for this specific row
         adapter.notifyItemChanged(position);
 
-        // 3. Firestore update in the background
         db.collection("tasks").document(task.id)
                 .update("completed", newStatus)
                 .addOnFailureListener(e -> {
-                    // Revert if Firebase fails
                     task.completed = !newStatus;
                     adapter.notifyItemChanged(position);
                     Toast.makeText(this, "Error syncing to database", Toast.LENGTH_SHORT).show();
                 });
 
-        // 4. Update header counter
         updateSubtitleCount();
+        applyFilter();
     }
 
     @Override
     public void onTaskDelete(TaskAdapter.TaskItem task, int position) {
-        db.collection("tasks").document(task.id)
-                .delete()
-                .addOnSuccessListener(aVoid -> {
-                    allTasks.remove(task);
-                    displayedTasks.remove(position);
-                    adapter.notifyItemRemoved(position);
-                    adapter.notifyItemRangeChanged(position, displayedTasks.size());
-                    updateSubtitleCount();
-                    Toast.makeText(this, "Task deleted", Toast.LENGTH_SHORT).show();
-                });
+        EditText etReason = new EditText(this);
+        etReason.setHint("Enter reason to drop task...");
+        etReason.setPadding(32, 32, 32, 32);
+
+        new AlertDialog.Builder(this)
+                .setTitle("Drop / Delete Task")
+                .setMessage("Are you sure you want to drop task: " + (task.title != null ? task.title : "Task") + "?")
+                .setView(etReason)
+                .setPositiveButton("Drop Task", (dialog, which) -> {
+                    String reason = etReason.getText().toString().trim();
+                    db.collection("tasks").document(task.id)
+                            .delete()
+                            .addOnSuccessListener(aVoid -> {
+                                allTasks.remove(task);
+                                if (position >= 0 && position < displayedTasks.size()) {
+                                    displayedTasks.remove(position);
+                                    adapter.notifyItemRemoved(position);
+                                    adapter.notifyItemRangeChanged(position, displayedTasks.size());
+                                } else {
+                                    applyFilter();
+                                }
+                                updateSubtitleCount();
+                                Toast.makeText(this, "Task dropped successfully. Reason: " + (reason.isEmpty() ? "None specified" : reason), Toast.LENGTH_LONG).show();
+                            })
+                            .addOnFailureListener(e -> Toast.makeText(this, "Could not drop task", Toast.LENGTH_SHORT).show());
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     private void updateSubtitleCount() {
@@ -186,6 +219,7 @@ public class TasksActivity extends AppCompatActivity implements TaskAdapter.OnTa
         if (isFormVisible) {
             cardAddTaskForm.setVisibility(View.GONE);
             etNewTaskName.setText("");
+            if (etTaskCourseName != null) etTaskCourseName.setText("");
             isFormVisible = false;
         } else {
             cardAddTaskForm.setVisibility(View.VISIBLE);
@@ -199,22 +233,30 @@ public class TasksActivity extends AppCompatActivity implements TaskAdapter.OnTa
         String taskName = etNewTaskName.getText().toString().trim();
         if (taskName.isEmpty()) return;
 
+        if (mAuth.getCurrentUser() == null) {
+            Toast.makeText(this, "Please log in again", Toast.LENGTH_SHORT).show();
+            return;
+        }
         String userId = mAuth.getCurrentUser().getUid();
         SimpleDateFormat displayDate = new SimpleDateFormat("MMM d · h:mm a", Locale.getDefault());
         String currentDate = "Today · " + displayDate.format(new Date());
+
+        String courseName = etTaskCourseName != null ? etTaskCourseName.getText().toString().trim() : "";
 
         Map<String, Object> taskData = new HashMap<>();
         taskData.put("userId", userId);
         taskData.put("title", taskName);
         taskData.put("dateString", currentDate);
-        taskData.put("completed", false); // Save as false initially
+        taskData.put("courseName", courseName.isEmpty() ? "General" : courseName);
+        taskData.put("priority", selectedPriority);
+        taskData.put("completed", false);
 
         db.collection("tasks").add(taskData)
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(this, "Task Created!", Toast.LENGTH_SHORT).show();
                     toggleAddForm();
                     setFilter("ALL");
-                    isDataLoaded = false; // Force reload so new item shows
+                    isDataLoaded = false;
                     loadTasks();
                 });
     }
@@ -269,24 +311,16 @@ public class TasksActivity extends AppCompatActivity implements TaskAdapter.OnTa
         bottomNav.setSelectedItemId(R.id.nav_tasks);
 
         bottomNav.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.nav_home) {
-                startActivity(new Intent(TasksActivity.this, DashboardActivity.class));
-                finish();
-                return true;
-            } else if (itemId == R.id.nav_schedule) {
-                startActivity(new Intent(TasksActivity.this, MyScheduleActivity.class));
-                finish();
-                return true;
-            } else if (itemId == R.id.nav_tasks) {
-                return true;
-            } else if (itemId == R.id.nav_study) {
-                startActivity(new Intent(TasksActivity.this, StudyActivity.class));
-                finish();
-                return true;
-            } else if (itemId == R.id.nav_profile) {
-                startActivity(new Intent(TasksActivity.this, ProfileActivity.class));
-                finish();
+            int targetIndex = NavigationHelper.getTabIndex(item.getItemId());
+            Class<?> targetClass = null;
+            if (targetIndex == 2) return true;
+            if (targetIndex == 0) targetClass = DashboardActivity.class;
+            else if (targetIndex == 1) targetClass = MyScheduleActivity.class;
+            else if (targetIndex == 3) targetClass = StudyActivity.class;
+            else if (targetIndex == 4) targetClass = ProfileActivity.class;
+
+            if (targetClass != null) {
+                NavigationHelper.navigateWithTabAnimation(this, 2, targetIndex, targetClass);
                 return true;
             }
             return false;

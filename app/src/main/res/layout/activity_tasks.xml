@@ -8,8 +8,7 @@
     android:background="@color/app_bg"
     tools:context=".TasksActivity">
 
-    <!-- ... (Keep your Header and Add Button exactly the same) ... -->
-
+    <!-- Title and Subtitle -->
     <TextView
         android:id="@+id/tvTasksTitle"
         android:layout_width="wrap_content"
@@ -17,8 +16,9 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="32dp"
         android:text="My Tasks"
-        android:textColor="#0F172A"
+        android:textColor="@color/text_primary"
         android:textSize="28sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -28,51 +28,44 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="4dp"
-        android:text="0 things to finish"
-        android:textColor="#64748B"
+        android:text="Loading tasks..."
+        android:textColor="@color/text_secondary"
         android:textSize="14sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvTasksTitle" />
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/btnAddTask"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+    <!-- Circular Floating Add Button -->
+    <ImageView
+        android:id="@+id/btnAddTaskToggle"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
         android:layout_marginEnd="20dp"
-        app:cardBackgroundColor="@color/eskwela_orange"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="4dp"
+        android:background="@drawable/bg_avatar_circle"
+        android:padding="10dp"
+        android:src="@drawable/ic_new_task"
         app:layout_constraintBottom_toBottomOf="@+id/tvTasksSubtitle"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvTasksTitle">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="+"
-            android:textColor="@color/white"
-            android:textSize="24sp" />
-    </androidx.cardview.widget.CardView>
+        app:layout_constraintTop_toTopOf="@+id/tvTasksTitle" />
 
+    <!-- Filter Segmented Control Container -->
     <LinearLayout
         android:id="@+id/filterContainer"
         android:layout_width="0dp"
-        android:layout_height="50dp"
+        android:layout_height="44dp"
         android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/bg_segment_inactive"
-        android:orientation="horizontal"
         android:padding="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvTasksSubtitle">
-        <!-- ... Tabs ... -->
+
         <TextView android:id="@+id/tabAll" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/bg_segment_active" android:elevation="2dp" android:gravity="center" android:text="All" android:textColor="#1D4ED8" android:textSize="14sp" android:textStyle="bold" />
-        <TextView android:id="@+id/tabToDo" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="To do" android:textColor="#475569" android:textSize="14sp" />
-        <TextView android:id="@+id/tabDone" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="Done" android:textColor="#475569" android:textSize="14sp" />
+        <TextView android:id="@+id/tabToDo" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="To do" android:textColor="@color/text_secondary" android:textSize="14sp" />
+        <TextView android:id="@+id/tabDone" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="Done" android:textColor="@color/text_secondary" android:textSize="14sp" />
     </LinearLayout>
 
-    <!-- NEW: The inline Add Task Form (Hidden by default) -->
+    <!-- Inline Add Task Form -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardAddTaskForm"
         android:layout_width="0dp"
@@ -96,8 +89,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TASK"
-                android:textColor="#334155"
+                android:text="CREATE NEW TASK"
+                android:textColor="@color/text_primary"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:letterSpacing="0.05" />
@@ -105,24 +98,88 @@
             <EditText
                 android:id="@+id/etNewTaskName"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
+                android:layout_height="48dp"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/bg_input_field"
-                android:hint="New assignment"
+                android:hint="Task title (e.g. Capstone Sprint 1 Deliverable)..."
                 android:inputType="textCapSentences"
-                android:imeOptions="actionDone"
-                android:paddingHorizontal="16dp"
-                android:textColor="#0F172A"
-                android:textColorHint="#94A3B8"
+                android:paddingHorizontal="12dp"
+                android:textColor="@color/text_primary"
                 android:textSize="14sp" />
+
+            <EditText
+                android:id="@+id/etTaskCourseName"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_input_field"
+                android:hint="Associated Course (e.g. SOFTWARE ENGINEERING)..."
+                android:inputType="textCapSentences"
+                android:paddingHorizontal="12dp"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Priority Level:"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_marginTop="6dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btnPriorityHigh"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_segment_active"
+                    android:gravity="center"
+                    android:text="HIGH 🔴"
+                    android:textColor="#EF4444"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btnPriorityMed"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/bg_segment_inactive"
+                    android:gravity="center"
+                    android:text="MEDIUM 🟡"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btnPriorityLow"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/bg_segment_inactive"
+                    android:gravity="center"
+                    android:text="LOW 🟢"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnCreateTask"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
+                android:layout_height="48dp"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_button_orange"
-                android:text="Create task"
+                android:text="Save Task 💾"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="15sp"
@@ -130,7 +187,7 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Task List (Moved down to be under the form) -->
+    <!-- Task List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvTasks"
         android:layout_width="0dp"
@@ -143,21 +200,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardAddTaskForm" />
 
-    <!-- ... (Keep Empty State and Bottom Nav exactly the same) ... -->
-
+    <!-- Empty State Text -->
     <TextView
         android:id="@+id/tvEmptyTasks"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No tasks found."
-        android:textColor="#94A3B8"
-        android:textSize="14sp"
+        android:text="No tasks found! 🎉"
+        android:textColor="@color/text_secondary"
+        android:textSize="16sp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/rvTasks"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/rvTasks" />
 
+    <!-- Bottom Navigation View -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="0dp"

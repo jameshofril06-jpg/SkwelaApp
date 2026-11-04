@@ -2,11 +2,13 @@
 <resources>
     <color name="black">#FFFFFFFF</color>
     <color name="white">#1E293B</color> <!-- Converts white cards to dark surface in dark mode -->
+    <color name="always_white">#FFFFFFFF</color>
 
     <color name="app_bg">#0F172A</color> <!-- Dark slate background -->
     <color name="card_bg">#1E293B</color> <!-- Dark card surface -->
     <color name="text_primary">#F8FAFC</color> <!-- Light primary text for high contrast -->
     <color name="text_secondary">#CBD5E1</color> <!-- Light secondary text for high contrast -->
+    <color name="admin_header_text">#FFFFFF</color>
 
     <!-- App Specific Colors -->
     <color name="eskwela_blue_bg">#0F172A</color>

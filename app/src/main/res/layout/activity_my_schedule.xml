@@ -15,8 +15,9 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="32dp"
         android:text="My Schedule"
-        android:textColor="#0F172A"
+        android:textColor="@color/text_primary"
         android:textSize="28sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -26,13 +27,13 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="4dp"
-        android:text="Loading..."
-        android:textColor="#64748B"
+        android:text="Loading schedule..."
+        android:textColor="@color/text_secondary"
         android:textSize="14sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvScheduleTitle" />
 
-    <!-- Add Button -->
+    <!-- Add Button (+) -->
     <androidx.cardview.widget.CardView
         android:id="@+id/btnAddSchedule"
         android:layout_width="48dp"
@@ -50,39 +51,103 @@
             android:gravity="center"
             android:text="+"
             android:textColor="@color/white"
-            android:textSize="24sp" />
+            android:textSize="24sp"
+            android:textStyle="bold" />
+    </androidx.cardview.widget.CardView>
+
+    <!-- Scan Study Load Banner Card -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardScanStudyLoadBanner"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="16dp"
+        app:cardBackgroundColor="#1D4ED8"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="3dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvScheduleSubtitle">
+
+        <LinearLayout
+            android:id="@+id/btnScanStudyLoadTrigger"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_camera"
+                app:tint="@color/white" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Scan Study Load Document 📷"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Auto-extract and plot courses &amp; rooms"
+                    android:textColor="#93C5FD"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_arrow_right"
+                app:tint="@color/white" />
+        </LinearLayout>
     </androidx.cardview.widget.CardView>
 
     <!-- Day/Week/Month Toggle -->
     <LinearLayout
         android:id="@+id/toggleContainer"
         android:layout_width="0dp"
-        android:layout_height="50dp"
+        android:layout_height="46dp"
         android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         android:background="@drawable/bg_segment_inactive"
         android:orientation="horizontal"
         android:padding="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvScheduleSubtitle">
-        <TextView android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/bg_segment_active" android:elevation="2dp" android:gravity="center" android:text="Day" android:textColor="#1D4ED8" android:textSize="14sp" android:textStyle="bold" />
-        <TextView android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="Week" android:textColor="#475569" android:textSize="14sp" />
-        <TextView android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="Month" android:textColor="#475569" android:textSize="14sp" />
+        app:layout_constraintTop_toBottomOf="@+id/cardScanStudyLoadBanner">
+
+        <TextView android:id="@+id/tabScheduleDay" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/bg_segment_active" android:elevation="2dp" android:gravity="center" android:text="Day" android:textColor="#1D4ED8" android:textSize="14sp" android:textStyle="bold" />
+        <TextView android:id="@+id/tabScheduleWeek" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="Week" android:textColor="@color/text_secondary" android:textSize="14sp" />
+        <TextView android:id="@+id/tabScheduleMonth" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="Month" android:textColor="@color/text_secondary" android:textSize="14sp" />
     </LinearLayout>
 
-    <!-- DYNAMIC Horizontal Dates (Container only) -->
+    <!-- DYNAMIC Horizontal Dates Container -->
     <HorizontalScrollView
         android:id="@+id/dateScrollView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         android:scrollbars="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toggleContainer">
 
-        <!-- Java will inject dates here -->
         <LinearLayout
             android:id="@+id/datesContainer"
             android:layout_width="wrap_content"
@@ -104,13 +169,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/dateScrollView" />
 
-    <!-- Empty State Text (Shows when no classes) -->
+    <!-- Empty State Text -->
     <TextView
         android:id="@+id/tvEmptyState"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="No classes scheduled for this day."
-        android:textColor="#94A3B8"
+        android:textColor="@color/text_secondary"
         android:textSize="14sp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/rvDailySchedule"
