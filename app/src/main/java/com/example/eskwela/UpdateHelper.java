@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -28,7 +29,8 @@ import java.util.Locale;
 public class UpdateHelper {
 
     public static final String GITHUB_API_LATEST_RELEASE = "https://api.github.com/repos/jameshofril06-jpg/SkwelaApp/releases/latest";
-    public static final String DEFAULT_FALLBACK_DOWNLOAD_URL = "https://github.com/jameshofril06-jpg/SkwelaApp/releases/latest/download/app-release.apk";
+    public static final String DEFAULT_FALLBACK_DOWNLOAD_URL = "https://github.com/jameshofril06-jpg/SkwelaApp/releases/download/v1.0.8/app-release.apk";
+    public static final String LATEST_VERSION_NAME = "1.0.8";
 
     public static void downloadAndInstallUpdate(Context context) {
         ProgressDialog checkingDialog = new ProgressDialog(context);
@@ -38,9 +40,9 @@ public class UpdateHelper {
         checkingDialog.show();
 
         new Thread(() -> {
-            String latestTagName = "1.0.7";
+            String latestTagName = LATEST_VERSION_NAME;
             String downloadUrl = DEFAULT_FALLBACK_DOWNLOAD_URL;
-            String releaseBody = "• ⏳ Admin Suspension Time Tracking\n• 📢 Announcement Log & Sharing\n• ⏱️ Focus Session Presets (2m, 5m, 10m, 15m, 25m, 45m, 60m)\n• 🌙 Dark Mode Profile Text Contrast\n• ⚠️ Time Schedule Conflict Detection\n• 📷 OCR Study Load Document Scanner\n• 🤖 Smart AI Quizzes & Ranking Leaderboard";
+            String releaseBody = "• 🤖 Enrolled Study Load AI Quiz Generator & Leaderboard Polish\n• ⏳ Admin Suspension Time Tracking (e.g. 6h 42m remaining)\n• 📢 Announcement Log Detail Modal & Share Feature\n• ⏱️ Focus Session Presets (2m, 5m, 10m, 15m, 25m, 45m, 60m)\n• 🌙 Global Dark Mode Text Contrast Fixes\n• ⚠️ Time Schedule Conflict Detection\n• 📷 OCR Study Load Document Scanner & Auto-Plotter";
 
             try {
                 URL url = new URL(GITHUB_API_LATEST_RELEASE);
