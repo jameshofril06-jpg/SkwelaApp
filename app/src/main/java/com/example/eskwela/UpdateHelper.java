@@ -21,9 +21,9 @@ import java.util.Locale;
 
 public class UpdateHelper {
 
-    public static final String BASE_APK_DOWNLOAD_URL = "https://github.com/jameshofril06-jpg/SkwelaApp/releases/download/v1.0.6/app-release.apk";
-    public static final String LATEST_VERSION_NAME = "1.0.6";
-    public static final int LATEST_VERSION_CODE = 6;
+    public static final String BASE_APK_DOWNLOAD_URL = "https://github.com/jameshofril06-jpg/SkwelaApp/releases/download/v1.0.7/app-release.apk";
+    public static final String LATEST_VERSION_NAME = "1.0.7";
+    public static final int LATEST_VERSION_CODE = 7;
 
     public static void downloadAndInstallUpdate(Context context) {
         // 1. Visual checking loading indicator
@@ -67,15 +67,18 @@ public class UpdateHelper {
 
             // 3. Otherwise, show update release notes and prompt download
             String whatsNew = "🚀 What's New & Fixes in ESKWELA v" + LATEST_VERSION_NAME + ":\n\n" +
+                    "• ⏳ Admin Suspension Time Tracking: Displays real-time remaining suspension countdowns (e.g. 6h 42m remaining).\n" +
+                    "• 📢 Announcement Log & Sharing: Clickable announcement detail modal with broadcast share features.\n" +
                     "• ⏱️ Focus Session Presets: Added 2m, 5m, 10m, 15m, 25m, 45m, and 60m focus session timer options.\n" +
                     "• 🌙 Dark Mode Profile Text Contrast: High-contrast visibility when editing profiles in Dark Mode.\n" +
-                    "• 🔍 Intelligent OTA Version Detection: Automatically detects if you are already on the latest version (v1.0.6).\n" +
+                    "• 🔍 Intelligent OTA Version Detection: Automatically detects if you are already on the latest version (v1.0.7).\n" +
                     "• ⚠️ Time Schedule Conflict Detection: Checks for overlapping class times when adding schedules.\n" +
                     "• 📦 Live Download Progress Bar: Real-time percentage tracking when downloading OTA updates.\n" +
                     "• 📷 OCR Study Load Document Scanner & Auto-Plotter across weekdays.\n" +
                     "• 🤖 Smart AI Quizzes & Ranking Leaderboard.\n" +
                     "• 🛡️ Admin Control Center with user moderation.\n" +
-                    "• 📝 Task Drop Confirmation with Reason & Class Deletion Code Validation.\n\n" +
+                    "• 📝 Task Drop Confirmation with Reason & Class Deletion Code Validation.\n" +
+                    "• ℹ️ 'About This App' settings section.\n\n" +
                     "Would you like to download and install v" + LATEST_VERSION_NAME + " now?";
 
             new AlertDialog.Builder(context)
@@ -106,7 +109,7 @@ public class UpdateHelper {
 
             DownloadManager.Request request = new DownloadManager.Request(Uri.parse(cacheBustedUrl));
             request.setTitle("ESKWELA OTA Update");
-            request.setDescription("Downloading latest version v1.0.6 APK...");
+            request.setDescription("Downloading latest version v1.0.7 APK...");
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "eskwela-latest.apk");
             request.setMimeType("application/vnd.android.package-archive");
@@ -122,7 +125,7 @@ public class UpdateHelper {
             // Create Live Progress Dialog
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Downloading Update 📦");
-            builder.setMessage("Please wait while v1.0.6 is being downloaded...");
+            builder.setMessage("Please wait while v1.0.7 is being downloaded...");
             builder.setCancelable(false);
 
             final AlertDialog progressDialog = builder.create();
@@ -152,11 +155,11 @@ public class UpdateHelper {
                             return;
                         } else if (status == DownloadManager.STATUS_FAILED) {
                             if (progressDialog.isShowing()) progressDialog.dismiss();
-                            Toast.makeText(context, "Download failed. Check if GitHub release v1.0.6 asset is public.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, "Download failed. Check if GitHub release v1.0.7 asset is public.", Toast.LENGTH_LONG).show();
                             return;
                         } else if (total > 0) {
                             int progress = (int) ((downloaded * 100L) / total);
-                            progressDialog.setMessage(String.format(Locale.getDefault(), "Downloading v1.0.6... %d%% (%d KB / %d KB)", progress, downloaded / 1024, total / 1024));
+                            progressDialog.setMessage(String.format(Locale.getDefault(), "Downloading v1.0.7... %d%% (%d KB / %d KB)", progress, downloaded / 1024, total / 1024));
                         }
                     }
                     handler.postDelayed(this, 500);

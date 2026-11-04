@@ -15,8 +15,8 @@ android {
         applicationId = "com.example.eskwela"
         minSdk = 24
         targetSdk = 37
-        versionCode = 6
-        versionName = "1.0.6"
+        versionCode = 7
+        versionName = "1.0.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
