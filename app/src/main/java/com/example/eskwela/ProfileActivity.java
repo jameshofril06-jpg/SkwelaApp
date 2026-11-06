@@ -304,6 +304,10 @@ public class ProfileActivity extends AppCompatActivity {
                                 if (cardAdmin != null) cardAdmin.setVisibility(View.VISIBLE);
                                 View rowOffline = findViewById(R.id.rowOffline);
                                 if (rowOffline != null) rowOffline.setVisibility(View.GONE);
+                                View rowReminders = findViewById(R.id.rowReminders);
+                                if (rowReminders != null) rowReminders.setVisibility(View.GONE);
+                                View viewReminderDivider = findViewById(R.id.viewReminderDivider);
+                                if (viewReminderDivider != null) viewReminderDivider.setVisibility(View.GONE);
                             }
                         }
                     });
