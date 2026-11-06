@@ -7,10 +7,6 @@ from reportlab.lib import colors
 
 artifact_dir = "C:/Users/JAMES/Documents/GitHub/SkwelaApp/.artifacts/5931fd5c-677b-4130-a6af-3695ce1b4c73"
 
-# =========================================================================
-# 1. GENERATE PRECISE HIGH-RESOLUTION PNG DIAGRAMS USING PILLOW
-# =========================================================================
-
 def get_font(size, bold=False):
     try:
         font_path = "C:/Windows/Fonts/arialbd.ttf" if bold else "C:/Windows/Fonts/arial.ttf"
@@ -24,23 +20,24 @@ font_body = get_font(15, bold=False)
 font_bold = get_font(15, bold=True)
 font_small = get_font(13, bold=False)
 
+# =========================================================================
+# 1. HIGH-RESOLUTION PNG DIAGRAM GENERATION
+# =========================================================================
+
 # -------------------------------------------------------------------------
-# Diagram 1: Clean, Non-Overlapping ERD Diagram (erd_diagram.png)
+# Diagram 1: Entity-Relationship Diagram (erd_diagram.png)
 # -------------------------------------------------------------------------
 img_erd = Image.new('RGB', (2400, 1500), color='#F8FAFC')
 draw = ImageDraw.Draw(img_erd)
 
-# Title Banner
 draw.rectangle([0, 0, 2400, 100], fill='#1D4ED8')
-draw.text((60, 30), "ESKWELA - Clean Field-to-Field ERD (Zero Line Crossings)", fill='#FFFFFF', font=font_title)
+draw.text((60, 30), "ESKWELA - Entity-Relationship Diagram (ERD)", fill='#FFFFFF', font=font_title)
 
-# Draw Table Box & Return Field Y-Coordinates dictionary
 def draw_table_with_fields(x, y, width, title, fields):
     header_height = 45
     row_height = 32
     total_height = header_height + (len(fields) * row_height) + 10
 
-    # Shadow and Box
     draw.rectangle([x+4, y+4, x+width+4, y+total_height+4], fill='#CBD5E1')
     draw.rectangle([x, y, x+width, y+total_height], fill='#FFFFFF', outline='#0F172A', width=3)
     draw.rectangle([x, y, x+width, y+header_height], fill='#1E293B')
@@ -50,18 +47,13 @@ def draw_table_with_fields(x, y, width, title, fields):
     curr_y = y + header_height + 10
     for field in fields:
         field_name = field.split()[0]
-        field_coords[field_name] = curr_y + 12 # center of row
+        field_coords[field_name] = curr_y + 12
 
         color = '#1D4ED8' if "[PK]" in field else ('#D97706' if "[FK]" in field else '#1E293B')
         draw.text((x+15, curr_y), field, fill=color, font=font_small)
         curr_y += row_height
 
     return field_coords, (x, y, width, total_height)
-
-# Layout:
-# Left Column: tblUsers (x=80)
-# Middle Column: tblSchedules (x=850, y=150), tblTasks (x=850, y=650), tblFocusSessions (x=850, y=1100)
-# Right Column: tblAiQuizzes (x=1600, y=150), tblAnnouncements (x=1600, y=650)
 
 f_users, b_users = draw_table_with_fields(80, 220, 440, "tblUsers (users)", [
     "id VARCHAR(128) [PK]",
@@ -129,64 +121,43 @@ f_announcements, b_announcements = draw_table_with_fields(1600, 650, 460, "tblAn
     "postedAt BIGINT"
 ])
 
-# Precise Pointer Generator with Arrowhead
 def draw_direct_arrow(start_x, start_y, end_x, end_y, color='#1D4ED8', label='1 : N', bend_offset=0):
     if bend_offset == 0:
-        # Simple Orthogonal Step: start_x -> mid_x -> end_y -> end_x
         mid_x = (start_x + end_x) // 2
         points = [(start_x, start_y), (mid_x, start_y), (mid_x, end_y), (end_x, end_y)]
     else:
-        # Customized Bend
         points = [(start_x, start_y), (start_x + bend_offset, start_y), (start_x + bend_offset, end_y), (end_x, end_y)]
         mid_x = start_x + bend_offset
 
     draw.line(points, fill=color, width=4)
-
-    # Arrowhead at (end_x, end_y)
     dir_x = -1 if end_x < points[-2][0] else 1
-    dir_y = -1 if end_y < points[-2][1] else 1
 
-    if points[-2][1] == end_y: # Horizontal arrival
-        draw.polygon([
-            (end_x, end_y),
-            (end_x - (14 * dir_x), end_y - 7),
-            (end_x - (14 * dir_x), end_y + 7)
-        ], fill=color)
-    else: # Vertical arrival
-        draw.polygon([
-            (end_x, end_y),
-            (end_x - 7, end_y - (14 * dir_y)),
-            (end_x + 7, end_y - (14 * dir_y))
-        ], fill=color)
+    if points[-2][1] == end_y:
+        draw.polygon([(end_x, end_y), (end_x - (14 * dir_x), end_y - 7), (end_x - (14 * dir_x), end_y + 7)], fill=color)
+    else:
+        dir_y = -1 if end_y < points[-2][1] else 1
+        draw.polygon([(end_x, end_y), (end_x - 7, end_y - (14 * dir_y)), (end_x + 7, end_y - (14 * dir_y))], fill=color)
 
-    # Label badge
     lbl_x = (start_x + end_x) // 2
     lbl_y = (start_y + end_y) // 2
     draw.rectangle([lbl_x-35, lbl_y-12, lbl_x+35, lbl_y+12], fill='#FFFFFF', outline=color, width=2)
     draw.text((lbl_x-22, lbl_y-8), label, fill=color, font=font_small)
 
-# 1. tblSchedules.userId [FK] ➔ tblUsers.id [PK]
 draw_direct_arrow(850, f_schedules["userId"], 520, f_users["id"], '#1D4ED8', "1 : N", -150)
-
-# 2. tblTasks.userId [FK] ➔ tblUsers.id [PK]
 draw_direct_arrow(850, f_tasks["userId"], 520, f_users["id"], '#2563EB', "1 : N", -200)
 
-# 3. tblTasks.scheduleId [FK] ➔ tblSchedules.id [PK] (Direct vertical relation between tasks & schedules!)
 draw.line([(850, f_tasks["scheduleId"]), (780, f_tasks["scheduleId"]), (780, f_schedules["id"]), (850, f_schedules["id"])], fill='#7C3AED', width=4)
 draw.polygon([(850, f_schedules["id"]), (836, f_schedules["id"]-7), (836, f_schedules["id"]+7)], fill='#7C3AED')
 draw.rectangle([730, (f_tasks["scheduleId"]+f_schedules["id"])//2 - 12, 830, (f_tasks["scheduleId"]+f_schedules["id"])//2 + 12], fill='#FFFFFF', outline='#7C3AED', width=2)
 draw.text((740, (f_tasks["scheduleId"]+f_schedules["id"])//2 - 8), "1 : N", fill='#7C3AED', font=font_small)
 
-# 4. tblFocusSessions.userId [FK] ➔ tblUsers.id [PK]
 draw_direct_arrow(850, f_focus["userId"], 520, f_users["id"], '#059669', "1 : N", -250)
 
-# 5. tblAiQuizzes.userId [FK] ➔ tblUsers.id [PK] (Route above)
 draw.line([(1600, f_quizzes["userId"]), (1540, f_quizzes["userId"]), (1540, 180), (520, 180), (520, f_users["id"])], fill='#D97706', width=4)
 draw.polygon([(520, f_users["id"]), (520-7, f_users["id"]+14), (520+7, f_users["id"]+14)], fill='#D97706')
 draw.rectangle([1000, 168, 1070, 192], fill='#FFFFFF', outline='#D97706', width=2)
 draw.text((1010, 172), "1 : N", fill='#D97706', font=font_small)
 
-# 6. tblAnnouncements.adminId [FK] ➔ tblUsers.id [PK] (Route below)
 draw.line([(1600, f_announcements["adminId"]), (1540, f_announcements["adminId"]), (1540, 600), (520, 600), (520, f_users["id"])], fill='#DC2626', width=4)
 draw.polygon([(520, f_users["id"]), (520-7, f_users["id"]+14), (520+7, f_users["id"]+14)], fill='#DC2626')
 draw.rectangle([1000, 588, 1070, 612], fill='#FFFFFF', outline='#DC2626', width=2)
@@ -197,19 +168,17 @@ img_erd.save(erd_path)
 
 
 # -------------------------------------------------------------------------
-# Diagram 2: System Use Case Diagram (Admin Restricted) (usecase_diagram.png)
+# Diagram 2: System Use Case Diagram (usecase_diagram.png)
 # -------------------------------------------------------------------------
 img_uc = Image.new('RGB', (2200, 1400), color='#F8FAFC')
 draw = ImageDraw.Draw(img_uc)
 
 draw.rectangle([0, 0, 2200, 100], fill='#1D4ED8')
-draw.text((60, 30), "ESKWELA - System Use Case Diagram (Role Access Control)", fill='#FFFFFF', font=font_title)
+draw.text((60, 30), "ESKWELA - System Use Case Diagram", fill='#FFFFFF', font=font_title)
 
-# System Boundary
 draw.rectangle([450, 140, 1750, 1320], fill='#FFFFFF', outline='#0F172A', width=4)
-draw.text((470, 160), "ESKWELA Mobile & Admin System Boundary", fill='#0F172A', font=font_bold)
+draw.text((470, 160), "ESKWELA System Boundary", fill='#0F172A', font=font_bold)
 
-# Draw Actors
 def draw_actor(x, y, name, color='#1D4ED8'):
     draw.ellipse([x-25, y, x+25, y+50], outline=color, width=4)
     draw.line([x, y+50, x, y+120], fill=color, width=4)
@@ -221,7 +190,6 @@ def draw_actor(x, y, name, color='#1D4ED8'):
 draw_actor(200, 550, "Student Actor", '#1D4ED8')
 draw_actor(2000, 550, "Admin Actor", '#D97706')
 
-# Use Cases
 use_cases = [
     (1100, 220, "UC1: Register & Profile Setup", True, False),
     (1100, 330, "UC2: OCR Study Load Timetable Scanner", True, False),
@@ -252,7 +220,7 @@ img_uc.save(usecase_path)
 
 
 # -------------------------------------------------------------------------
-# Diagram 3: High-Resolution Data Flow Diagram (DFD) (dfd_diagram.png)
+# Diagram 3: Data Flow Diagram (DFD) (dfd_diagram.png)
 # -------------------------------------------------------------------------
 img_dfd = Image.new('RGB', (2200, 1200), color='#F8FAFC')
 draw = ImageDraw.Draw(img_dfd)
@@ -260,14 +228,12 @@ draw = ImageDraw.Draw(img_dfd)
 draw.rectangle([0, 0, 2200, 100], fill='#1D4ED8')
 draw.text((60, 30), "ESKWELA - Data Flow Diagram (DFD Level 1)", fill='#FFFFFF', font=font_title)
 
-# Entities
 draw.rectangle([80, 300, 380, 450], fill='#EFF6FF', outline='#1D4ED8', width=3)
 draw.text((120, 360), "Student Entity", fill='#0F172A', font=font_bold)
 
 draw.rectangle([80, 700, 380, 850], fill='#FEF3C7', outline='#D97706', width=3)
 draw.text((120, 760), "Admin Entity", fill='#0F172A', font=font_bold)
 
-# Processes
 def draw_process(cx, cy, num, label):
     draw.ellipse([cx-140, cy-70, cx+140, cy+70], fill='#FFFFFF', outline='#0F172A', width=3)
     draw.line([cx-140, cy-20, cx+140, cy-20], fill='#0F172A', width=2)
@@ -279,7 +245,6 @@ draw_process(800, 550, "2.0", "OCR Scanner &\nSchedule Engine")
 draw_process(800, 850, "3.0", "AI Quiz &\nLeaderboard Engine")
 draw_process(1500, 550, "4.0", "Admin Control &\nAnnouncement Broadcast")
 
-# Data Stores
 def draw_datastore(x, y, name):
     draw.line([x, y, x+320, y], fill='#0F172A', width=3)
     draw.line([x, y+60, x+320, y+60], fill='#0F172A', width=3)
@@ -292,7 +257,6 @@ draw_datastore(1780, 560, "D3: tblTasks")
 draw_datastore(1780, 740, "D4: tblAiQuizzes")
 draw_datastore(1780, 920, "D5: tblAnnouncements")
 
-# Arrows
 draw.line([380, 375, 660, 250], fill='#64748B', width=3)
 draw.line([380, 375, 660, 550], fill='#64748B', width=3)
 draw.line([380, 375, 660, 850], fill='#64748B', width=3)
@@ -310,51 +274,58 @@ img_dfd.save(dfd_path)
 
 
 # -------------------------------------------------------------------------
-# Diagram 4: High-Resolution Sequence Diagram (sequence_diagram.png)
+# Diagram 4: Full System Life Cycle Sequence Diagram (sequence_diagram.png)
 # -------------------------------------------------------------------------
-img_seq = Image.new('RGB', (2200, 1100), color='#F8FAFC')
+img_seq = Image.new('RGB', (2400, 1400), color='#F8FAFC')
 draw = ImageDraw.Draw(img_seq)
 
-draw.rectangle([0, 0, 2200, 100], fill='#1D4ED8')
-draw.text((60, 30), "ESKWELA - AI Quiz & Leaderboard Sequence Diagram", fill='#FFFFFF', font=font_title)
+draw.rectangle([0, 0, 2400, 100], fill='#1D4ED8')
+draw.text((60, 30), "ESKWELA - End-to-End System Life Cycle Sequence Diagram", fill='#FFFFFF', font=font_title)
 
 # Lifelines
 lifelines = [
-    (250, "Student"),
-    (800, "ESKWELA Mobile App"),
-    (1350, "Google ML Kit / AI Engine"),
-    (1900, "Firebase Firestore")
+    (250, "User (Student / Admin)"),
+    (850, "ESKWELA Mobile App"),
+    (1450, "Google ML Kit / AI Engine"),
+    (2050, "Google Firebase Backend")
 ]
 
 for x, name in lifelines:
-    draw.rectangle([x-120, 140, x+120, 200], fill='#1E293B')
-    draw.text((x-80, 160), name, fill='#FFFFFF', font=font_bold)
-    draw.line([x, 200, x, 1000], fill='#64748B', width=2)
+    draw.rectangle([x-140, 130, x+140, 190], fill='#1E293B')
+    draw.text((x-110, 150), name, fill='#FFFFFF', font=font_bold)
+    draw.line([x, 190, x, 1350], fill='#64748B', width=2)
 
-# Sequence Arrows
-def draw_msg(y, x1, x2, text):
-    draw.line([x1, y, x2, y], fill='#1D4ED8', width=3)
+# Full Sequence Messages
+def draw_msg(y, x1, x2, text, color='#1D4ED8'):
+    draw.line([x1, y, x2, y], fill=color, width=3)
     direction = 1 if x2 > x1 else -1
-    draw.polygon([x2, y, x2 - (15*direction), y-8, x2 - (15*direction), y+8], fill='#1D4ED8')
+    draw.polygon([x2, y, x2 - (15*direction), y-8, x2 - (15*direction), y+8], fill=color)
     mid_x = (x1 + x2) // 2
-    draw.text((mid_x-150, y-25), text, fill='#0F172A', font=font_small)
+    draw.text((mid_x-220, y-22), text, fill='#0F172A', font=font_small)
 
-draw_msg(280, 250, 800, "1. Selects Course & Question Count (5-15 Qs)")
-draw_msg(360, 800, 1350, "2. Request Smart Multiple-Choice Questions")
-draw_msg(440, 1350, 800, "3. Return Course Questions & Explanations")
-draw_msg(520, 800, 250, "4. Render Active Quiz Runner")
-draw_msg(620, 250, 800, "5. Submits Answer Choices")
-draw_msg(700, 800, 800, "6. Calculate Score & Diagnostic Percentage")
-draw_msg(780, 800, 1900, "7. Save Attempt Record (tblAiQuizzes)")
-draw_msg(860, 1900, 800, "8. Query Top 5 High Scores (ORDER BY percentage DESC)")
-draw_msg(940, 800, 250, "9. Render Score Modal & Live Leaderboard Ranks")
+draw_msg(240, 250, 850, "1. Submit Login / Profile Credentials")
+draw_msg(300, 850, 2050, "2. Authenticate User & Fetch Role (tblUsers)")
+draw_msg(360, 2050, 850, "3. Return Auth Token & Role ('student' / 'admin')")
+draw_msg(420, 850, 250, "4. Render Dashboard & Official Announcements")
+draw_msg(500, 250, 850, "5. Upload Study Load Photo (Camera/Gallery)")
+draw_msg(560, 850, 1450, "6. Process Document Text Recognition (OCR)")
+draw_msg(620, 1450, 850, "7. Return Extracted Course Titles, Times & Rooms")
+draw_msg(680, 850, 2050, "8. Auto-Plot Weekday Timetable (tblSchedules)")
+draw_msg(760, 250, 850, "9. Select Course & Complete AI Practice Quiz")
+draw_msg(820, 850, 2050, "10. Save Attempt (tblAiQuizzes) & Query Leaderboard")
+draw_msg(900, 250, 850, "11. Admin Access Control Center & Student Search", '#D97706')
+draw_msg(960, 850, 2050, "12. Update Student Status (Suspend / Archive)", '#D97706')
+draw_msg(1040, 250, 850, "13. Broadcast Official Announcement", '#D97706')
+draw_msg(1100, 850, 2050, "14. Save Broadcast Record (tblAnnouncements)", '#D97706')
+draw_msg(1180, 250, 850, "15. Trigger Account Logout")
+draw_msg(1240, 850, 2050, "16. Revoke Auth Session & Return to Landing Screen")
 
 seq_path = os.path.join(artifact_dir, "sequence_diagram.png")
 img_seq.save(seq_path)
 
 
 # =========================================================================
-# 2. GENERATE PDF DOCUMENT WITH INSTRUCTOR'S EXACT TABLE TEMPLATE & PNGs
+# 2. GENERATE PDF DOCUMENT
 # =========================================================================
 
 pdf_path = os.path.join(artifact_dir, "database_documentation.pdf")
@@ -425,10 +396,10 @@ story.append(Spacer(1, 10))
 
 # 1. Executive Summary
 story.append(Paragraph("1. Executive Summary", h2_style))
-story.append(Paragraph("This document provides the complete database technical specifications, instructor-formatted Data Dictionary, field-precise visual ERD diagram, role-restricted Use Case Diagram, DFD, Sequence Diagram, and raw DDL SQL creation script for <b>ESKWELA</b>. Administrators have restricted privilege scoped exclusively to the Admin Control Center, user inspection, and modifying announcements.", body_style))
+story.append(Paragraph("This document provides the complete database technical specifications, instructor-formatted Data Dictionary, visual ERD diagram, role-restricted Use Case Diagram, DFD, end-to-end Sequence Diagram, and raw DDL SQL creation script for <b>ESKWELA</b>. Administrators have restricted privilege scoped exclusively to the Admin Control Center, user inspection, and modifying announcements.", body_style))
 
 # 2. Data Dictionary (Instructor Template Format)
-story.append(Paragraph("2. Data Dictionary (Instructor Format)", h2_style))
+story.append(Paragraph("2. Data Dictionary", h2_style))
 
 def make_instructor_table(title, rows):
     story.append(Paragraph(f"<b>{title}</b>", body_style))
@@ -544,33 +515,34 @@ story.append(PageBreak())
 # 3. HIGH-RESOLUTION VISUAL DIAGRAMS EMBEDDED IN PDF
 # =========================================================================
 
-story.append(Paragraph("3. Precise Field-to-Field Visual Entity-Relationship Diagram (ERD)", h2_style))
-story.append(Paragraph("Zero-crossing, clean diagram with precise orthogonal arrows pointing directly from Foreign Keys [FK] to Primary Keys [PK]:", body_style))
+# Diagram 1: High-Resolution ERD
+story.append(Paragraph("3. Entity-Relationship Diagram (ERD)", h2_style))
+story.append(Paragraph("Diagram depicting entities, attributes, primary keys [PK], foreign keys [FK], and 1:N cardinalities:", body_style))
 story.append(RLImage(erd_path, width=540, height=337))
 story.append(Spacer(1, 15))
 
 story.append(PageBreak())
 
 # Diagram 2: Use Case Diagram
-story.append(Paragraph("4. Visual System Use Case Diagram (Admin Access Scoped)", h2_style))
-story.append(Paragraph("High-resolution diagram showing Student use cases and Admin restricted access (Admin Control Center & Announcements ONLY):", body_style))
+story.append(Paragraph("4. System Use Case Diagram (Role Scoped)", h2_style))
+story.append(Paragraph("Diagram showing Student use cases and Admin restricted access (Admin Control Center & Announcements ONLY):", body_style))
 story.append(RLImage(usecase_path, width=540, height=343))
 story.append(Spacer(1, 15))
 
 story.append(PageBreak())
 
 # Diagram 3: Data Flow Diagram (DFD)
-story.append(Paragraph("5. Visual Data Flow Diagram (DFD Level 1)", h2_style))
-story.append(Paragraph("High-resolution diagram depicting data flow between entities, processes, and data stores:", body_style))
+story.append(Paragraph("5. Data Flow Diagram (DFD Level 1)", h2_style))
+story.append(Paragraph("Diagram depicting data flows between entities, processes, and data stores:", body_style))
 story.append(RLImage(dfd_path, width=540, height=294))
 story.append(Spacer(1, 15))
 
 story.append(PageBreak())
 
-# Diagram 4: Sequence Diagram
-story.append(Paragraph("6. Visual AI Quiz & Leaderboard Sequence Diagram", h2_style))
-story.append(Paragraph("High-resolution diagram depicting the execution sequence for smart AI quiz generation and leaderboard rankings:", body_style))
-story.append(RLImage(seq_path, width=540, height=270))
+# Diagram 4: End-to-End Sequence Diagram
+story.append(Paragraph("6. End-to-End System Life Cycle Sequence Diagram", h2_style))
+story.append(Paragraph("Full system execution flow from User Login, OCR Scanning, Quiz Runner, and Admin Moderation to Session Logout:", body_style))
+story.append(RLImage(seq_path, width=540, height=315))
 story.append(Spacer(1, 15))
 
 story.append(PageBreak())
@@ -683,4 +655,4 @@ for line in sql_script.split('\n'):
     story.append(Paragraph(line, code_style))
 
 doc.build(story)
-print("Single PDF Document with Un-Crossed ERD generated successfully.")
+print("Pristine Academic PDF Document generated successfully.")
