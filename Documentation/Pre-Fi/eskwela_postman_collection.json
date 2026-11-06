@@ -1,0 +1,188 @@
+{
+	"info": {
+		"_postman_id": "a9b8c7d6-e5f4-4321-8765-123456789abc",
+		"name": "ESKWELA API Postman Collection",
+		"description": "Postman Collection for testing ESKWELA Firebase Auth, Firestore REST API endpoints, and GitHub OTA Release API.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register Student Account",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"student@eskwela.com\",\n  \"password\": \"SecurePass123!\",\n  \"returnSecureToken\": true\n}"
+						},
+						"url": {
+							"raw": "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=YOUR_FIREBASE_API_KEY",
+							"protocol": "https",
+							"host": ["identitytoolkit", "googleapis", "com"],
+							"path": ["v1", "accounts:signUp"],
+							"query": [
+								{
+									"key": "key",
+									"value": "YOUR_FIREBASE_API_KEY"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Login User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"student@eskwela.com\",\n  \"password\": \"SecurePass123!\",\n  \"returnSecureToken\": true\n}"
+						},
+						"url": {
+							"raw": "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=YOUR_FIREBASE_API_KEY",
+							"protocol": "https",
+							"host": ["identitytoolkit", "googleapis", "com"],
+							"path": ["v1", "accounts:signInWithPassword"],
+							"query": [
+								{
+									"key": "key",
+									"value": "YOUR_FIREBASE_API_KEY"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Users & Profile",
+			"item": [
+				{
+					"name": "Get User Profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://firestore.googleapis.com/v1/projects/eskwela-450eb/databases/(default)/documents/users/student-uid-101",
+							"protocol": "https",
+							"host": ["firestore", "googleapis", "com"],
+							"path": ["v1", "projects", "eskwela-450eb", "databases", "(default)", "documents", "users", "student-uid-101"]
+						}
+					}
+				},
+				{
+					"name": "Update User Status (Admin)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fields\": {\n    \"status\": { \"stringValue\": \"suspended\" },\n    \"suspensionDuration\": { \"stringValue\": \"24 Hours\" },\n    \"suspendedAt\": { \"integerValue\": 1715000000000 }\n  }\n}"
+						},
+						"url": {
+							"raw": "https://firestore.googleapis.com/v1/projects/eskwela-450eb/databases/(default)/documents/users/student-uid-101?updateMask.fieldPaths=status&updateMask.fieldPaths=suspensionDuration&updateMask.fieldPaths=suspendedAt",
+							"protocol": "https",
+							"host": ["firestore", "googleapis", "com"],
+							"path": ["v1", "projects", "eskwela-450eb", "databases", "(default)", "documents", "users", "student-uid-101"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Schedules & Timetable",
+			"item": [
+				{
+					"name": "Get Daily Schedules",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"structuredQuery\": {\n    \"from\": [{ \"collectionId\": \"schedules\" }],\n    \"where\": {\n      \"compositeFilter\": {\n        \"op\": \"AND\",\n        \"filters\": [\n          {\n            \"fieldFilter\": {\n              \"field\": { \"fieldPath\": \"userId\" },\n              \"op\": \"EQUAL\",\n              \"value\": { \"stringValue\": \"student-uid-101\" }\n            }\n          },\n          {\n            \"fieldFilter\": {\n              \"field\": { \"fieldPath\": \"dateString\" },\n              \"op\": \"EQUAL\",\n              \"value\": { \"stringValue\": \"2025-05-12\" }\n            }\n          }\n        ]\n      }\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "https://firestore.googleapis.com/v1/projects/eskwela-450eb/databases/(default)/documents:runQuery",
+							"protocol": "https",
+							"host": ["firestore", "googleapis", "com"],
+							"path": ["v1", "projects", "eskwela-450eb", "databases", "(default)", "documents:runQuery"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "AI Quizzes & Leaderboard",
+			"item": [
+				{
+					"name": "Get Leaderboard High Scores",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"structuredQuery\": {\n    \"from\": [{ \"collectionId\": \"ai_quizzes\" }],\n    \"orderBy\": [{ \"field\": { \"fieldPath\": \"percentage\" }, \"direction\": \"DESCENDING\" }],\n    \"limit\": 5\n  }\n}"
+						},
+						"url": {
+							"raw": "https://firestore.googleapis.com/v1/projects/eskwela-450eb/databases/(default)/documents:runQuery",
+							"protocol": "https",
+							"host": ["firestore", "googleapis", "com"],
+							"path": ["v1", "projects", "eskwela-450eb", "databases", "(default)", "documents:runQuery"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "OTA Release API",
+			"item": [
+				{
+					"name": "Check Latest GitHub Release",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "User-Agent",
+								"value": "ESKWELA-App"
+							}
+						],
+						"url": {
+							"raw": "https://api.github.com/repos/jameshofril06-jpg/SkwelaApp/releases/latest",
+							"protocol": "https",
+							"host": ["api", "github", "com"],
+							"path": ["repos", "jameshofril06-jpg", "SkwelaApp", "releases", "latest"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

@@ -28,8 +28,8 @@ import java.util.Locale;
 public class UpdateHelper {
 
     public static final String GITHUB_API_RELEASES = "https://api.github.com/repos/jameshofril06-jpg/SkwelaApp/releases";
-    public static final String DEFAULT_FALLBACK_DOWNLOAD_URL = "https://github.com/jameshofril06-jpg/SkwelaApp/releases/download/v1.0.8/app-release.apk";
-    public static final String LATEST_VERSION_NAME = "1.0.8";
+    public static final String DEFAULT_FALLBACK_DOWNLOAD_URL = "https://github.com/jameshofril06-jpg/SkwelaApp/releases/download/v1.1.0/app-release.apk";
+    public static final String LATEST_VERSION_NAME = "1.1.0";
 
     public static void downloadAndInstallUpdate(Context context) {
         ProgressDialog checkingDialog = new ProgressDialog(context);
@@ -41,7 +41,7 @@ public class UpdateHelper {
         new Thread(() -> {
             String latestTagName = LATEST_VERSION_NAME;
             String downloadUrl = DEFAULT_FALLBACK_DOWNLOAD_URL;
-            String releaseBody = "• 🤖 Enrolled Study Load AI Quiz Generator & Leaderboard Polish\n• ⏳ Admin Suspension Time Tracking (e.g. 6h 42m remaining)\n• 📢 Announcement Log Detail Modal & Share Feature\n• ⏱️ Focus Session Presets (2m, 5m, 10m, 15m, 25m, 45m, 60m)\n• 🌙 Global Dark Mode Text Contrast Fixes\n• ⚠️ Time Schedule Conflict Detection\n• 📷 OCR Study Load Document Scanner & Auto-Plotter";
+            String releaseBody = "• 📱 Official Release Candidate v1.1.0\n• 🎓 Complete Software Testing & QA Suite PDF & Postman API Collection\n• 🤖 Study Load Enrolled Course AI Quiz Generator & Ranking Leaderboard\n• ⏳ Admin User Suspension Time Tracking (e.g. 6h 42m remaining)\n• 📢 Clickable Announcement Log Detail Modal & Share Feature\n• ⏱️ Focus Session Presets (2m, 5m, 10m, 15m, 25m, 45m, 60m)\n• 🌙 Global Dark Mode Text Contrast Fixes across all screens\n• ⚠️ Time Schedule Conflict Detection & Code-Validated Class Deletion\n• 📷 OCR Study Load Document Scanner & Auto-Plotter across weekdays";
 
             try {
                 URL url = new URL(GITHUB_API_RELEASES);
@@ -61,7 +61,7 @@ public class UpdateHelper {
 
                     JSONArray releasesArray = new JSONArray(sb.toString());
                     if (releasesArray.length() > 0) {
-                        JSONObject json = releasesArray.getJSONObject(0); // Index 0 is absolute latest release or pre-release
+                        JSONObject json = releasesArray.getJSONObject(0);
                         if (json.has("tag_name")) {
                             latestTagName = json.getString("tag_name").replace("v", "").trim();
                         }
