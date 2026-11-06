@@ -13,3 +13,14 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Secrets, Keystores & Credentials
+*.jks
+*.keystore
+*.p12
+*.pem
+*.key
+key.properties
+secrets.properties
+service-account*.json
+*.log
