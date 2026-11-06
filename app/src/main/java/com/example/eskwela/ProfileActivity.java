@@ -204,14 +204,37 @@ public class ProfileActivity extends AppCompatActivity {
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setSelectedItemId(R.id.nav_profile);
 
+        boolean isAdminUser = mAuth.getCurrentUser() != null && AccountGuard.isAdmin(mAuth.getCurrentUser().getEmail(), null);
+        if (isAdminUser) {
+            bottomNav.getMenu().clear();
+            bottomNav.inflateMenu(R.menu.admin_bottom_nav_menu);
+        }
+
         bottomNav.setOnItemSelectedListener(item -> {
-            int targetIndex = NavigationHelper.getTabIndex(item.getItemId());
+            int itemId = item.getItemId();
+            if (itemId == R.id.nav_profile) return true;
+
             Class<?> targetClass = null;
-            if (targetIndex == 4) return true;
-            if (targetIndex == 0) targetClass = DashboardActivity.class;
-            else if (targetIndex == 1) targetClass = MyScheduleActivity.class;
-            else if (targetIndex == 2) targetClass = TasksActivity.class;
-            else if (targetIndex == 3) targetClass = StudyActivity.class;
+            int targetIndex = 0;
+            if (itemId == R.id.nav_home) {
+                if (isAdminUser) {
+                    startActivity(new Intent(ProfileActivity.this, AdminDashboardActivity.class));
+                    finish();
+                    return true;
+                } else {
+                    targetClass = DashboardActivity.class;
+                    targetIndex = 0;
+                }
+            } else if (itemId == R.id.nav_schedule) {
+                targetClass = MyScheduleActivity.class;
+                targetIndex = 1;
+            } else if (itemId == R.id.nav_tasks) {
+                targetClass = TasksActivity.class;
+                targetIndex = 2;
+            } else if (itemId == R.id.nav_study) {
+                targetClass = StudyActivity.class;
+                targetIndex = 3;
+            }
 
             if (targetClass != null) {
                 NavigationHelper.navigateWithTabAnimation(this, 4, targetIndex, targetClass);
@@ -277,8 +300,10 @@ public class ProfileActivity extends AppCompatActivity {
                                 tvStudentId.setText("ID: " + studentId);
                             }
 
-                            if (AccountGuard.isAdmin(email, role) && cardAdmin != null) {
-                                cardAdmin.setVisibility(View.VISIBLE);
+                            if (AccountGuard.isAdmin(email, role)) {
+                                if (cardAdmin != null) cardAdmin.setVisibility(View.VISIBLE);
+                                View rowOffline = findViewById(R.id.rowOffline);
+                                if (rowOffline != null) rowOffline.setVisibility(View.GONE);
                             }
                         }
                     });
