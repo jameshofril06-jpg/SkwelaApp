@@ -111,7 +111,13 @@ public class SplashActivity extends AppCompatActivity {
                         if (AccountGuard.blockIfRestricted(SplashActivity.this, FirebaseAuth.getInstance(), documentSnapshot)) {
                             return;
                         }
-                        goTo(DashboardActivity.class);
+                        String role = documentSnapshot.getString("role");
+                        String email = currentUser.getEmail();
+                        if (AccountGuard.isAdmin(email, role)) {
+                            goTo(AdminDashboardActivity.class);
+                        } else {
+                            goTo(DashboardActivity.class);
+                        }
                     })
                     .addOnFailureListener(e -> {
                         if (isFinishing() || isDestroyed()) return;

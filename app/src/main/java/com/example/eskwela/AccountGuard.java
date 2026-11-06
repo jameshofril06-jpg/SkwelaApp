@@ -26,6 +26,17 @@ public final class AccountGuard {
         return lower.contains("admin") || "admin@eskwela.com".equals(lower);
     }
 
+    public static boolean redirectIfAdmin(AppCompatActivity activity, String email, String role) {
+        if (isAdmin(email, role)) {
+            Intent intent = new Intent(activity, AdminDashboardActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            activity.startActivity(intent);
+            activity.finish();
+            return true;
+        }
+        return false;
+    }
+
     public static boolean blockIfRestricted(AppCompatActivity activity, FirebaseAuth auth, DocumentSnapshot doc) {
         if (doc != null && doc.exists() && isRestricted(doc.getString("status"))) {
             showRestrictedAndLogout(activity, auth, doc.getString("status"));

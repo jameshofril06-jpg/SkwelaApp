@@ -82,12 +82,13 @@ public class LoginActivity extends AppCompatActivity {
                                         if (AccountGuard.blockIfRestricted(LoginActivity.this, mAuth, doc)) {
                                             return;
                                         }
-                                        goToDashboard();
+                                        String role = doc.getString("role");
+                                        goToDashboard(email, role);
                                     })
                                     .addOnFailureListener(e -> {
                                         if (isFinishing()) return;
                                         setLoading(false);
-                                        goToDashboard();
+                                        goToDashboard(email, null);
                                     });
                         } else {
                             setLoading(false);
@@ -117,9 +118,10 @@ public class LoginActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Toast.makeText(this, "Could not send reset email: " + e.getMessage(), Toast.LENGTH_LONG).show());
     }
 
-    private void goToDashboard() {
-        Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
+    private void goToDashboard(String email, String role) {
+        Toast.makeText(LoginActivity.this, "Login Successful ✨", Toast.LENGTH_SHORT).show();
+        Class<?> target = AccountGuard.isAdmin(email, role) ? AdminDashboardActivity.class : DashboardActivity.class;
+        Intent intent = new Intent(LoginActivity.this, target);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();

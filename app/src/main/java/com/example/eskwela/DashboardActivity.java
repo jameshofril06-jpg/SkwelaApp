@@ -161,6 +161,10 @@ public class DashboardActivity extends AppCompatActivity {
                     if (AccountGuard.blockIfRestricted(DashboardActivity.this, mAuth, documentSnapshot)) {
                         return;
                     }
+                    String email = mAuth.getCurrentUser() != null ? mAuth.getCurrentUser().getEmail() : null;
+                    if (AccountGuard.redirectIfAdmin(DashboardActivity.this, email, documentSnapshot.getString("role"))) {
+                        return;
+                    }
                     if (documentSnapshot.exists()) {
                         String fullName = documentSnapshot.getString("fullName");
                         if (fullName != null && !fullName.isEmpty()) {
