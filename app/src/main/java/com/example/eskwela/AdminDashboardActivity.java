@@ -34,7 +34,7 @@ import java.util.Map;
 public class AdminDashboardActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
-    private TextView tvTotalUsers, tvTotalSchedules, tvTotalAnnouncements, tvAdminAnnouncementsContent;
+    private TextView tvTotalUsers, tvTotalSchedules;
     private RecyclerView rvAdminUsers;
     private EditText etSearchUsers;
     private AdminUserAdapter userAdapter;
@@ -80,8 +80,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
         tvTotalUsers = findViewById(R.id.tvTotalUsers);
         tvTotalSchedules = findViewById(R.id.tvTotalSchedules);
-        tvTotalAnnouncements = findViewById(R.id.tvTotalAnnouncements);
-        tvAdminAnnouncementsContent = findViewById(R.id.tvAdminAnnouncementsContent);
 
         rvAdminUsers = findViewById(R.id.rvAdminUsers);
         etSearchUsers = findViewById(R.id.etSearchUsers);
@@ -112,11 +110,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
             btnPostAnn.setOnClickListener(v -> showPostAnnouncementDialog());
         }
 
-        View cardAnnouncements = findViewById(R.id.cardAdminAnnouncements);
-        if (cardAnnouncements != null) {
-            cardAnnouncements.setOnClickListener(v -> startActivity(new Intent(AdminDashboardActivity.this, AnnouncementActivity.class)));
-        }
-
         setupEntranceAnimations();
         loadAdminData();
     }
@@ -124,10 +117,9 @@ public class AdminDashboardActivity extends AppCompatActivity {
     private void setupEntranceAnimations() {
         View cardStats = findViewById(R.id.cardStats);
         View cardPost = findViewById(R.id.cardPostAnnouncement);
-        View cardAnnouncements = findViewById(R.id.cardAdminAnnouncements);
         View headerUsers = findViewById(R.id.tvUsersHeader);
 
-        View[] viewsToAnimate = {cardStats, cardPost, cardAnnouncements, headerUsers, etSearchUsers, rvAdminUsers};
+        View[] viewsToAnimate = {cardStats, cardPost, headerUsers, etSearchUsers, rvAdminUsers};
         long delay = 100;
         for (View v : viewsToAnimate) {
             if (v != null) {
@@ -180,10 +172,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
                         announcement.put("author", "ADMIN");
 
                         db.collection("announcements").add(announcement)
-                                .addOnSuccessListener(ref -> {
-                                    Toast.makeText(this, "Announcement Posted to all students! 📢", Toast.LENGTH_SHORT).show();
-                                    loadAdminData();
-                                })
+                                .addOnSuccessListener(ref -> Toast.makeText(this, "Announcement Posted to all students! 📢", Toast.LENGTH_SHORT).show())
                                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to post: " + e.getMessage(), Toast.LENGTH_SHORT).show());
                     }
                 })
@@ -215,32 +204,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         int count = task.getResult().size();
                         if (tvTotalSchedules != null) tvTotalSchedules.setText(String.valueOf(count));
-                    }
-                });
-
-        // 3. Fetch Active Announcements
-        db.collection("announcements")
-                .orderBy("postedAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                        int count = task.getResult().size();
-                        if (tvTotalAnnouncements != null) tvTotalAnnouncements.setText(String.valueOf(count));
-
-                        StringBuilder sb = new StringBuilder();
-                        int idx = 1;
-                        for (QueryDocumentSnapshot doc : task.getResult()) {
-                            String msg = doc.getString("message");
-                            if (msg != null && !msg.isEmpty()) {
-                                sb.append(idx).append(". ").append(msg).append("\n");
-                                idx++;
-                            }
-                            if (idx > 3) break;
-                        }
-                        if (tvAdminAnnouncementsContent != null) tvAdminAnnouncementsContent.setText(sb.toString().trim());
-                    } else {
-                        if (tvTotalAnnouncements != null) tvTotalAnnouncements.setText("0");
-                        if (tvAdminAnnouncementsContent != null) tvAdminAnnouncementsContent.setText("No active broadcast announcements.");
                     }
                 });
     }
