@@ -1,6 +1,6 @@
 import os
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, Preformatted
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 
@@ -50,19 +50,19 @@ code_style = ParagraphStyle(
 story = []
 
 # Title
-story.append(Paragraph("ESKWELA Database Documentation & Technical Specification", title_style))
-story.append(Paragraph("<b>Role:</b> Database Manager & Engineer<br/><b>Project:</b> ESKWELA – Smart Student Productivity & Academic Management System", body_style))
+story.append(Paragraph("ESKWELA Firebase Firestore Documentation & Technical Specification", title_style))
+story.append(Paragraph("<b>Role:</b> Database Manager & Engineer<br/><b>Backend Architecture:</b> Google Firebase Auth & Firestore NoSQL Document Database", body_style))
 story.append(Spacer(1, 10))
 
 # 1. Executive Summary
-story.append(Paragraph("1. Executive Summary", h2_style))
-story.append(Paragraph("This document provides the complete database architecture, data dictionary, entity-relationship models, UML design specifications, and DDL SQL schema for ESKWELA. The database is designed for high performance, offline-first Firestore persistence, secure role-based access control, and scalable academic tracking.", body_style))
+story.append(Paragraph("1. Executive Summary & Firebase Architecture", h2_style))
+story.append(Paragraph("This document provides the technical database architecture, data dictionary, Entity-Relationship Diagram (ERD), UML diagrams, and DDL SQL export script for <b>ESKWELA</b>, strictly structured around <b>Google Firebase Firestore NoSQL</b> document collections and Firebase Auth UID references. The system provides real-time multi-device synchronization, offline local caching, and role-based security rules.", body_style))
 
-# 2. Data Dictionary
-story.append(Paragraph("2. Data Dictionary", h2_style))
+# 2. Data Dictionary (Firebase Collections)
+story.append(Paragraph("2. Firebase Firestore Data Dictionary", h2_style))
 
 def make_table(data):
-    t = Table(data, colWidths=[90, 80, 50, 145, 165])
+    t = Table(data, colWidths=[100, 70, 60, 135, 165])
     t.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#F1F5F9')),
         ('TEXTCOLOR', (0,0), (-1,0), colors.HexColor('#0F172A')),
@@ -75,89 +75,98 @@ def make_table(data):
     ]))
     return t
 
-# Users table
-story.append(Paragraph("<b>Table 1: users</b>", body_style))
+# Collection: users
+story.append(Paragraph("<b>Collection 1: users</b> (Document ID: Firebase Auth UID)", body_style))
 users_data = [
-    ["Column", "Type", "Length", "Constraints", "Description"],
-    ["id", "VARCHAR", "128", "PRIMARY KEY", "Firebase Auth UID"],
-    ["email", "VARCHAR", "255", "UNIQUE, NOT NULL", "Login email address"],
-    ["full_name", "VARCHAR", "150", "NULLABLE", "Student/admin full name"],
-    ["student_id", "VARCHAR", "50", "UNIQUE", "Student ID card number"],
-    ["school", "VARCHAR", "200", "NULLABLE", "University name"],
-    ["course", "VARCHAR", "150", "NULLABLE", "Degree program"],
-    ["role", "user_role", "-", "DEFAULT 'student'", "Role: student or admin"],
-    ["status", "user_status", "-", "DEFAULT 'active'", "Status: active, suspended, etc."]
+    ["Field Name", "Type", "Format", "Constraints", "Description"],
+    ["id", "String", "UID", "PRIMARY KEY", "Firebase Auth User ID"],
+    ["email", "String", "Email", "UNIQUE, NOT NULL", "Login email address"],
+    ["fullName", "String", "Text", "NULLABLE", "Student or administrator full name"],
+    ["studentId", "String", "Text", "UNIQUE, NULLABLE", "Student ID number (e.g. STU-4921)"],
+    ["school", "String", "Text", "NULLABLE", "University name"],
+    ["course", "String", "Text", "NULLABLE", "Degree program / Course"],
+    ["year", "String", "Text", "NULLABLE", "Year level (e.g. '4th Year')"],
+    ["section", "String", "Text", "NULLABLE", "Class section code (e.g. 'IT41C1')"],
+    ["role", "String", "Enum", "DEFAULT 'student'", "'student' or 'admin'"],
+    ["status", "String", "Enum", "DEFAULT 'active'", "'active', 'suspended', 'deactivated', 'archived'"],
+    ["suspensionDuration", "String", "Text", "NULLABLE", "Duration if suspended (e.g. '24 Hours')"],
+    ["suspendedAt", "Number", "Epoch ms", "NULLABLE", "Timestamp when account was suspended"]
 ]
 story.append(make_table(users_data))
 story.append(Spacer(1, 10))
 
-# Schedules table
-story.append(Paragraph("<b>Table 2: schedules</b>", body_style))
+# Collection: schedules
+story.append(Paragraph("<b>Collection 2: schedules</b> (Auto-generated Document ID)", body_style))
 schedules_data = [
-    ["Column", "Type", "Length", "Constraints", "Description"],
-    ["id", "VARCHAR", "128", "PRIMARY KEY", "Unique schedule ID"],
-    ["user_id", "VARCHAR", "128", "FOREIGN KEY", "Owner user ID"],
-    ["class_date", "DATE", "-", "NOT NULL", "Scheduled date"],
-    ["class_name", "VARCHAR", "200", "NOT NULL", "Course title"],
-    ["class_code", "VARCHAR", "50", "NOT NULL", "Course code (e.g. IT6398)"],
-    ["start_time", "TIME", "-", "NOT NULL", "Start time"],
-    ["end_time", "TIME", "-", "NOT NULL", "End time"],
-    ["room", "VARCHAR", "50", "NULLABLE", "Room / Lab number"]
+    ["Field Name", "Type", "Format", "Constraints", "Description"],
+    ["id", "String", "UUID", "PRIMARY KEY", "Unique schedule document ID"],
+    ["userId", "String", "UID", "FOREIGN KEY", "Owner Firebase Auth UID"],
+    ["dateString", "String", "YYYY-MM-DD", "NOT NULL", "Scheduled date string"],
+    ["className", "String", "Text", "NOT NULL", "Course title (e.g. 'CAPSTONE PROJECT 1')"],
+    ["classCode", "String", "Text", "NULLABLE", "Course code (e.g. 'IT6398')"],
+    ["school", "String", "Text", "NULLABLE", "Institution name"],
+    ["startTime", "String", "h:mm a", "NOT NULL", "Class start time (e.g. '3:00 PM')"],
+    ["endTime", "String", "h:mm a", "NOT NULL", "Class end time (e.g. '4:30 PM')"],
+    ["room", "String", "Text", "NULLABLE", "Room location (e.g. '301', 'SLAB5')"],
+    ["instructor", "String", "Text", "NULLABLE", "Units and section metadata"],
+    ["colorType", "String", "Text", "NOT NULL", "UI color badge ('BLUE', 'ORANGE', 'GREEN')"]
 ]
 story.append(make_table(schedules_data))
 story.append(Spacer(1, 10))
 
 story.append(PageBreak())
 
-# Tasks table
-story.append(Paragraph("<b>Table 3: tasks</b>", body_style))
+# Collection: tasks
+story.append(Paragraph("<b>Collection 3: tasks</b> (Auto-generated Document ID)", body_style))
 tasks_data = [
-    ["Column", "Type", "Length", "Constraints", "Description"],
-    ["id", "VARCHAR", "128", "PRIMARY KEY", "Unique task ID"],
-    ["user_id", "VARCHAR", "128", "FOREIGN KEY", "Owner user ID"],
-    ["schedule_id", "VARCHAR", "128", "FOREIGN KEY", "Linked class schedule"],
-    ["title", "TEXT", "-", "NOT NULL", "Task title"],
-    ["due_date", "TIMESTAMPTZ", "-", "NOT NULL", "Deadline"],
-    ["priority", "task_priority", "-", "DEFAULT 'MEDIUM'", "HIGH, MEDIUM, LOW"],
-    ["completed", "BOOLEAN", "-", "DEFAULT FALSE", "Completion flag"]
+    ["Field Name", "Type", "Format", "Constraints", "Description"],
+    ["id", "String", "UUID", "PRIMARY KEY", "Unique task document ID"],
+    ["userId", "String", "UID", "FOREIGN KEY", "Owner Firebase Auth UID"],
+    ["title", "String", "Text", "NOT NULL", "Task title / description"],
+    ["dateString", "String", "Text", "NOT NULL", "Deadline display string"],
+    ["courseName", "String", "Text", "NULLABLE", "Associated course title"],
+    ["priority", "String", "Enum", "DEFAULT 'MEDIUM'", "Task priority ('HIGH', 'MEDIUM', 'LOW')"],
+    ["completed", "Boolean", "true/false", "DEFAULT false", "Completion status flag"]
 ]
 story.append(make_table(tasks_data))
 story.append(Spacer(1, 10))
 
-# AI Quizzes table
-story.append(Paragraph("<b>Table 4: ai_quizzes</b>", body_style))
+# Collection: ai_quizzes
+story.append(Paragraph("<b>Collection 4: ai_quizzes</b> (Auto-generated Document ID)", body_style))
 quizzes_data = [
-    ["Column", "Type", "Length", "Constraints", "Description"],
-    ["id", "VARCHAR", "128", "PRIMARY KEY", "Unique quiz attempt ID"],
-    ["user_id", "VARCHAR", "128", "FOREIGN KEY", "User ID"],
-    ["topic", "VARCHAR", "250", "NOT NULL", "Quiz topic / course"],
-    ["score", "INT", "-", "NOT NULL", "Correct answers count"],
-    ["total_questions", "INT", "-", "NOT NULL", "Total questions (5-15)"],
-    ["percentage", "NUMERIC", "5,2", "GENERATED STORED", "Score percentage"]
+    ["Field Name", "Type", "Format", "Constraints", "Description"],
+    ["id", "String", "UUID", "PRIMARY KEY", "Unique quiz record ID"],
+    ["userId", "String", "UID", "FOREIGN KEY", "User who completed the quiz"],
+    ["userEmail", "String", "Email", "NULLABLE", "Email prefix used for Leaderboard ranking"],
+    ["topic", "String", "Text", "NOT NULL", "Quiz course subject / topic"],
+    ["score", "Number", "Integer", "NOT NULL", "Correct answers count"],
+    ["totalQuestions", "Number", "Integer", "NOT NULL", "Total questions in quiz (5, 10, 15)"],
+    ["percentage", "Number", "Integer", "NOT NULL", "Calculated score percentage (0-100)"],
+    ["timestamp", "Number", "Epoch ms", "NOT NULL", "Quiz completion timestamp"]
 ]
 story.append(make_table(quizzes_data))
 story.append(Spacer(1, 10))
 
-# Announcements table
-story.append(Paragraph("<b>Table 5: announcements</b>", body_style))
+# Collection: announcements
+story.append(Paragraph("<b>Collection 5: announcements</b> (Auto-generated Document ID)", body_style))
 ann_data = [
-    ["Column", "Type", "Length", "Constraints", "Description"],
-    ["id", "VARCHAR", "128", "PRIMARY KEY", "Unique announcement ID"],
-    ["admin_id", "VARCHAR", "128", "FOREIGN KEY", "Admin author ID"],
-    ["message", "TEXT", "-", "NOT NULL", "Broadcast message"],
-    ["created_at", "TIMESTAMPTZ", "-", "DEFAULT NOW()", "Timestamp posted"]
+    ["Field Name", "Type", "Format", "Constraints", "Description"],
+    ["id", "String", "UUID", "PRIMARY KEY", "Unique announcement ID"],
+    ["message", "String", "Text", "NOT NULL", "Official broadcast message"],
+    ["author", "String", "Text", "DEFAULT 'ADMIN'", "Author credential tag"],
+    ["postedAt", "Number", "Epoch ms", "NOT NULL", "Broadcast timestamp"]
 ]
 story.append(make_table(ann_data))
 story.append(Spacer(1, 10))
 
-# Focus Sessions table
-story.append(Paragraph("<b>Table 6: focus_sessions</b>", body_style))
+# Collection: focus_sessions
+story.append(Paragraph("<b>Collection 6: focus_sessions</b> (Auto-generated Document ID)", body_style))
 focus_data = [
-    ["Column", "Type", "Length", "Constraints", "Description"],
-    ["id", "VARCHAR", "128", "PRIMARY KEY", "Unique session ID"],
-    ["user_id", "VARCHAR", "128", "FOREIGN KEY", "User ID"],
-    ["duration_minutes", "INT", "-", "NOT NULL", "Duration (15, 25, 45, 60)"],
-    ["created_at", "TIMESTAMPTZ", "-", "DEFAULT NOW()", "Completion timestamp"]
+    ["Field Name", "Type", "Format", "Constraints", "Description"],
+    ["id", "String", "UUID", "PRIMARY KEY", "Unique session ID"],
+    ["userId", "String", "UID", "FOREIGN KEY", "User ID"],
+    ["durationMinutes", "Number", "Integer", "NOT NULL", "Duration completed (2, 5, 10, 15, 25, 45, 60)"],
+    ["completedAt", "Number", "Epoch ms", "NOT NULL", "Completion timestamp"]
 ]
 story.append(make_table(focus_data))
 story.append(Spacer(1, 15))
@@ -165,105 +174,97 @@ story.append(Spacer(1, 15))
 story.append(PageBreak())
 
 # 3. ERD & Relationships
-story.append(Paragraph("3. Entity-Relationship Diagram (ERD) & Cardinality", h2_style))
-story.append(Paragraph("• <b>USERS to SCHEDULES</b> (1 : N): One user has zero or many scheduled classes.", body_style))
-story.append(Paragraph("• <b>USERS to TASKS</b> (1 : N): One user manages zero or many tasks.", body_style))
-story.append(Paragraph("• <b>USERS to AI_QUIZZES</b> (1 : N): One user takes zero or many AI quizzes, contributing to global leaderboard rankings.", body_style))
-story.append(Paragraph("• <b>USERS to FOCUS_SESSIONS</b> (1 : N): One user records zero or many Pomodoro focus sessions.", body_style))
-story.append(Paragraph("• <b>ANNOUNCEMENTS</b>: Standalone entity managed exclusively by admin users for global student broadcast.", body_style))
+story.append(Paragraph("3. Firebase Firestore ERD & Document Relationships", h2_style))
+story.append(Paragraph("• <b>users (1) ➔ schedules (N)</b>: Linked via <code>userId</code> field.", body_style))
+story.append(Paragraph("• <b>users (1) ➔ tasks (N)</b>: Linked via <code>userId</code> field.", body_style))
+story.append(Paragraph("• <b>users (1) ➔ ai_quizzes (N)</b>: Linked via <code>userId</code> field (queries indexed on <code>percentage DESC</code> for global Leaderboard).", body_style))
+story.append(Paragraph("• <b>users (1) ➔ focus_sessions (N)</b>: Linked via <code>userId</code> field for productivity analytics.", body_style))
+story.append(Paragraph("• <b>announcements</b>: Global collection broadcasted by admins and queried in real-time on student home dashboards.", body_style))
 
-# 4. UML & Use Case
-story.append(Paragraph("4. UML & Use Case Specifications", h2_style))
-story.append(Paragraph("<b>Use Cases:</b><br/>- <b>Student:</b> Register/Login, scan study load via OCR camera/gallery, view schedule (Day/Week/Month), manage tasks, take smart AI quizzes (5-15 Qs), view live leaderboard rankings, run focus timer, toggle dark theme and online auto-sync.<br/>- <b>Administrator:</b> Authenticate admin account, access Admin Control Center, search students, manage user accounts (timed suspension, activation/deactivation, archiving), broadcast official announcements.", body_style))
+# 4. UML & Use Case Specifications
+story.append(Paragraph("4. UML Diagrams & Workflow Specifications", h2_style))
+story.append(Paragraph("<b>Use Cases:</b><br/>- <b>Student:</b> Register/Login, scan study load via OCR camera/gallery, view schedule (Day/Week/Month), manage tasks & priorities, take smart AI quizzes (5-15 Qs), view live leaderboard rankings, run Pomodoro focus timer, toggle dark theme and online auto-sync.<br/>- <b>Administrator:</b> Authenticate admin account, access Admin Control Center, search students, manage user accounts (timed suspension, activation/deactivation, archiving), broadcast official announcements.", body_style))
 
-# 5. SQL DDL Script
+# 5. Raw SQL Schema Export Script
 story.append(Paragraph("5. Raw SQL Schema Script (schema.sql)", h2_style))
-sql_text = """CREATE TYPE user_role AS ENUM ('student', 'admin');
-CREATE TYPE user_status AS ENUM ('active', 'pending', 'suspended', 'deactivated', 'archived');
-CREATE TYPE task_priority AS ENUM ('HIGH', 'MEDIUM', 'LOW');
+sql_text = """-- Firebase Firestore Structured Relational SQL DDL Export
+DROP TABLE IF EXISTS focus_sessions CASCADE;
+DROP TABLE IF EXISTS ai_quizzes CASCADE;
+DROP TABLE IF EXISTS tasks CASCADE;
+DROP TABLE IF EXISTS schedules CASCADE;
+DROP TABLE IF EXISTS announcements CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
 
 CREATE TABLE users (
     id VARCHAR(128) PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
-    full_name VARCHAR(150),
-    student_id VARCHAR(50) UNIQUE,
+    fullName VARCHAR(150),
+    studentId VARCHAR(50) UNIQUE,
     school VARCHAR(200),
     course VARCHAR(150),
     year VARCHAR(20),
     section VARCHAR(50),
-    role user_role NOT NULL DEFAULT 'student',
-    status user_status NOT NULL DEFAULT 'active',
-    suspension_duration VARCHAR(50),
-    suspended_at TIMESTAMPTZ,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMPTZ
+    role VARCHAR(30) NOT NULL DEFAULT 'student',
+    status VARCHAR(30) NOT NULL DEFAULT 'active',
+    suspensionDuration VARCHAR(50),
+    suspendedAt BIGINT
 );
 
 CREATE TABLE schedules (
     id VARCHAR(128) PRIMARY KEY,
-    user_id VARCHAR(128) NOT NULL,
-    class_date DATE NOT NULL,
-    class_name VARCHAR(200) NOT NULL,
-    class_code VARCHAR(50) NOT NULL,
+    userId VARCHAR(128) NOT NULL,
+    dateString VARCHAR(20) NOT NULL,
+    className VARCHAR(200) NOT NULL,
+    classCode VARCHAR(50),
     school VARCHAR(150),
-    start_time TIME NOT NULL,
-    end_time TIME NOT NULL,
+    startTime VARCHAR(30) NOT NULL,
+    endTime VARCHAR(30) NOT NULL,
     room VARCHAR(50),
     instructor VARCHAR(150),
-    color_type VARCHAR(30) NOT NULL DEFAULT 'BLUE',
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMPTZ,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    colorType VARCHAR(30) NOT NULL,
+    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE tasks (
     id VARCHAR(128) PRIMARY KEY,
-    user_id VARCHAR(128) NOT NULL,
-    schedule_id VARCHAR(128),
+    userId VARCHAR(128) NOT NULL,
     title TEXT NOT NULL,
-    due_date TIMESTAMPTZ NOT NULL,
-    course_name VARCHAR(150),
-    priority task_priority NOT NULL DEFAULT 'MEDIUM',
+    dateString VARCHAR(100) NOT NULL,
+    courseName VARCHAR(150),
+    priority VARCHAR(30) NOT NULL DEFAULT 'MEDIUM',
     completed BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMPTZ,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (schedule_id) REFERENCES schedules(id) ON DELETE SET NULL
+    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE ai_quizzes (
     id VARCHAR(128) PRIMARY KEY,
-    user_id VARCHAR(128) NOT NULL,
+    userId VARCHAR(128) NOT NULL,
+    userEmail VARCHAR(255),
     topic VARCHAR(250) NOT NULL,
-    score INT NOT NULL CHECK (score >= 0),
-    total_questions INT NOT NULL CHECK (total_questions > 0),
-    percentage NUMERIC(5,2) GENERATED ALWAYS AS (ROUND((score::NUMERIC / total_questions::NUMERIC) * 100, 2)) STORED,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMPTZ,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    score INT NOT NULL,
+    totalQuestions INT NOT NULL,
+    percentage INT NOT NULL,
+    timestamp BIGINT NOT NULL,
+    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE announcements (
     id VARCHAR(128) PRIMARY KEY,
-    admin_id VARCHAR(128) NOT NULL,
-    school_scope VARCHAR(200),
     message TEXT NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMPTZ,
-    FOREIGN KEY (admin_id) REFERENCES users(id) ON DELETE CASCADE
+    author VARCHAR(100) NOT NULL DEFAULT 'ADMIN',
+    postedAt BIGINT NOT NULL
 );
 
 CREATE TABLE focus_sessions (
     id VARCHAR(128) PRIMARY KEY,
-    user_id VARCHAR(128) NOT NULL,
-    duration_minutes INT NOT NULL CHECK (duration_minutes > 0),
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    userId VARCHAR(128) NOT NULL,
+    durationMinutes INT NOT NULL,
+    completedAt BIGINT NOT NULL,
+    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
 );"""
 
 for line in sql_text.split('\n'):
     story.append(Paragraph(line, code_style))
 
 doc.build(story)
-print("PDF generated successfully.")
+print("Firebase PDF Documentation generated successfully.")
