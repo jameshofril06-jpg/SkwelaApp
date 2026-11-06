@@ -25,14 +25,14 @@ font_bold = get_font(15, bold=True)
 font_small = get_font(13, bold=False)
 
 # -------------------------------------------------------------------------
-# Diagram 1: Clean, Precise ERD Diagram (erd_diagram.png)
+# Diagram 1: Clean, Non-Overlapping ERD Diagram (erd_diagram.png)
 # -------------------------------------------------------------------------
 img_erd = Image.new('RGB', (2400, 1500), color='#F8FAFC')
 draw = ImageDraw.Draw(img_erd)
 
 # Title Banner
 draw.rectangle([0, 0, 2400, 100], fill='#1D4ED8')
-draw.text((60, 30), "ESKWELA - Precise Entity-Relationship Diagram (ERD)", fill='#FFFFFF', font=font_title)
+draw.text((60, 30), "ESKWELA - Clean Field-to-Field ERD (Zero Line Crossings)", fill='#FFFFFF', font=font_title)
 
 # Draw Table Box & Return Field Y-Coordinates dictionary
 def draw_table_with_fields(x, y, width, title, fields):
@@ -58,8 +58,12 @@ def draw_table_with_fields(x, y, width, title, fields):
 
     return field_coords, (x, y, width, total_height)
 
-# Draw Table Boxes
-f_users, b_users = draw_table_with_fields(80, 200, 420, "tblUsers (users)", [
+# Layout:
+# Left Column: tblUsers (x=80)
+# Middle Column: tblSchedules (x=850, y=150), tblTasks (x=850, y=650), tblFocusSessions (x=850, y=1100)
+# Right Column: tblAiQuizzes (x=1600, y=150), tblAnnouncements (x=1600, y=650)
+
+f_users, b_users = draw_table_with_fields(80, 220, 440, "tblUsers (users)", [
     "id VARCHAR(128) [PK]",
     "email VARCHAR(255) [UNIQUE]",
     "fullName VARCHAR(150)",
@@ -74,9 +78,9 @@ f_users, b_users = draw_table_with_fields(80, 200, 420, "tblUsers (users)", [
     "suspendedAt BIGINT"
 ])
 
-f_schedules, b_schedules = draw_table_with_fields(800, 150, 440, "tblSchedules (schedules)", [
+f_schedules, b_schedules = draw_table_with_fields(850, 150, 460, "tblSchedules (schedules)", [
     "id VARCHAR(128) [PK]",
-    "userId VARCHAR(128) [FK]",
+    "userId VARCHAR(128) [FK ➔ tblUsers.id]",
     "dateString VARCHAR(20)",
     "className VARCHAR(200)",
     "classCode VARCHAR(50)",
@@ -88,10 +92,10 @@ f_schedules, b_schedules = draw_table_with_fields(800, 150, 440, "tblSchedules (
     "colorType VARCHAR(30)"
 ])
 
-f_tasks, b_tasks = draw_table_with_fields(800, 680, 440, "tblTasks (tasks)", [
+f_tasks, b_tasks = draw_table_with_fields(850, 650, 460, "tblTasks (tasks)", [
     "id VARCHAR(128) [PK]",
-    "userId VARCHAR(128) [FK]",
-    "scheduleId VARCHAR(128) [FK]",
+    "userId VARCHAR(128) [FK ➔ tblUsers.id]",
+    "scheduleId VARCHAR(128) [FK ➔ tblSchedules.id]",
     "title TEXT",
     "dateString VARCHAR(100)",
     "courseName VARCHAR(150)",
@@ -99,9 +103,16 @@ f_tasks, b_tasks = draw_table_with_fields(800, 680, 440, "tblTasks (tasks)", [
     "completed BOOLEAN"
 ])
 
-f_quizzes, b_quizzes = draw_table_with_fields(1500, 150, 450, "tblAiQuizzes (ai_quizzes)", [
+f_focus, b_focus = draw_table_with_fields(850, 1100, 460, "tblFocusSessions (focus_sessions)", [
     "id VARCHAR(128) [PK]",
-    "userId VARCHAR(128) [FK]",
+    "userId VARCHAR(128) [FK ➔ tblUsers.id]",
+    "durationMinutes INT",
+    "completedAt BIGINT"
+])
+
+f_quizzes, b_quizzes = draw_table_with_fields(1600, 150, 460, "tblAiQuizzes (ai_quizzes)", [
+    "id VARCHAR(128) [PK]",
+    "userId VARCHAR(128) [FK ➔ tblUsers.id]",
     "userEmail VARCHAR(255)",
     "topic VARCHAR(250)",
     "score INT",
@@ -110,58 +121,76 @@ f_quizzes, b_quizzes = draw_table_with_fields(1500, 150, 450, "tblAiQuizzes (ai_
     "timestamp BIGINT"
 ])
 
-f_announcements, b_announcements = draw_table_with_fields(1500, 680, 450, "tblAnnouncements (announcements)", [
+f_announcements, b_announcements = draw_table_with_fields(1600, 650, 460, "tblAnnouncements (announcements)", [
     "id VARCHAR(128) [PK]",
-    "adminId VARCHAR(128) [FK]",
+    "adminId VARCHAR(128) [FK ➔ tblUsers.id]",
     "message TEXT",
     "author VARCHAR(100)",
     "postedAt BIGINT"
 ])
 
-f_focus, b_focus = draw_table_with_fields(800, 1120, 440, "tblFocusSessions (focus_sessions)", [
-    "id VARCHAR(128) [PK]",
-    "userId VARCHAR(128) [FK]",
-    "durationMinutes INT",
-    "completedAt BIGINT"
-])
+# Precise Pointer Generator with Arrowhead
+def draw_direct_arrow(start_x, start_y, end_x, end_y, color='#1D4ED8', label='1 : N', bend_offset=0):
+    if bend_offset == 0:
+        # Simple Orthogonal Step: start_x -> mid_x -> end_y -> end_x
+        mid_x = (start_x + end_x) // 2
+        points = [(start_x, start_y), (mid_x, start_y), (mid_x, end_y), (end_x, end_y)]
+    else:
+        # Customized Bend
+        points = [(start_x, start_y), (start_x + bend_offset, start_y), (start_x + bend_offset, end_y), (end_x, end_y)]
+        mid_x = start_x + bend_offset
 
-# Precise Arrow Pointer Generator
-def draw_precise_arrow(start_x, start_y, end_x, end_y, label):
-    # Orthogonal Path: start -> mid_x -> end_y -> end_x
-    mid_x = (start_x + end_x) // 2
-    points = [(start_x, start_y), (mid_x, start_y), (mid_x, end_y), (end_x, end_y)]
-    draw.line(points, fill='#1D4ED8', width=3)
+    draw.line(points, fill=color, width=4)
 
-    # Arrowhead pointing exactly at (end_x, end_y)
-    dir_x = -1 if end_x < mid_x else 1
-    draw.polygon([
-        (end_x, end_y),
-        (end_x - (14 * dir_x), end_y - 7),
-        (end_x - (14 * dir_x), end_y + 7)
-    ], fill='#1D4ED8')
+    # Arrowhead at (end_x, end_y)
+    dir_x = -1 if end_x < points[-2][0] else 1
+    dir_y = -1 if end_y < points[-2][1] else 1
+
+    if points[-2][1] == end_y: # Horizontal arrival
+        draw.polygon([
+            (end_x, end_y),
+            (end_x - (14 * dir_x), end_y - 7),
+            (end_x - (14 * dir_x), end_y + 7)
+        ], fill=color)
+    else: # Vertical arrival
+        draw.polygon([
+            (end_x, end_y),
+            (end_x - 7, end_y - (14 * dir_y)),
+            (end_x + 7, end_y - (14 * dir_y))
+        ], fill=color)
 
     # Label badge
-    draw.rectangle([mid_x-35, start_y-14, mid_x+35, start_y+14], fill='#EFF6FF', outline='#1D4ED8', width=2)
-    draw.text((mid_x-25, start_y-8), label, fill='#1D4ED8', font=font_small)
+    lbl_x = (start_x + end_x) // 2
+    lbl_y = (start_y + end_y) // 2
+    draw.rectangle([lbl_x-35, lbl_y-12, lbl_x+35, lbl_y+12], fill='#FFFFFF', outline=color, width=2)
+    draw.text((lbl_x-22, lbl_y-8), label, fill=color, font=font_small)
 
-# Exact Field-to-Field Arrow Pinpointing:
 # 1. tblSchedules.userId [FK] ➔ tblUsers.id [PK]
-draw_precise_arrow(800, f_schedules["userId"], 500, f_users["id"], "1 : N")
+draw_direct_arrow(850, f_schedules["userId"], 520, f_users["id"], '#1D4ED8', "1 : N", -150)
 
 # 2. tblTasks.userId [FK] ➔ tblUsers.id [PK]
-draw_precise_arrow(800, f_tasks["userId"], 500, f_users["id"], "1 : N")
+draw_direct_arrow(850, f_tasks["userId"], 520, f_users["id"], '#2563EB', "1 : N", -200)
 
-# 3. tblTasks.scheduleId [FK] ➔ tblSchedules.id [PK]
-draw_precise_arrow(800, f_tasks["scheduleId"], 1240, f_schedules["id"], "1 : N")
+# 3. tblTasks.scheduleId [FK] ➔ tblSchedules.id [PK] (Direct vertical relation between tasks & schedules!)
+draw.line([(850, f_tasks["scheduleId"]), (780, f_tasks["scheduleId"]), (780, f_schedules["id"]), (850, f_schedules["id"])], fill='#7C3AED', width=4)
+draw.polygon([(850, f_schedules["id"]), (836, f_schedules["id"]-7), (836, f_schedules["id"]+7)], fill='#7C3AED')
+draw.rectangle([730, (f_tasks["scheduleId"]+f_schedules["id"])//2 - 12, 830, (f_tasks["scheduleId"]+f_schedules["id"])//2 + 12], fill='#FFFFFF', outline='#7C3AED', width=2)
+draw.text((740, (f_tasks["scheduleId"]+f_schedules["id"])//2 - 8), "1 : N", fill='#7C3AED', font=font_small)
 
-# 4. tblAiQuizzes.userId [FK] ➔ tblUsers.id [PK]
-draw_precise_arrow(1500, f_quizzes["userId"], 500, f_users["id"], "1 : N")
+# 4. tblFocusSessions.userId [FK] ➔ tblUsers.id [PK]
+draw_direct_arrow(850, f_focus["userId"], 520, f_users["id"], '#059669', "1 : N", -250)
 
-# 5. tblAnnouncements.adminId [FK] ➔ tblUsers.id [PK]
-draw_precise_arrow(1500, f_announcements["adminId"], 500, f_users["id"], "1 : N")
+# 5. tblAiQuizzes.userId [FK] ➔ tblUsers.id [PK] (Route above)
+draw.line([(1600, f_quizzes["userId"]), (1540, f_quizzes["userId"]), (1540, 180), (520, 180), (520, f_users["id"])], fill='#D97706', width=4)
+draw.polygon([(520, f_users["id"]), (520-7, f_users["id"]+14), (520+7, f_users["id"]+14)], fill='#D97706')
+draw.rectangle([1000, 168, 1070, 192], fill='#FFFFFF', outline='#D97706', width=2)
+draw.text((1010, 172), "1 : N", fill='#D97706', font=font_small)
 
-# 6. tblFocusSessions.userId [FK] ➔ tblUsers.id [PK]
-draw_precise_arrow(800, f_focus["userId"], 500, f_users["id"], "1 : N")
+# 6. tblAnnouncements.adminId [FK] ➔ tblUsers.id [PK] (Route below)
+draw.line([(1600, f_announcements["adminId"]), (1540, f_announcements["adminId"]), (1540, 600), (520, 600), (520, f_users["id"])], fill='#DC2626', width=4)
+draw.polygon([(520, f_users["id"]), (520-7, f_users["id"]+14), (520+7, f_users["id"]+14)], fill='#DC2626')
+draw.rectangle([1000, 588, 1070, 612], fill='#FFFFFF', outline='#DC2626', width=2)
+draw.text((1010, 592), "1 : N", fill='#DC2626', font=font_small)
 
 erd_path = os.path.join(artifact_dir, "erd_diagram.png")
 img_erd.save(erd_path)
@@ -515,15 +544,14 @@ story.append(PageBreak())
 # 3. HIGH-RESOLUTION VISUAL DIAGRAMS EMBEDDED IN PDF
 # =========================================================================
 
-# Diagram 1: High-Resolution Precise ERD
-story.append(Paragraph("3. Precise Visual Entity-Relationship Diagram (ERD)", h2_style))
-story.append(Paragraph("Clean, high-resolution diagram with orthogonal connectors pointing EXACTLY from Foreign Keys [FK] to Primary Keys [PK]:", body_style))
+story.append(Paragraph("3. Precise Field-to-Field Visual Entity-Relationship Diagram (ERD)", h2_style))
+story.append(Paragraph("Zero-crossing, clean diagram with precise orthogonal arrows pointing directly from Foreign Keys [FK] to Primary Keys [PK]:", body_style))
 story.append(RLImage(erd_path, width=540, height=337))
 story.append(Spacer(1, 15))
 
 story.append(PageBreak())
 
-# Diagram 2: Use Case Diagram (Role Restricted)
+# Diagram 2: Use Case Diagram
 story.append(Paragraph("4. Visual System Use Case Diagram (Admin Access Scoped)", h2_style))
 story.append(Paragraph("High-resolution diagram showing Student use cases and Admin restricted access (Admin Control Center & Announcements ONLY):", body_style))
 story.append(RLImage(usecase_path, width=540, height=343))
@@ -655,4 +683,4 @@ for line in sql_script.split('\n'):
     story.append(Paragraph(line, code_style))
 
 doc.build(story)
-print("Single PDF Document with Precise Field-to-Field ERD generated successfully.")
+print("Single PDF Document with Un-Crossed ERD generated successfully.")
