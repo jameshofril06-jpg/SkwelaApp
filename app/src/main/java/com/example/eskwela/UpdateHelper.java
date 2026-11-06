@@ -28,8 +28,8 @@ import java.util.Locale;
 public class UpdateHelper {
 
     public static final String GITHUB_API_RELEASES = "https://api.github.com/repos/jameshofril06-jpg/SkwelaApp/releases";
-    public static final String DEFAULT_FALLBACK_DOWNLOAD_URL = "https://github.com/jameshofril06-jpg/SkwelaApp/releases/download/v1.1.4/app-release.apk";
-    public static final String LATEST_VERSION_NAME = "1.1.4";
+    public static final String DEFAULT_FALLBACK_DOWNLOAD_URL = "https://github.com/jameshofril06-jpg/SkwelaApp/releases/download/v1.1.5/app-release.apk";
+    public static final String LATEST_VERSION_NAME = "1.1.5";
 
     public static void downloadAndInstallUpdate(Context context) {
         ProgressDialog checkingDialog = new ProgressDialog(context);
@@ -41,7 +41,7 @@ public class UpdateHelper {
         new Thread(() -> {
             String latestTagName = LATEST_VERSION_NAME;
             String downloadUrl = DEFAULT_FALLBACK_DOWNLOAD_URL;
-            String releaseBody = "• 🛡️ Admin Control Center & Navigation Refinements: Removed redundant announcement cards from Admin Center and ensured strict admin access isolation (Home & Profile tabs only).\n• 👤 Admin Profile Access: Seamless access from Admin Control Center toolbar to My Profile (Edit profile, Dark theme, OTA updates, About this app, Logout).\n• 📅 Specific Date Schedule Querying: Home and Schedule views filter classes strictly for the selected calendar date.\n• 🎓 Complete Software Testing & QA Suite PDF & Postman API Collection v2.1\n• 🤖 Enrolled Study Load AI Quiz Generator & Ranking Leaderboard\n• ⏳ Admin User Suspension Time Tracking (e.g. 6h 42m remaining)\n• 📢 Announcement Log Detail Modal & Share Feature\n• ⏱️ Focus Session Presets (2m, 5m, 10m, 15m, 25m, 45m, 60m)\n• 🌙 Global Dark Mode Text Contrast Fixes across all screens\n• ⚠️ Time Schedule Conflict Detection & Code-Validated Class Deletion\n• 📷 OCR Study Load Document Scanner & Auto-Plotter";
+            String releaseBody = "• 📅 Strict Date-Specific Schedule Filtering: Home Dashboard and Schedule tab Day view now strictly filter classes by the exact selected calendar date.\n• 👤 Admin Profile Access & Navigation: Admin bottom navigation restricted exclusively to Home and Profile tabs, with Admin Profile toolbar access.\n• 🛡️ Strict Admin Access Isolation: Admins are restricted exclusively to Admin Control Center & Announcements.\n• 🎓 Complete Software Testing & QA Suite PDF & Postman API Collection v2.1\n• 🤖 Enrolled Study Load AI Quiz Generator & Ranking Leaderboard\n• ⏳ Admin User Suspension Time Tracking (e.g. 6h 42m remaining)\n• 📢 Announcement Log Detail Modal & Share Feature\n• ⏱️ Focus Session Presets (2m, 5m, 10m, 15m, 25m, 45m, 60m)\n• 🌙 Global Dark Mode Text Contrast Fixes across all screens\n• ⚠️ Time Schedule Conflict Detection & Code-Validated Class Deletion\n• 📷 OCR Study Load Document Scanner & Auto-Plotter";
 
             try {
                 URL url = new URL(GITHUB_API_RELEASES);
