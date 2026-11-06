@@ -243,7 +243,6 @@ public class MyScheduleActivity extends AppCompatActivity implements ScheduleCar
 
         db.collection("schedules")
                 .whereEqualTo("userId", userId)
-                .whereEqualTo("dateString", date)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -251,7 +250,9 @@ public class MyScheduleActivity extends AppCompatActivity implements ScheduleCar
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             ScheduleCardAdapter.ScheduleItem item = document.toObject(ScheduleCardAdapter.ScheduleItem.class);
                             item.id = document.getId();
-                            dailyList.add(item);
+                            if (item.dateString != null && item.dateString.startsWith(date)) {
+                                dailyList.add(item);
+                            }
                         }
 
                         adapter.notifyDataSetChanged();

@@ -174,10 +174,9 @@ public class DashboardActivity extends AppCompatActivity {
                     }
                 });
 
-        // 2. Fetch Schedule
+        // 2. Fetch Schedule (Strictly filtered by today's date)
         db.collection("schedules")
                 .whereEqualTo("userId", userId)
-                .whereEqualTo("dateString", todayDateString)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (isFinishing()) return;
@@ -185,7 +184,10 @@ public class DashboardActivity extends AppCompatActivity {
                         todayClasses.clear();
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             ScheduleCardAdapter.ScheduleItem item = document.toObject(ScheduleCardAdapter.ScheduleItem.class);
-                            todayClasses.add(item);
+                            item.id = document.getId();
+                            if (item.dateString != null && item.dateString.startsWith(todayDateString)) {
+                                todayClasses.add(item);
+                            }
                         }
 
                         sortClassesByTime(todayClasses);
