@@ -7,14 +7,12 @@ plugins {
 
 android {
     namespace = "com.example.eskwela"
-    compileSdk {
-        version = release(37)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.eskwela"
         minSdk = 24
-        targetSdk = 37
+        targetSdk = 36
         versionCode = 115
         versionName = "1.1.5"
 

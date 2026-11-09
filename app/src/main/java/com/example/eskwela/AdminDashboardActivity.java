@@ -2,17 +2,17 @@ package com.example.eskwela;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -21,25 +21,26 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class AdminDashboardActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
-    private TextView tvTotalUsers, tvTotalSchedules;
-    private RecyclerView rvAdminUsers;
-    private EditText etSearchUsers;
-    private AdminUserAdapter userAdapter;
-    private List<AdminUserAdapter.UserItem> userList = new ArrayList<>();
-    private List<AdminUserAdapter.UserItem> allUserList = new ArrayList<>();
+    private RecyclerView rvAdminAnnouncements;
+    private TextView tvEmptyAnnouncements;
+    private final List<AnnouncementActivity.AnnouncementItem> announcementList = new ArrayList<>();
+    private AdminAnnouncementAdapter announcementAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,11 +79,8 @@ public class AdminDashboardActivity extends AppCompatActivity {
                     }
                 });
 
-        tvTotalUsers = findViewById(R.id.tvTotalUsers);
-        tvTotalSchedules = findViewById(R.id.tvTotalSchedules);
-
-        rvAdminUsers = findViewById(R.id.rvAdminUsers);
-        etSearchUsers = findViewById(R.id.etSearchUsers);
+        rvAdminAnnouncements = findViewById(R.id.rvAdminAnnouncements);
+        tvEmptyAnnouncements = findViewById(R.id.tvEmptyAnnouncements);
         ImageView ivBack = findViewById(R.id.ivBack);
         ImageView ivAdminProfile = findViewById(R.id.ivAdminProfile);
 
@@ -91,19 +89,9 @@ public class AdminDashboardActivity extends AppCompatActivity {
             ivAdminProfile.setOnClickListener(v -> startActivity(new Intent(AdminDashboardActivity.this, ProfileActivity.class)));
         }
 
-        rvAdminUsers.setLayoutManager(new LinearLayoutManager(this));
-        userAdapter = new AdminUserAdapter(userList, this::showUserActionDialog);
-        rvAdminUsers.setAdapter(userAdapter);
-
-        if (etSearchUsers != null) {
-            etSearchUsers.addTextChangedListener(new TextWatcher() {
-                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    filterUserList(s.toString().trim());
-                }
-                @Override public void afterTextChanged(Editable s) {}
-            });
-        }
+        announcementAdapter = new AdminAnnouncementAdapter(announcementList, this::showAnnouncementDetailDialog);
+        rvAdminAnnouncements.setLayoutManager(new LinearLayoutManager(this));
+        rvAdminAnnouncements.setAdapter(announcementAdapter);
 
         View btnPostAnn = findViewById(R.id.btnAdminPostAnnouncement);
         if (btnPostAnn != null) {
@@ -111,15 +99,14 @@ public class AdminDashboardActivity extends AppCompatActivity {
         }
 
         setupEntranceAnimations();
-        loadAdminData();
+        loadAdminAnnouncements();
     }
 
     private void setupEntranceAnimations() {
-        View cardStats = findViewById(R.id.cardStats);
         View cardPost = findViewById(R.id.cardPostAnnouncement);
-        View headerUsers = findViewById(R.id.tvUsersHeader);
+        View headerAnnounce = findViewById(R.id.tvAnnounceHeader);
 
-        View[] viewsToAnimate = {cardStats, cardPost, headerUsers, etSearchUsers, rvAdminUsers};
+        View[] viewsToAnimate = {cardPost, headerAnnounce, rvAdminAnnouncements};
         long delay = 100;
         for (View v : viewsToAnimate) {
             if (v != null) {
@@ -135,24 +122,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
                 delay += 80;
             }
         }
-    }
-
-    private void filterUserList(String query) {
-        userList.clear();
-        if (query.isEmpty()) {
-            userList.addAll(allUserList);
-        } else {
-            String lowerQuery = query.toLowerCase();
-            for (AdminUserAdapter.UserItem item : allUserList) {
-                boolean matchName = item.fullName != null && item.fullName.toLowerCase().contains(lowerQuery);
-                boolean matchEmail = item.email != null && item.email.toLowerCase().contains(lowerQuery);
-                boolean matchId = item.studentId != null && item.studentId.toLowerCase().contains(lowerQuery);
-                if (matchName || matchEmail || matchId) {
-                    userList.add(item);
-                }
-            }
-        }
-        userAdapter.notifyDataSetChanged();
     }
 
     private void showPostAnnouncementDialog() {
@@ -172,7 +141,10 @@ public class AdminDashboardActivity extends AppCompatActivity {
                         announcement.put("author", "ADMIN");
 
                         db.collection("announcements").add(announcement)
-                                .addOnSuccessListener(ref -> Toast.makeText(this, "Announcement Posted to all students! 📢", Toast.LENGTH_SHORT).show())
+                                .addOnSuccessListener(ref -> {
+                                    Toast.makeText(this, "Announcement Posted to all students! 📢", Toast.LENGTH_SHORT).show();
+                                    loadAdminAnnouncements();
+                                })
                                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to post: " + e.getMessage(), Toast.LENGTH_SHORT).show());
                     }
                 })
@@ -180,110 +152,114 @@ public class AdminDashboardActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void loadAdminData() {
-        // 1. Fetch Users
-        db.collection("users").get()
+    private void loadAdminAnnouncements() {
+        db.collection("announcements")
+                .orderBy("postedAt", Query.Direction.DESCENDING)
+                .get()
                 .addOnCompleteListener(task -> {
+                    if (isFinishing()) return;
                     if (task.isSuccessful()) {
-                        allUserList.clear();
+                        announcementList.clear();
                         for (QueryDocumentSnapshot doc : task.getResult()) {
-                            AdminUserAdapter.UserItem item = doc.toObject(AdminUserAdapter.UserItem.class);
-                            item.id = doc.getId();
-                            allUserList.add(item);
+                            String id = doc.getId();
+                            String message = doc.getString("message");
+                            String author = doc.getString("author");
+                            Long postedAt = doc.getLong("postedAt");
+
+                            if (message != null && !message.isEmpty()) {
+                                announcementList.add(new AnnouncementActivity.AnnouncementItem(
+                                        id,
+                                        message,
+                                        author != null ? author : "ADMIN",
+                                        postedAt != null ? postedAt : System.currentTimeMillis()
+                                ));
+                            }
                         }
-                        if (tvTotalUsers != null) tvTotalUsers.setText(String.valueOf(allUserList.size()));
-                        filterUserList(etSearchUsers != null ? etSearchUsers.getText().toString().trim() : "");
-                    } else {
-                        Toast.makeText(this, "Failed to load users", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-        // 2. Fetch Total Schedules count in system
-        db.collection("schedules").get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        int count = task.getResult().size();
-                        if (tvTotalSchedules != null) tvTotalSchedules.setText(String.valueOf(count));
+                        announcementAdapter.notifyDataSetChanged();
+                        if (tvEmptyAnnouncements != null) {
+                            tvEmptyAnnouncements.setVisibility(announcementList.isEmpty() ? View.VISIBLE : View.GONE);
+                        }
                     }
                 });
     }
 
-    private void showUserActionDialog(AdminUserAdapter.UserItem user) {
-        String name = user.fullName != null ? user.fullName : "User";
-        String currentStatus = user.status != null ? user.status : "active";
+    private void showAnnouncementDetailDialog(AnnouncementActivity.AnnouncementItem item) {
+        SimpleDateFormat sdf = new SimpleDateFormat("MMMM d, yyyy 'at' h:mm a", Locale.getDefault());
+        String formattedDate = sdf.format(new Date(item.postedAt));
 
-        BottomSheetDialog bottomSheet = new BottomSheetDialog(this);
-        View paneView = getLayoutInflater().inflate(R.layout.layout_admin_user_pane, null);
-        bottomSheet.setContentView(paneView);
-
-        TextView tvName = paneView.findViewById(R.id.tvPaneUserName);
-        TextView tvDetails = paneView.findViewById(R.id.tvPaneUserDetails);
-        TextView tvStatus = paneView.findViewById(R.id.tvPaneUserStatus);
-        Button btnSuspend = paneView.findViewById(R.id.btnPaneSuspend);
-        Button btnToggleActive = paneView.findViewById(R.id.btnPaneToggleActive);
-        Button btnArchive = paneView.findViewById(R.id.btnPaneArchive);
-
-        tvName.setText(name);
-        tvDetails.setText((user.email != null ? user.email : "No Email") + " • " + (user.studentId != null ? "ID: " + user.studentId : "N/A"));
-        if ("suspended".equalsIgnoreCase(currentStatus)) {
-            String remainingTime = AdminUserAdapter.calculateRemainingSuspensionTime(user.suspensionDuration, user.suspendedAt);
-            tvStatus.setText("STATUS: SUSPENDED\n⏳ Remaining: " + remainingTime);
-            tvStatus.setTextColor(0xFFEF4444);
-        } else {
-            tvStatus.setText("STATUS: " + currentStatus.toUpperCase());
-        }
-
-        btnToggleActive.setText("active".equalsIgnoreCase(currentStatus) ? "Deactivate Account" : "Activate Account");
-
-        btnSuspend.setOnClickListener(v -> {
-            bottomSheet.dismiss();
-            showSuspendDurationDialog(user);
-        });
-
-        btnToggleActive.setOnClickListener(v -> {
-            bottomSheet.dismiss();
-            String newStatus = "active".equalsIgnoreCase(currentStatus) ? "deactivated" : "active";
-            updateUserStatus(user, newStatus, "Account status changed to " + newStatus);
-        });
-
-        btnArchive.setOnClickListener(v -> {
-            bottomSheet.dismiss();
-            updateUserStatus(user, "archived", "Account archived");
-        });
-
-        bottomSheet.show();
-    }
-
-    private void showSuspendDurationDialog(AdminUserAdapter.UserItem user) {
-        CharSequence[] durations = new CharSequence[] { "24 Hours", "7 Days", "30 Days", "Indefinite" };
         new AlertDialog.Builder(this)
-                .setTitle("Select Suspension Duration")
-                .setItems(durations, (dialog, which) -> {
-                    String duration = durations[which].toString();
-                    Map<String, Object> updates = new HashMap<>();
-                    updates.put("status", "suspended");
-                    updates.put("suspensionDuration", duration);
-                    updates.put("suspendedAt", System.currentTimeMillis());
-
-                    db.collection("users").document(user.id).update(updates)
-                            .addOnSuccessListener(aVoid -> {
-                                Toast.makeText(this, "User suspended for " + duration, Toast.LENGTH_SHORT).show();
-                                loadAdminData();
-                            })
-                            .addOnFailureListener(e -> Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                .setTitle("📢 Manage Announcement")
+                .setMessage("Author: " + item.author + "\nDate: " + formattedDate + "\n\n" + item.message)
+                .setPositiveButton("Share", (dialog, which) -> {
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("text/plain");
+                    shareIntent.putExtra(Intent.EXTRA_SUBJECT, "ESKWELA Announcement");
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, "📢 [ESKWELA Announcement]\n" + item.message + "\n\nPosted: " + formattedDate);
+                    startActivity(Intent.createChooser(shareIntent, "Share Announcement via"));
                 })
+                .setNeutralButton("Delete", (dialog, which) -> {
+                    db.collection("announcements").document(item.id).delete()
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(this, "Announcement deleted", Toast.LENGTH_SHORT).show();
+                                loadAdminAnnouncements();
+                            })
+                            .addOnFailureListener(e -> Toast.makeText(this, "Failed to delete", Toast.LENGTH_SHORT).show());
+                })
+                .setNegativeButton("Close", null)
                 .show();
     }
 
-    private void updateUserStatus(AdminUserAdapter.UserItem user, String newStatus, String successMsg) {
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("status", newStatus);
+    private interface OnAdminAnnouncementClickListener {
+        void onAdminAnnouncementClick(AnnouncementActivity.AnnouncementItem item);
+    }
 
-        db.collection("users").document(user.id).update(updates)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, successMsg, Toast.LENGTH_SHORT).show();
-                    loadAdminData();
-                })
-                .addOnFailureListener(e -> Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    private static class AdminAnnouncementAdapter extends RecyclerView.Adapter<AdminAnnouncementAdapter.Holder> {
+        private final List<AnnouncementActivity.AnnouncementItem> items;
+        private final OnAdminAnnouncementClickListener listener;
+
+        AdminAnnouncementAdapter(List<AnnouncementActivity.AnnouncementItem> items, OnAdminAnnouncementClickListener listener) {
+            this.items = items;
+            this.listener = listener;
+        }
+
+        @NonNull
+        @Override
+        public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_announcement, parent, false);
+            return new Holder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull Holder holder, int position) {
+            AnnouncementActivity.AnnouncementItem item = items.get(position);
+            holder.tvMessage.setText(item.message);
+            holder.tvAuthor.setText(item.author != null && !item.author.isEmpty() ? "OFFICIAL " + item.author + " BROADCAST" : "OFFICIAL ADMIN BROADCAST");
+
+            SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy 'at' h:mm a", Locale.getDefault());
+            holder.tvDate.setText(sdf.format(new Date(item.postedAt)));
+
+            holder.itemView.setOnClickListener(v -> {
+                if (listener != null) listener.onAdminAnnouncementClick(item);
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return items.size();
+        }
+
+        static class Holder extends RecyclerView.ViewHolder {
+            final TextView tvMessage;
+            final TextView tvAuthor;
+            final TextView tvDate;
+
+            Holder(@NonNull View itemView) {
+                super(itemView);
+                tvMessage = itemView.findViewById(R.id.tvAnnounceMessage);
+                tvAuthor = itemView.findViewById(R.id.tvAnnounceAuthor);
+                tvDate = itemView.findViewById(R.id.tvAnnounceDate);
+            }
+        }
     }
 }
