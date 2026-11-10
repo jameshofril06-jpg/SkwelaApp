@@ -28,8 +28,8 @@ import java.util.Locale;
 public class UpdateHelper {
 
     public static final String GITHUB_API_RELEASES = "https://api.github.com/repos/jameshofril06-jpg/SkwelaApp/releases";
-    public static final String DEFAULT_FALLBACK_DOWNLOAD_URL = "https://github.com/jameshofril06-jpg/SkwelaApp/releases/download/v1.1.9/app-release.apk";
-    public static final String LATEST_VERSION_NAME = "1.1.9";
+    public static final String DEFAULT_FALLBACK_DOWNLOAD_URL = "https://github.com/jameshofril06-jpg/SkwelaApp/releases/download/v1.2.0/app-release.apk";
+    public static final String LATEST_VERSION_NAME = "1.2.0";
 
     public static void downloadAndInstallUpdate(Context context) {
         ProgressDialog checkingDialog = new ProgressDialog(context);
@@ -41,7 +41,7 @@ public class UpdateHelper {
         new Thread(() -> {
             String latestTagName = LATEST_VERSION_NAME;
             String downloadUrl = DEFAULT_FALLBACK_DOWNLOAD_URL;
-            String releaseBody = "• 🛡️ Strict Admin Navigation & Menu Enforcement: ProfileActivity dynamically enforces the 2-tab Admin menu (Home & Profile only) upon Firestore role resolution.\n• 📢 Admin Home Announcements: Admin Home tab focuses exclusively on broadcast announcements management.\n• 📅 Day-Specific OCR Study Load & Manual Class Plotting: Scanned or added classes map strictly to their specific scheduled days of the week.\n• 👁️ Show/Hide Password Toggle: Interactive eye icon on password inputs for secure viewing.\n• 🖼️ User Profile Picture Picker: Select custom avatar photos from gallery stored directly in Firestore.\n• 🎓 Complete Software Testing & QA Suite PDF with 80 Test Cases & Postman API Collection v2.1\n• 🤖 Enrolled Study Load AI Quiz Generator & Ranking Leaderboard\n• ⏳ Admin User Suspension Time Tracking (e.g. 6h 42m remaining)\n• ⏱️ Focus Session Presets (2m, 5m, 10m, 15m, 25m, 45m, 60m)\n• 🌙 Global Dark Mode Text Contrast Fixes across all screens\n• ⚠️ Time Schedule Conflict Detection & Code-Validated Class Deletion";
+            String releaseBody = "• 🚨 Upcoming Class Time Notifications: Enhanced dashboard next class alerts with urgent 'STARTING SOON IN X MINS' badges when a class is starting within 45 minutes.\n• 🔄 Smooth Admin Navigation Animations: Silky slide transitions when switching between Admin Home and Profile tabs.\n• 📅 Strict Date-Specific Schedule Filtering: Home Dashboard and Schedule tab Day view filter classes strictly by the exact selected calendar date.\n• 👤 Admin Profile Access & Navigation: Admin bottom navigation restricted exclusively to Home and Profile tabs.\n• 🎓 Complete Software Testing & QA Suite PDF with 80 Test Cases & Postman API Collection v2.1\n• 🤖 Enrolled Study Load AI Quiz Generator & Ranking Leaderboard\n• ⏳ Admin User Suspension Time Tracking (e.g. 6h 42m remaining)\n• 📢 Announcement Log Detail Modal & Share Feature\n• ⏱️ Focus Session Presets (2m, 5m, 10m, 15m, 25m, 45m, 60m)\n• 🌙 Global Dark Mode Text Contrast Fixes across all screens\n• ⚠️ Time Schedule Conflict Detection & Code-Validated Class Deletion";
 
             try {
                 URL url = new URL(GITHUB_API_RELEASES);
