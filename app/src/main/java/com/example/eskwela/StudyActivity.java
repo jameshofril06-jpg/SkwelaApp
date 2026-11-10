@@ -4,10 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.graphics.Insets;
@@ -224,9 +226,85 @@ public class StudyActivity extends AppCompatActivity {
             startActivity(new Intent(StudyActivity.this, AiQuizActivity.class));
         });
 
-        cardNotes.setOnClickListener(v ->
-                Toast.makeText(this, "Study Notes coming soon!", Toast.LENGTH_SHORT).show()
-        );
+        cardNotes.setOnClickListener(v -> openStudyNotesManager());
+    }
+
+    private void openStudyNotesManager() {
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) return;
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        FirebaseFirestore.getInstance().collection("study_notes")
+                .whereEqualTo("userId", userId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    StringBuilder sb = new StringBuilder();
+                    if (queryDocumentSnapshots.isEmpty()) {
+                        sb.append("No saved study notes yet.\nTap 'Add Note' to create study notes for your courses!");
+                    } else {
+                        int count = 1;
+                        for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                            String subject = doc.getString("subject");
+                            String title = doc.getString("title");
+                            String content = doc.getString("content");
+
+                            sb.append(count).append(". 📝 [").append(subject != null ? subject : "General")
+                                    .append("] ").append(title != null ? title : "Note").append("\n")
+                                    .append("   • ").append(content != null ? content : "").append("\n\n");
+                            count++;
+                        }
+                    }
+
+                    new AlertDialog.Builder(this)
+                            .setTitle("📚 My Study Notes & Reviewers")
+                            .setMessage(sb.toString().trim())
+                            .setPositiveButton("Add Note 📝", (dialog, which) -> showAddNoteDialog(userId))
+                            .setNegativeButton("Close", null)
+                            .show();
+                });
+    }
+
+    private void showAddNoteDialog(String userId) {
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        layout.setPadding(48, 24, 48, 24);
+
+        EditText etSubject = new EditText(this);
+        etSubject.setHint("Course Subject (e.g. CAPSTONE 1)");
+        layout.addView(etSubject);
+
+        EditText etTitle = new EditText(this);
+        etTitle.setHint("Note Title (e.g. Chapter 1 Review)");
+        layout.addView(etTitle);
+
+        EditText etContent = new EditText(this);
+        etContent.setHint("Study note details / reviewer text...");
+        etContent.setLines(4);
+        layout.addView(etContent);
+
+        new AlertDialog.Builder(this)
+                .setTitle("Create Study Note 📝")
+                .setView(layout)
+                .setPositiveButton("Save Note", (dialog, which) -> {
+                    String sub = etSubject.getText().toString().trim();
+                    String title = etTitle.getText().toString().trim();
+                    String content = etContent.getText().toString().trim();
+
+                    if (!title.isEmpty()) {
+                        Map<String, Object> note = new HashMap<>();
+                        note.put("userId", userId);
+                        note.put("subject", sub.isEmpty() ? "General" : sub);
+                        note.put("title", title);
+                        note.put("content", content);
+                        note.put("createdAt", System.currentTimeMillis());
+
+                        FirebaseFirestore.getInstance().collection("study_notes").add(note)
+                                .addOnSuccessListener(ref -> {
+                                    Toast.makeText(this, "Study Note Saved! 📝", Toast.LENGTH_SHORT).show();
+                                });
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     private void setupBottomNavigation() {

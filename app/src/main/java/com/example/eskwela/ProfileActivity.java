@@ -276,11 +276,17 @@ public class ProfileActivity extends AppCompatActivity {
 
                             if (fullName != null && !fullName.isEmpty()) {
                                 tvFullName.setText(fullName);
-                                String[] parts = fullName.split("\\s+");
-                                String initials = "";
-                                if (parts.length > 0 && !parts[0].isEmpty()) initials += parts[0].substring(0, 1).toUpperCase();
-                                if (parts.length > 1 && !parts[parts.length - 1].isEmpty()) initials += parts[parts.length - 1].substring(0, 1).toUpperCase();
-                                tvInitials.setText(initials);
+                            }
+
+                            String gender = documentSnapshot.getString("gender");
+                            boolean isAdmin = AccountGuard.isAdmin(email, role);
+
+                            if (isAdmin) {
+                                tvInitials.setText("👔");
+                            } else if ("female".equalsIgnoreCase(gender)) {
+                                tvInitials.setText("👩‍🎓");
+                            } else {
+                                tvInitials.setText("👨‍🎓");
                             }
 
                             String courseYear = "";

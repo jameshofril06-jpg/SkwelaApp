@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -92,10 +94,15 @@ public class RegisterActivity extends AppCompatActivity {
                             String uniqueSuffix = userId.length() >= 4 ? userId.substring(0, 4).toUpperCase() : userId.toUpperCase();
                             String generatedId = "STU-" + uniqueSuffix;
 
+                            RadioGroup rgGender = findViewById(R.id.rgGender);
+                            RadioButton rbFemale = findViewById(R.id.rbFemale);
+                            String selectedGender = (rbFemale != null && rbFemale.isChecked()) ? "female" : "male";
+
                             Map<String, Object> initialData = new HashMap<>();
                             initialData.put("studentId", generatedId);
                             initialData.put("email", email);
                             initialData.put("fullName", fullName);
+                            initialData.put("gender", selectedGender);
                             initialData.put("status", "active");
 
                             db.collection("users").document(userId).set(initialData)
