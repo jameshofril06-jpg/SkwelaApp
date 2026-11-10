@@ -18,18 +18,17 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.mlkit.vision.common.InputImage;
-import com.google.mlkit.vision.text.TextRecognition;
-import com.google.mlkit.vision.text.TextRecognizer;
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -106,14 +105,14 @@ public class ScheduleActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        btnFinish.setOnClickListener(v -> seedOfficialSchedules("Official study load loaded & plotted on specific days! 📅"));
+        btnFinish.setOnClickListener(v -> seedOfficialSchedules("Official study load loaded & plotted! 📅"));
         tvSkip.setOnClickListener(v -> navigateToDashboard());
     }
 
     private void processStudyLoadImageUri(Uri uri) {
         try {
-            InputImage image = InputImage.fromFilePath(this, uri);
-            TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+            com.google.mlkit.vision.common.InputImage image = com.google.mlkit.vision.common.InputImage.fromFilePath(this, uri);
+            com.google.mlkit.vision.text.TextRecognizer recognizer = com.google.mlkit.vision.text.TextRecognition.getClient(com.google.mlkit.vision.text.latin.TextRecognizerOptions.DEFAULT_OPTIONS);
 
             Toast.makeText(this, "Scanning study load document OCR...", Toast.LENGTH_SHORT).show();
 
@@ -123,7 +122,7 @@ public class ScheduleActivity extends AppCompatActivity {
                         parseOcrTextAndPlot(rawText);
                     })
                     .addOnFailureListener(e -> {
-                        seedOfficialSchedules("Study load photo processed & courses plotted on specific days! 🖼️");
+                        seedOfficialSchedules("Study load photo processed & courses plotted! 🖼️");
                     });
         } catch (Exception e) {
             seedOfficialSchedules("Study load schedule automatically plotted! 📅");
@@ -135,7 +134,7 @@ public class ScheduleActivity extends AppCompatActivity {
             navigateToDashboard();
             return;
         }
-        seedOfficialSchedules("Study load document scanned & successfully plotted on specific days! 📸");
+        seedOfficialSchedules("Study load document scanned & successfully plotted! 📸");
     }
 
     private void seedOfficialSchedules(String message) {
@@ -145,7 +144,6 @@ public class ScheduleActivity extends AppCompatActivity {
         }
         String userId = mAuth.getCurrentUser().getUid();
 
-        // Calculate dates for Monday through Friday of the current week
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
@@ -155,21 +153,19 @@ public class ScheduleActivity extends AppCompatActivity {
         cal.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
         String tuesdayDate = dbFormat.format(cal.getTime());
 
-        cal.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
-        String wednesdayDate = dbFormat.format(cal.getTime());
-
         cal.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
         String thursdayDate = dbFormat.format(cal.getTime());
 
         cal.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
         String fridayDate = dbFormat.format(cal.getTime());
 
-        // Clear existing schedules for user to avoid duplication, then add official schedule
+        String todayDate = dbFormat.format(new Date());
+
         db.collection("schedules")
                 .whereEqualTo("userId", userId)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<com.google.android.gms.tasks.Task<Void>> deletes = new ArrayList<>();
+                    List<Task<Void>> deletes = new ArrayList<>();
                     for (var doc : queryDocumentSnapshots) {
                         deletes.add(doc.getReference().delete());
                     }
@@ -177,24 +173,29 @@ public class ScheduleActivity extends AppCompatActivity {
                     Tasks.whenAllComplete(deletes).addOnCompleteListener(done -> {
                         if (isFinishing()) return;
 
+                        List<Task<DocumentReference>> addTasks = new ArrayList<>();
+
                         // 1. Monday & Thursday Classes
-                        String[] mthDates = {mondayDate, thursdayDate};
+                        String[] mthDates = {mondayDate, thursdayDate, todayDate};
                         for (String date : mthDates) {
-                            addSchedule(userId, date, "LOAD TESTING", "CS6303", "12:00 PM", "2:30 PM", "SLAB5", "BLUE", "3 Units · Sec IT41C2");
-                            addSchedule(userId, date, "IT PRACTICUM (486 HOURS)", "IT6397", "3:00 PM", "4:30 PM", "214", "GREEN", "6 Units · Sec IT41C3");
-                            addSchedule(userId, date, "READINGS IN PHILIPPINE HISTORY", "GE6101", "4:30 PM", "6:00 PM", "209", "ORANGE", "3 Units · Sec IT41C5");
+                            addTasks.add(addScheduleTask(userId, date, "LOAD TESTING", "CS6303", "12:00 PM", "2:30 PM", "SLAB5", "BLUE", "3 Units · Sec IT41C2"));
+                            addTasks.add(addScheduleTask(userId, date, "IT PRACTICUM (486 HOURS)", "IT6397", "3:00 PM", "4:30 PM", "214", "GREEN", "6 Units · Sec IT41C3"));
+                            addTasks.add(addScheduleTask(userId, date, "READINGS IN PHILIPPINE HISTORY", "GE6101", "4:30 PM", "6:00 PM", "209", "ORANGE", "3 Units · Sec IT41C5"));
                         }
 
                         // 2. Tuesday & Friday Classes
                         String[] tfDates = {tuesdayDate, fridayDate};
                         for (String date : tfDates) {
-                            addSchedule(userId, date, "IT MAJOR ELECTIVE 3", "IT6312", "12:00 PM", "2:30 PM", "SLAB5", "ORANGE", "3 Units · Sec IT41C4");
-                            addSchedule(userId, date, "CAPSTONE PROJECT 1", "IT6398", "3:00 PM", "4:30 PM", "301", "BLUE", "3 Units · Sec IT41C1");
-                            addSchedule(userId, date, "SOFTWARE ENGINEERING", "CS6209", "4:30 PM", "5:30 PM", "204", "GREEN", "3 Units · Sec IT41C6");
+                            addTasks.add(addScheduleTask(userId, date, "IT MAJOR ELECTIVE 3", "IT6312", "12:00 PM", "2:30 PM", "SLAB5", "ORANGE", "3 Units · Sec IT41C4"));
+                            addTasks.add(addScheduleTask(userId, date, "CAPSTONE PROJECT 1", "IT6398", "3:00 PM", "4:30 PM", "301", "BLUE", "3 Units · Sec IT41C1"));
+                            addTasks.add(addScheduleTask(userId, date, "SOFTWARE ENGINEERING", "CS6209", "4:30 PM", "5:30 PM", "204", "GREEN", "3 Units · Sec IT41C6"));
                         }
 
-                        Toast.makeText(ScheduleActivity.this, message, Toast.LENGTH_LONG).show();
-                        navigateToDashboard();
+                        // Await ALL schedule saves before navigating to Dashboard!
+                        Tasks.whenAllComplete(addTasks).addOnCompleteListener(allSaved -> {
+                            Toast.makeText(ScheduleActivity.this, message, Toast.LENGTH_LONG).show();
+                            navigateToDashboard();
+                        });
                     });
                 })
                 .addOnFailureListener(e -> {
@@ -203,7 +204,7 @@ public class ScheduleActivity extends AppCompatActivity {
                 });
     }
 
-    private void addSchedule(String userId, String dateString, String className, String classCode, String startTime, String endTime, String room, String colorType, String sectionUnits) {
+    private Task<DocumentReference> addScheduleTask(String userId, String dateString, String className, String classCode, String startTime, String endTime, String room, String colorType, String sectionUnits) {
         Map<String, Object> classData = new HashMap<>();
         classData.put("userId", userId);
         classData.put("dateString", dateString);
@@ -216,7 +217,7 @@ public class ScheduleActivity extends AppCompatActivity {
         classData.put("instructor", sectionUnits);
         classData.put("colorType", colorType);
 
-        db.collection("schedules").add(classData);
+        return db.collection("schedules").add(classData);
     }
 
     private void navigateToDashboard() {
