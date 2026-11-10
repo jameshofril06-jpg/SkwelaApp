@@ -27,6 +27,7 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
         public String school;
         public String course;
         public String year;
+        public String section;
         public String status; // "active", "suspended", "deactivated", "archived"
         public String suspensionDuration; // "24 Hours", "7 Days", "30 Days", "Indefinite"
         public Long suspendedAt; // Milliseconds timestamp
