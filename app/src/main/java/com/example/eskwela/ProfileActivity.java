@@ -307,6 +307,13 @@ public class ProfileActivity extends AppCompatActivity {
                                 if (rowReminders != null) rowReminders.setVisibility(View.GONE);
                                 View viewReminderDivider = findViewById(R.id.viewReminderDivider);
                                 if (viewReminderDivider != null) viewReminderDivider.setVisibility(View.GONE);
+
+                                BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+                                if (bottomNav != null) {
+                                    bottomNav.getMenu().clear();
+                                    bottomNav.inflateMenu(R.menu.admin_bottom_nav_menu);
+                                    bottomNav.setSelectedItemId(R.id.nav_profile);
+                                }
                             }
                         }
                     });
