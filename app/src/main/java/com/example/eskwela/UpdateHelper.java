@@ -28,8 +28,8 @@ import java.util.Locale;
 public class UpdateHelper {
 
     public static final String GITHUB_API_RELEASES = "https://api.github.com/repos/jameshofril06-jpg/SkwelaApp/releases";
-    public static final String DEFAULT_FALLBACK_DOWNLOAD_URL = "https://github.com/jameshofril06-jpg/SkwelaApp/releases/download/v1.1.6/app-release.apk";
-    public static final String LATEST_VERSION_NAME = "1.1.6";
+    public static final String DEFAULT_FALLBACK_DOWNLOAD_URL = "https://github.com/jameshofril06-jpg/SkwelaApp/releases/download/v1.1.7/app-release.apk";
+    public static final String LATEST_VERSION_NAME = "1.1.7";
 
     public static void downloadAndInstallUpdate(Context context) {
         ProgressDialog checkingDialog = new ProgressDialog(context);
@@ -41,7 +41,7 @@ public class UpdateHelper {
         new Thread(() -> {
             String latestTagName = LATEST_VERSION_NAME;
             String downloadUrl = DEFAULT_FALLBACK_DOWNLOAD_URL;
-            String releaseBody = "• 📋 Software Testing & QA Suite PDF with 80 Executed Test Cases & Postman API Collection v2.1\n• 📅 Strict Date-Specific Schedule Filtering: Home Dashboard and Schedule tab Day view filter classes strictly for selected date.\n• 🛡️ Strict Admin Access Isolation: Admins are restricted exclusively to Admin Control Center & Announcements.\n• 🤖 Enrolled Study Load AI Quiz Generator & Ranking Leaderboard\n• ⏳ Admin User Suspension Time Tracking (e.g. 6h 42m remaining)\n• 📢 Announcement Log Detail Modal & Share Feature\n• ⏱️ Focus Session Presets (2m, 5m, 10m, 15m, 25m, 45m, 60m)\n• 🌙 Global Dark Mode Text Contrast Fixes across all screens\n• ⚠️ Time Schedule Conflict Detection & Code-Validated Class Deletion\n• 📷 OCR Study Load Document Scanner & Auto-Plotter";
+            String releaseBody = "• 👁️ Show/Hide Password Toggle: Interactive eye icon on password inputs for secure viewing.\n• 🖼️ User Profile Picture Picker: Select custom avatar photos from gallery stored directly in Firestore.\n• 👤 Admin Profile Access & Navigation: Seamless access from Admin Control Center toolbar to Profile (Edit profile, Dark theme, OTA updates, About this app, Logout).\n• 📢 Admin Home Announcements: Admin Home tab displays broadcast announcements management exclusively.\n• 📅 Strict Date-Specific Schedule Filtering: Timetable views filter classes strictly by selected date.\n• 🤖 Enrolled Study Load AI Quiz Generator & Ranking Leaderboard\n• ⏳ Admin User Suspension Time Tracking (e.g. 6h 42m remaining)\n• ⏱️ Focus Session Presets (2m, 5m, 10m, 15m, 25m, 45m, 60m)\n• 🌙 Global Dark Mode Text Contrast Fixes across all screens\n• ⚠️ Time Schedule Conflict Detection & Code-Validated Class Deletion";
 
             try {
                 URL url = new URL(GITHUB_API_RELEASES);

@@ -129,7 +129,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void showAboutAppDialog() {
-        String currentVersion = "1.0.7";
+        String currentVersion = "1.1.7";
         try {
             currentVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
         } catch (Exception ignored) {}
@@ -137,17 +137,16 @@ public class ProfileActivity extends AppCompatActivity {
         String aboutMsg = "🎓 ESKWELA v" + currentVersion + "\n\n" +
                 "Smart Student Productivity & Academic Management System designed for students and academic administrators.\n\n" +
                 "🚀 What's New & Changelog (v" + currentVersion + "):\n" +
-                "• ⏳ Admin Suspension Time Tracking: Displays real-time remaining suspension countdowns (e.g. 6h 42m remaining).\n" +
-                "• 📢 Announcement Log & Sharing: Clickable announcement detail modal with broadcast share features.\n" +
-                "• ⏱️ Focus Session Presets: Added 2m, 5m, 10m, 15m, 25m, 45m, and 60m focus session timer options.\n" +
-                "• 🌙 Dark Mode Profile Text Contrast: High-contrast visibility when editing profiles in Dark Mode.\n" +
-                "• 🔍 Intelligent Live OTA Version Detection: Automatically checks GitHub releases API for latest versions.\n" +
-                "• ⚠️ Time Schedule Conflict Detection: Checks for overlapping class times when adding schedules.\n" +
-                "• 📦 Live Download Progress Bar: Real-time percentage tracking when downloading OTA updates.\n" +
-                "• 📷 OCR Study Load Document Scanner & Auto-Plotter across weekdays.\n" +
-                "• 🤖 Smart AI Quizzes & Ranking Leaderboard.\n" +
-                "• 🛡️ Admin Control Center with user moderation.\n" +
-                "• 📝 Task Drop Confirmation with Reason & Class Deletion Code Validation.\n\n" +
+                "• 👁️ Show/Hide Password Toggle: Interactive eye icon on password inputs for secure viewing.\n" +
+                "• 🖼️ User Profile Picture Picker: Select custom avatar photos from gallery stored directly in Firestore.\n" +
+                "• 👤 Admin Profile Access & Navigation: Seamless access from Admin Control Center toolbar to Profile (Edit profile, Dark theme, OTA updates, About this app, Logout).\n" +
+                "• 📢 Admin Home Announcements: Admin Home tab displays broadcast announcements management exclusively.\n" +
+                "• 📅 Strict Date-Specific Schedule Filtering: Timetable views filter classes strictly by selected date.\n" +
+                "• 🤖 Enrolled Study Load AI Quiz Generator & Ranking Leaderboard.\n" +
+                "• ⏳ Admin User Suspension Time Tracking (e.g. 6h 42m remaining).\n" +
+                "• ⏱️ Focus Session Presets (2m, 5m, 10m, 15m, 25m, 45m, 60m).\n" +
+                "• 🌙 Global Dark Mode Text Contrast Fixes across all screens.\n" +
+                "• ⚠️ Time Schedule Conflict Detection & Code-Validated Class Deletion.\n\n" +
                 "© 2025 ESKWELA Team. All rights reserved.";
 
         new AlertDialog.Builder(this)
