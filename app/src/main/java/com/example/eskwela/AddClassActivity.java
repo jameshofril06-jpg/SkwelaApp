@@ -3,8 +3,10 @@ package com.example.eskwela;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -31,6 +33,7 @@ public class AddClassActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private String selectedDate;
+    private Spinner spinnerClassDay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,11 +62,20 @@ public class AddClassActivity extends AppCompatActivity {
         EditText etClassName = findViewById(R.id.etClassName);
         EditText etClassCode = findViewById(R.id.etClassCode);
         EditText etSchool = findViewById(R.id.etAddSchool);
+        spinnerClassDay = findViewById(R.id.spinnerClassDay);
         EditText etStartTime = findViewById(R.id.etStartTime);
         EditText etEndTime = findViewById(R.id.etEndTime);
         EditText etRoom = findViewById(R.id.etRoom);
         EditText etInstructor = findViewById(R.id.etInstructor);
         Button btnAddClassSubmit = findViewById(R.id.btnAddClassSubmit);
+
+        // Setup Spinner Adapter for Day of Week
+        ArrayAdapter<String> dayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new String[] {
+                "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday",
+                "Monday / Thursday", "Tuesday / Friday", "Monday / Wednesday / Friday", "Tuesday / Thursday"
+        });
+        dayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerClassDay.setAdapter(dayAdapter);
 
         setupTimePickers(etStartTime, etEndTime);
 
@@ -84,6 +96,9 @@ public class AddClassActivity extends AppCompatActivity {
             String userId = mAuth.getCurrentUser().getUid();
             btnAddClassSubmit.setEnabled(false);
 
+            String selectedDayChoice = spinnerClassDay.getSelectedItem().toString();
+            String targetDate = calculateDateForDayOfWeek(selectedDayChoice, selectedDate);
+
             // Randomly assign a color type (Blue, Orange, Green) for the UI
             String[] colors = {"BLUE", "ORANGE", "GREEN"};
             String randomColor = colors[new Random().nextInt(colors.length)];
@@ -91,19 +106,44 @@ public class AddClassActivity extends AppCompatActivity {
             // Create Data Map
             Map<String, Object> classData = new HashMap<>();
             classData.put("userId", userId);
-            classData.put("dateString", selectedDate);
+            classData.put("dateString", targetDate);
             classData.put("className", className);
             classData.put("classCode", etClassCode.getText().toString().trim());
             classData.put("school", etSchool.getText().toString().trim());
             classData.put("startTime", startTime);
             classData.put("endTime", endTime);
             classData.put("room", etRoom.getText().toString().trim());
-            classData.put("instructor", etInstructor.getText().toString().trim());
+            classData.put("instructor", etInstructor.getText().toString().trim() + " (" + selectedDayChoice + ")");
             classData.put("colorType", randomColor);
 
             // Check for schedule time conflicts before saving
-            checkConflictAndSave(userId, selectedDate, classData, startTime, endTime, btnAddClassSubmit);
+            checkConflictAndSave(userId, targetDate, classData, startTime, endTime, btnAddClassSubmit);
         });
+    }
+
+    private String calculateDateForDayOfWeek(String dayChoice, String fallbackDate) {
+        try {
+            Calendar cal = Calendar.getInstance();
+            String lower = dayChoice.toLowerCase();
+            if (lower.contains("tuesday")) {
+                cal.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
+            } else if (lower.contains("wednesday")) {
+                cal.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
+            } else if (lower.contains("thursday")) {
+                cal.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
+            } else if (lower.contains("friday")) {
+                cal.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
+            } else if (lower.contains("saturday")) {
+                cal.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+            } else if (lower.contains("sunday")) {
+                cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+            } else {
+                cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+            }
+            return new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(cal.getTime());
+        } catch (Exception e) {
+            return fallbackDate;
+        }
     }
 
     private void checkConflictAndSave(String userId, String dateStr, Map<String, Object> classData, String newStart, String newEnd, Button submitBtn) {
@@ -138,7 +178,7 @@ public class AddClassActivity extends AppCompatActivity {
                         submitBtn.setEnabled(true);
                         new AlertDialog.Builder(this)
                                 .setTitle("⚠️ Schedule Conflict Detected")
-                                .setMessage("This class time overlaps with an existing scheduled class:\n\n• " + conflictingClass + "\n\nWould you like to override and add this class anyway?")
+                                .setMessage("This class time overlaps with an existing scheduled class on this day:\n\n• " + conflictingClass + "\n\nWould you like to override and add this class anyway?")
                                 .setPositiveButton("Override & Add", (dialog, which) -> executeSave(classData, submitBtn))
                                 .setNegativeButton("Cancel / Edit Time", (dialog, which) -> dialog.dismiss())
                                 .show();

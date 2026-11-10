@@ -33,7 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Build your schedule."
+            android:text="Build your schedule with specific day input."
             android:textColor="@color/text_secondary"
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="parent"
@@ -129,6 +129,31 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/lblAddSchool" />
 
+        <!-- DAY OF WEEK -->
+        <TextView
+            android:id="@+id/lblClassDay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="DAY OF WEEK"
+            android:textColor="@color/text_primary"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/etAddSchool" />
+
+        <Spinner
+            android:id="@+id/spinnerClassDay"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_input_field"
+            android:paddingHorizontal="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblClassDay" />
+
         <!-- STARTS & ENDS -->
         <TextView
             android:id="@+id/lblStarts"
@@ -141,7 +166,7 @@
             android:textStyle="bold"
             android:letterSpacing="0.05"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/etAddSchool" />
+            app:layout_constraintTop_toBottomOf="@+id/spinnerClassDay" />
 
         <TextView
             android:id="@+id/lblEnds"
@@ -154,7 +179,7 @@
             android:textStyle="bold"
             android:letterSpacing="0.05"
             app:layout_constraintStart_toStartOf="@+id/etEndTime"
-            app:layout_constraintTop_toBottomOf="@+id/etAddSchool" />
+            app:layout_constraintTop_toBottomOf="@+id/spinnerClassDay" />
 
         <EditText
             android:id="@+id/etStartTime"
