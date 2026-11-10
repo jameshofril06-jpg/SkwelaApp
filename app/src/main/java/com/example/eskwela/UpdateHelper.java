@@ -28,8 +28,8 @@ import java.util.Locale;
 public class UpdateHelper {
 
     public static final String GITHUB_API_RELEASES = "https://api.github.com/repos/jameshofril06-jpg/SkwelaApp/releases";
-    public static final String DEFAULT_FALLBACK_DOWNLOAD_URL = "https://github.com/jameshofril06-jpg/SkwelaApp/releases/download/v1.2.0/app-release.apk";
-    public static final String LATEST_VERSION_NAME = "1.2.0";
+    public static final String DEFAULT_FALLBACK_DOWNLOAD_URL = "https://github.com/jameshofril06-jpg/SkwelaApp/releases/download/v1.2.1/app-release.apk";
+    public static final String LATEST_VERSION_NAME = "1.2.1";
 
     public static void downloadAndInstallUpdate(Context context) {
         ProgressDialog checkingDialog = new ProgressDialog(context);
@@ -41,7 +41,7 @@ public class UpdateHelper {
         new Thread(() -> {
             String latestTagName = LATEST_VERSION_NAME;
             String downloadUrl = DEFAULT_FALLBACK_DOWNLOAD_URL;
-            String releaseBody = "• 🚨 Upcoming Class Time Notifications: Enhanced dashboard next class alerts with urgent 'STARTING SOON IN X MINS' badges when a class is starting within 45 minutes.\n• 🔄 Smooth Admin Navigation Animations: Silky slide transitions when switching between Admin Home and Profile tabs.\n• 📅 Strict Date-Specific Schedule Filtering: Home Dashboard and Schedule tab Day view filter classes strictly by the exact selected calendar date.\n• 👤 Admin Profile Access & Navigation: Admin bottom navigation restricted exclusively to Home and Profile tabs.\n• 🎓 Complete Software Testing & QA Suite PDF with 80 Test Cases & Postman API Collection v2.1\n• 🤖 Enrolled Study Load AI Quiz Generator & Ranking Leaderboard\n• ⏳ Admin User Suspension Time Tracking (e.g. 6h 42m remaining)\n• 📢 Announcement Log Detail Modal & Share Feature\n• ⏱️ Focus Session Presets (2m, 5m, 10m, 15m, 25m, 45m, 60m)\n• 🌙 Global Dark Mode Text Contrast Fixes across all screens\n• ⚠️ Time Schedule Conflict Detection & Code-Validated Class Deletion";
+            String releaseBody = "• 📋 Pre-Final Documentation Package: Updated Software Testing & QA Suite PDF with 30 Sample Test Cases and Postman API Collection v2.1.\n• 🛡️ Separated Admin Home & Control Center: Admin Home focuses exclusively on announcements, while Admin Control Center handles student directory moderation.\n• 🚨 Upcoming Class Time Notifications: Enhanced dashboard next class alerts with urgent 'STARTING SOON IN X MINS' badges.\n• 📅 Strict Date-Specific Schedule Filtering: Timetable views filter classes strictly by selected calendar date.\n• 👤 Admin Profile Access & Navigation: Admin bottom navigation restricted exclusively to Home and Profile tabs.\n• 🤖 Enrolled Study Load AI Quiz Generator & Ranking Leaderboard\n• ⏳ Admin User Suspension Time Tracking (e.g. 6h 42m remaining)\n• 📢 Announcement Log Detail Modal & Share Feature\n• ⏱️ Focus Session Presets (2m, 5m, 10m, 15m, 25m, 45m, 60m)\n• 🌙 Global Dark Mode Text Contrast Fixes across all screens\n• ⚠️ Time Schedule Conflict Detection & Code-Validated Class Deletion";
 
             try {
                 URL url = new URL(GITHUB_API_RELEASES);
