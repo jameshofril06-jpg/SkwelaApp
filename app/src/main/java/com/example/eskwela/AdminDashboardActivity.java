@@ -21,6 +21,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -52,7 +53,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.admin_main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
 
@@ -62,31 +63,17 @@ public class AdminDashboardActivity extends AppCompatActivity {
             AccountGuard.goLogin(this);
             return;
         }
-        String adminEmail = auth.getCurrentUser().getEmail();
-        db.collection("users").document(auth.getCurrentUser().getUid()).get()
-                .addOnSuccessListener(doc -> {
-                    if (isFinishing()) return;
-                    String role = doc.getString("role");
-                    if (!AccountGuard.isAdmin(adminEmail, role)) {
-                        Toast.makeText(this, "Admin access only", Toast.LENGTH_SHORT).show();
-                        finish();
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    if (!AccountGuard.isAdmin(adminEmail, null)) {
-                        Toast.makeText(this, "Admin access only", Toast.LENGTH_SHORT).show();
-                        finish();
-                    }
-                });
 
         rvAdminAnnouncements = findViewById(R.id.rvAdminAnnouncements);
         tvEmptyAnnouncements = findViewById(R.id.tvEmptyAnnouncements);
-        ImageView ivBack = findViewById(R.id.ivBack);
         ImageView ivAdminProfile = findViewById(R.id.ivAdminProfile);
 
-        ivBack.setOnClickListener(v -> finish());
         if (ivAdminProfile != null) {
-            ivAdminProfile.setOnClickListener(v -> startActivity(new Intent(AdminDashboardActivity.this, ProfileActivity.class)));
+            ivAdminProfile.setOnClickListener(v -> {
+                startActivity(new Intent(AdminDashboardActivity.this, ProfileActivity.class));
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                finish();
+            });
         }
 
         announcementAdapter = new AdminAnnouncementAdapter(announcementList, this::showAnnouncementDetailDialog);
@@ -98,8 +85,27 @@ public class AdminDashboardActivity extends AppCompatActivity {
             btnPostAnn.setOnClickListener(v -> showPostAnnouncementDialog());
         }
 
+        setupBottomNavigation();
         setupEntranceAnimations();
         loadAdminAnnouncements();
+    }
+
+    private void setupBottomNavigation() {
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+        if (bottomNav != null) {
+            bottomNav.setSelectedItemId(R.id.nav_home);
+            bottomNav.setOnItemSelectedListener(item -> {
+                int itemId = item.getItemId();
+                if (itemId == R.id.nav_home) return true;
+                if (itemId == R.id.nav_profile) {
+                    startActivity(new Intent(AdminDashboardActivity.this, ProfileActivity.class));
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                    finish();
+                    return true;
+                }
+                return false;
+            });
+        }
     }
 
     private void setupEntranceAnimations() {

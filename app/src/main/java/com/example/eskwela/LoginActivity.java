@@ -47,6 +47,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // Trigger Entrance Animations
         setupAnimations();
+        setupPasswordToggle(etPassword);
 
         TextView tvForgotPassword = findViewById(R.id.tvForgotPassword);
         if (tvForgotPassword != null) {
@@ -104,6 +105,31 @@ public class LoginActivity extends AppCompatActivity {
         tvGoToRegister.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
+        });
+    }
+
+    private void setupPasswordToggle(EditText editText) {
+        if (editText == null) return;
+        editText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_eye, 0);
+        final boolean[] isVisible = {false};
+
+        editText.setOnTouchListener((v, event) -> {
+            final int DRAWABLE_RIGHT = 2;
+            if (event.getAction() == android.view.MotionEvent.ACTION_UP) {
+                if (editText.getCompoundDrawables()[DRAWABLE_RIGHT] != null &&
+                        event.getRawX() >= (editText.getRight() - editText.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 48)) {
+                    isVisible[0] = !isVisible[0];
+                    v.performClick();
+                    if (isVisible[0]) {
+                        editText.setTransformationMethod(android.text.method.HideReturnsTransformationMethod.getInstance());
+                    } else {
+                        editText.setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance());
+                    }
+                    editText.setSelection(editText.getText().length());
+                    return true;
+                }
+            }
+            return false;
         });
     }
 

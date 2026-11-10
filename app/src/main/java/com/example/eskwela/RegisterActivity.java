@@ -56,6 +56,8 @@ public class RegisterActivity extends AppCompatActivity {
 
         // Trigger Animations
         setupAnimations();
+        setupPasswordToggle(etPassword);
+        setupPasswordToggle(etConfirmPassword);
 
         btnCreateAccount.setOnClickListener(v -> {
             String fullName = etFullName != null ? etFullName.getText().toString().trim() : "";
@@ -125,6 +127,31 @@ public class RegisterActivity extends AppCompatActivity {
             Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
+        });
+    }
+
+    private void setupPasswordToggle(EditText editText) {
+        if (editText == null) return;
+        editText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_eye, 0);
+        final boolean[] isVisible = {false};
+
+        editText.setOnTouchListener((v, event) -> {
+            final int DRAWABLE_RIGHT = 2;
+            if (event.getAction() == android.view.MotionEvent.ACTION_UP) {
+                if (editText.getCompoundDrawables()[DRAWABLE_RIGHT] != null &&
+                        event.getRawX() >= (editText.getRight() - editText.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 48)) {
+                    isVisible[0] = !isVisible[0];
+                    v.performClick();
+                    if (isVisible[0]) {
+                        editText.setTransformationMethod(android.text.method.HideReturnsTransformationMethod.getInstance());
+                    } else {
+                        editText.setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance());
+                    }
+                    editText.setSelection(editText.getText().length());
+                    return true;
+                }
+            }
+            return false;
         });
     }
 

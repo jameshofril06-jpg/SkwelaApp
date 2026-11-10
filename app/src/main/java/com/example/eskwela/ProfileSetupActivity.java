@@ -1,15 +1,19 @@
 package com.example.eskwela;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -28,6 +32,8 @@ public class ProfileSetupActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private EditText etFullName, etSchool, etCourse, etYear, etSection;
     private boolean editMode;
+    private ActivityResultLauncher<Intent> avatarPickerLauncher;
+    private String selectedPhotoUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +61,25 @@ public class ProfileSetupActivity extends AppCompatActivity {
         etSection = findViewById(R.id.etSection);
         TextView tvInitials = findViewById(R.id.tvAvatarInitials);
         Button btnContinue = findViewById(R.id.btnContinue);
+        View frameAvatar = findViewById(R.id.frameAvatar);
+
+        avatarPickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null && result.getData().getData() != null) {
+                        Uri imageUri = result.getData().getData();
+                        selectedPhotoUri = imageUri.toString();
+                        Toast.makeText(this, "Profile picture selected! 📷", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        if (frameAvatar != null) {
+            frameAvatar.setOnClickListener(v -> {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                avatarPickerLauncher.launch(intent);
+            });
+        }
 
         editMode = getIntent().getBooleanExtra("EDIT_MODE", false);
         String passedName = getIntent().getStringExtra("fullName");
@@ -103,6 +128,9 @@ public class ProfileSetupActivity extends AppCompatActivity {
             user.put("course", etCourse.getText().toString().trim());
             user.put("year", etYear.getText().toString().trim());
             user.put("section", etSection.getText().toString().trim());
+            if (selectedPhotoUri != null && !selectedPhotoUri.isEmpty()) {
+                user.put("photoUrl", selectedPhotoUri);
+            }
 
             btnContinue.setEnabled(false);
             db.collection("users").document(userId).set(user, SetOptions.merge())
