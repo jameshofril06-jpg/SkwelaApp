@@ -28,8 +28,8 @@ import java.util.Locale;
 public class UpdateHelper {
 
     public static final String GITHUB_API_RELEASES = "https://api.github.com/repos/jameshofril06-jpg/SkwelaApp/releases";
-    public static final String DEFAULT_FALLBACK_DOWNLOAD_URL = "https://github.com/jameshofril06-jpg/SkwelaApp/releases/download/v1.2.2/app-release.apk";
-    public static final String LATEST_VERSION_NAME = "1.2.2";
+    public static final String DEFAULT_FALLBACK_DOWNLOAD_URL = "https://github.com/jameshofril06-jpg/SkwelaApp/releases/download/v1.2.3/app-release.apk";
+    public static final String LATEST_VERSION_NAME = "1.2.3";
 
     public static void downloadAndInstallUpdate(Context context) {
         ProgressDialog checkingDialog = new ProgressDialog(context);
@@ -41,7 +41,7 @@ public class UpdateHelper {
         new Thread(() -> {
             String latestTagName = LATEST_VERSION_NAME;
             String downloadUrl = DEFAULT_FALLBACK_DOWNLOAD_URL;
-            String releaseBody = "• 👨‍🎓 Gender-Based Student & Admin Profile Avatars: Default male student (👨‍🎓), female student (👩‍🎓), and admin (👔) icons mapped directly to registration gender selection.\n• 📚 Study Notes & Course Reviewer Feature: Save, review, and search subject study notes directly in the Study space.\n• 📅 Day-Specific OCR Study Load Scanner: Scanned study load documents map courses strictly to their specific scheduled days of the week.\n• 🛡️ Separated Admin Dashboard & Control Center: Admin Dashboard tab displays broadcast announcements exclusively, while Control Center manages student moderation.\n• 🚨 Upcoming Class Time Notifications: Enhanced dashboard next class alerts with urgent 'STARTING SOON IN X MINS' badges.\n• 🎓 Complete Software Testing & QA Suite PDF with 80 Test Cases & Postman API Collection v2.1";
+            String releaseBody = "• 📸 Dynamic Custom Study Load OCR Scanner: RegEx text parser extracts custom course codes, start/end times, and weekday schedules from any custom study load image.\n• 👨‍🎓 Gender-Based Student & Admin Profile Avatars: Default male student (👨‍🎓), female student (👩‍🎓), and admin (👔) icons mapped directly to registration gender selection.\n• 📚 Study Notes & Course Reviewer Feature: Save, review, and search subject study notes directly in the Study space.\n• 📅 Day-Specific OCR Study Load Scanner: Scanned study load documents map courses strictly to their specific scheduled days of the week.\n• 🛡️ Separated Admin Dashboard & Control Center: Admin Dashboard tab displays broadcast announcements exclusively, while Control Center manages student moderation.\n• 🚨 Upcoming Class Time Notifications: Enhanced dashboard next class alerts with urgent 'STARTING SOON IN X MINS' badges.\n• 🎓 Complete Software Testing & QA Suite PDF with 80 Test Cases & Postman API Collection v2.1";
 
             try {
                 URL url = new URL(GITHUB_API_RELEASES);
