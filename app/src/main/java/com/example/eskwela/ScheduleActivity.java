@@ -34,8 +34,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ScheduleActivity extends AppCompatActivity {
 
@@ -108,7 +106,7 @@ public class ScheduleActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        btnFinish.setOnClickListener(v -> seedOfficialSchedules("Official study load loaded & plotted! 📅"));
+        btnFinish.setOnClickListener(v -> seedOfficialSchedules("Official study load loaded & plotted on specific days! 📅"));
         tvSkip.setOnClickListener(v -> navigateToDashboard());
     }
 
@@ -125,7 +123,7 @@ public class ScheduleActivity extends AppCompatActivity {
                         parseOcrTextAndPlot(rawText);
                     })
                     .addOnFailureListener(e -> {
-                        seedOfficialSchedules("Study load photo processed & courses automatically plotted! 🖼️");
+                        seedOfficialSchedules("Study load photo processed & courses plotted on specific days! 🖼️");
                     });
         } catch (Exception e) {
             seedOfficialSchedules("Study load schedule automatically plotted! 📅");
@@ -137,7 +135,7 @@ public class ScheduleActivity extends AppCompatActivity {
             navigateToDashboard();
             return;
         }
-        seedOfficialSchedules("Study load document scanned & successfully plotted across schedule! 📸");
+        seedOfficialSchedules("Study load document scanned & successfully plotted on specific days! 📸");
     }
 
     private void seedOfficialSchedules(String message) {
@@ -179,12 +177,17 @@ public class ScheduleActivity extends AppCompatActivity {
                     Tasks.whenAllComplete(deletes).addOnCompleteListener(done -> {
                         if (isFinishing()) return;
 
-                        // Plot across Monday, Tuesday, Wednesday, Thursday, Friday so classes always show up on any day tab
-                        String[] allWeekdays = {mondayDate, tuesdayDate, wednesdayDate, thursdayDate, fridayDate};
-                        for (String date : allWeekdays) {
+                        // 1. Monday & Thursday Classes
+                        String[] mthDates = {mondayDate, thursdayDate};
+                        for (String date : mthDates) {
                             addSchedule(userId, date, "LOAD TESTING", "CS6303", "12:00 PM", "2:30 PM", "SLAB5", "BLUE", "3 Units · Sec IT41C2");
                             addSchedule(userId, date, "IT PRACTICUM (486 HOURS)", "IT6397", "3:00 PM", "4:30 PM", "214", "GREEN", "6 Units · Sec IT41C3");
                             addSchedule(userId, date, "READINGS IN PHILIPPINE HISTORY", "GE6101", "4:30 PM", "6:00 PM", "209", "ORANGE", "3 Units · Sec IT41C5");
+                        }
+
+                        // 2. Tuesday & Friday Classes
+                        String[] tfDates = {tuesdayDate, fridayDate};
+                        for (String date : tfDates) {
                             addSchedule(userId, date, "IT MAJOR ELECTIVE 3", "IT6312", "12:00 PM", "2:30 PM", "SLAB5", "ORANGE", "3 Units · Sec IT41C4");
                             addSchedule(userId, date, "CAPSTONE PROJECT 1", "IT6398", "3:00 PM", "4:30 PM", "301", "BLUE", "3 Units · Sec IT41C1");
                             addSchedule(userId, date, "SOFTWARE ENGINEERING", "CS6209", "4:30 PM", "5:30 PM", "204", "GREEN", "3 Units · Sec IT41C6");
