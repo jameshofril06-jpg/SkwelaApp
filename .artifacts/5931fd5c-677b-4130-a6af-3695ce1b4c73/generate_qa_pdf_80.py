@@ -60,7 +60,7 @@ story = []
 
 # Title Banner
 story.append(Paragraph("ESKWELA Software Testing & Quality Assurance (QA) Suite", title_style))
-story.append(Paragraph("<b>Project:</b> ESKWELA Mobile & Web System &nbsp;|&nbsp; <b>QA Lead:</b> Software Testing & QA Engineer", body_style))
+story.append(Paragraph("<b>Project:</b> ESKWELA Android Mobile Application &nbsp;|&nbsp; <b>QA Lead:</b> Software Testing & QA Engineer", body_style))
 story.append(Paragraph("<b>Code Repository Link:</b> https://github.com/jameshofril06-jpg/SkwelaApp", body_style))
 story.append(Paragraph("<b>Total Executed Test Cases:</b> 80 Test Cases (50 Functional, 18 Integration/API, 12 UAT Scripts)", body_style))
 story.append(Spacer(1, 8))
@@ -260,4 +260,4 @@ make_bug_table([
 ])
 
 doc.build(story)
-print("QA Suite PDF with 80 Test Cases generated successfully.")
+print("QA Suite PDF with 80 Test Cases updated successfully.")
