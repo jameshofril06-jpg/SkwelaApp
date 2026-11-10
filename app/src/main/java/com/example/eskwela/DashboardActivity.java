@@ -382,7 +382,17 @@ public class DashboardActivity extends AppCompatActivity {
         }
 
         if (nextClass != null) {
-            tvNextClassLabel.setText("NEXT CLASS • " + nextClass.startTime);
+            long diffMillis = parseTimeToMillis(nextClass.startTime) - currentTimeMillis;
+            long minsLeft = diffMillis / (60 * 1000L);
+
+            if (minsLeft >= 0 && minsLeft <= 45) {
+                tvNextClassLabel.setText("🚨 STARTING SOON IN " + minsLeft + " MINS • " + nextClass.startTime);
+                tvNextClassLabel.setTextColor(0xFFFDE047);
+            } else {
+                tvNextClassLabel.setText("NEXT CLASS • " + nextClass.startTime);
+                tvNextClassLabel.setTextColor(0xFF93C5FD);
+            }
+
             tvNextClassName.setText(nextClass.className);
             String room = nextClass.room != null ? nextClass.room : "";
             String instructor = nextClass.instructor != null ? nextClass.instructor : "";
