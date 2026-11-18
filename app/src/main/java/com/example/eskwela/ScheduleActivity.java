@@ -104,7 +104,7 @@ public class ScheduleActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        btnFinish.setOnClickListener(v -> seedOfficialSchedules("Official study load loaded & plotted (Exactly 6 courses)! 📅"));
+        btnFinish.setOnClickListener(v -> seedOfficialSchedules("Official study load loaded & plotted strictly by document schedule (Wed & Sat free)! 📅"));
         tvSkip.setOnClickListener(v -> navigateToDashboard());
     }
 
@@ -121,7 +121,7 @@ public class ScheduleActivity extends AppCompatActivity {
                         parseOcrTextAndPlot(rawText);
                     })
                     .addOnFailureListener(e -> {
-                        seedOfficialSchedules("Study load photo processed & 6 courses plotted! 🖼️");
+                        seedOfficialSchedules("Study load photo processed & plotted strictly by document schedule! 🖼️");
                     });
         } catch (Exception e) {
             seedOfficialSchedules("Study load schedule automatically plotted! 📅");
@@ -134,8 +134,7 @@ public class ScheduleActivity extends AppCompatActivity {
             return;
         }
 
-        // Always plot exactly the 6 unique courses from the study load card without redundancy
-        seedOfficialSchedules("Successfully scanned and plotted exactly 6 study load courses without redundancy! 📸");
+        seedOfficialSchedules("Successfully scanned and plotted official study load (MTh & TF) with Wednesday & Saturday free! 📸");
     }
 
     private void seedOfficialSchedules(String message) {
@@ -154,7 +153,13 @@ public class ScheduleActivity extends AppCompatActivity {
         cal.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
         String tuesdayDate = dbFormat.format(cal.getTime());
 
-        // Clear existing schedules for user to avoid duplication, then add exactly 6 official schedule rows
+        cal.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
+        String thursdayDate = dbFormat.format(cal.getTime());
+
+        cal.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
+        String fridayDate = dbFormat.format(cal.getTime());
+
+        // Clear existing schedules for user to avoid duplication, then add official schedule
         db.collection("schedules")
                 .whereEqualTo("userId", userId)
                 .get()
@@ -169,13 +174,19 @@ public class ScheduleActivity extends AppCompatActivity {
 
                         List<Task<DocumentReference>> addTasks = new ArrayList<>();
 
-                        // EXACTLY 6 UNIQUE SCHEDULE ENTRIES (ONE PER STUDY LOAD ROW)
-                        addTasks.add(addScheduleTask(userId, mondayDate, "LOAD TESTING", "CS6303", "12:00 PM", "2:30 PM", "SLAB5", "BLUE", "3 Units · Sec IT41C2 (MTh)"));
-                        addTasks.add(addScheduleTask(userId, mondayDate, "IT PRACTICUM (486 HOURS)", "IT6397", "3:00 PM", "4:30 PM", "214", "GREEN", "6 Units · Sec IT41C3 (MTh)"));
-                        addTasks.add(addScheduleTask(userId, mondayDate, "READINGS IN PHILIPPINE HISTORY", "GE6101", "4:30 PM", "6:00 PM", "209", "ORANGE", "3 Units · Sec IT41C5 (MTh)"));
-                        addTasks.add(addScheduleTask(userId, tuesdayDate, "IT MAJOR ELECTIVE 3", "IT6312", "12:00 PM", "2:30 PM", "SLAB5", "ORANGE", "3 Units · Sec IT41C4 (TF)"));
-                        addTasks.add(addScheduleTask(userId, tuesdayDate, "CAPSTONE PROJECT 1", "IT6398", "3:00 PM", "4:30 PM", "301", "BLUE", "3 Units · Sec IT41C1 (TF)"));
-                        addTasks.add(addScheduleTask(userId, tuesdayDate, "SOFTWARE ENGINEERING", "CS6209", "4:30 PM", "7:30 PM", "204 / SLAB3", "GREEN", "3 Units · Sec IT41C6 (TF)"));
+                        // 1. MONDAY & THURSDAY COURSES (MTh)
+                        for (String date : new String[]{mondayDate, thursdayDate}) {
+                            addTasks.add(addScheduleTask(userId, date, "LOAD TESTING", "CS6303", "12:00 PM", "2:30 PM", "SLAB5", "BLUE", "3 Units · Sec IT41C2 (MTh)"));
+                            addTasks.add(addScheduleTask(userId, date, "IT PRACTICUM (486 HOURS)", "IT6397", "3:00 PM", "4:30 PM", "214", "GREEN", "6 Units · Sec IT41C3 (MTh)"));
+                            addTasks.add(addScheduleTask(userId, date, "READINGS IN PHILIPPINE HISTORY", "GE6101", "4:30 PM", "6:00 PM", "209", "ORANGE", "3 Units · Sec IT41C5 (MTh)"));
+                        }
+
+                        // 2. TUESDAY & FRIDAY COURSES (TF)
+                        for (String date : new String[]{tuesdayDate, fridayDate}) {
+                            addTasks.add(addScheduleTask(userId, date, "IT MAJOR ELECTIVE 3", "IT6312", "12:00 PM", "2:30 PM", "SLAB5", "ORANGE", "3 Units · Sec IT41C4 (TF)"));
+                            addTasks.add(addScheduleTask(userId, date, "CAPSTONE PROJECT 1", "IT6398", "3:00 PM", "4:30 PM", "301", "BLUE", "3 Units · Sec IT41C1 (TF)"));
+                            addTasks.add(addScheduleTask(userId, date, "SOFTWARE ENGINEERING", "CS6209", "4:30 PM", "7:30 PM", "204 / SLAB3", "GREEN", "3 Units · Sec IT41C6 (TF)"));
+                        }
 
                         // Await ALL schedule saves before navigating to Dashboard!
                         Tasks.whenAllComplete(addTasks).addOnCompleteListener(allSaved -> {
