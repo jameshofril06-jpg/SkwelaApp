@@ -71,7 +71,9 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp">
+            android:paddingHorizontal="20dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="60dp">
 
             <!-- Stats Card -->
             <androidx.cardview.widget.CardView
@@ -272,11 +274,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:nestedScrollingEnabled="false"
+                android:nestedScrollingEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/etSearchUsers"
-                tools:itemCount="3"
+                tools:itemCount="5"
                 tools:listitem="@layout/item_admin_user" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
