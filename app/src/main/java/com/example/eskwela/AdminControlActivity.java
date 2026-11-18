@@ -183,8 +183,18 @@ public class AdminControlActivity extends AppCompatActivity {
                     if (isFinishing()) return;
                     allUserList.clear();
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                        AdminUserAdapter.UserItem item = doc.toObject(AdminUserAdapter.UserItem.class);
+                        AdminUserAdapter.UserItem item = new AdminUserAdapter.UserItem();
                         item.id = doc.getId();
+                        item.fullName = doc.getString("fullName");
+                        item.email = doc.getString("email");
+                        item.studentId = doc.getString("studentId");
+                        item.school = doc.getString("school");
+                        item.course = doc.getString("course");
+                        item.year = doc.getString("year");
+                        item.section = doc.getString("section");
+                        item.status = doc.getString("status") != null ? doc.getString("status") : "active";
+                        item.suspensionDuration = doc.getString("suspensionDuration");
+                        item.suspendedAt = doc.getLong("suspendedAt");
                         allUserList.add(item);
                     }
                     if (allUserList.isEmpty()) {
