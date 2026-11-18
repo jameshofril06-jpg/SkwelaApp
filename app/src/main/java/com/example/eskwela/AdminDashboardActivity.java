@@ -227,61 +227,43 @@ public class AdminDashboardActivity extends AppCompatActivity {
     }
 
     private void loadAdminDataRealtime() {
-        db.collection("users").addSnapshotListener((value, error) -> {
-            if (isFinishing()) return;
-            allUserList.clear();
-            if (value != null) {
-                for (QueryDocumentSnapshot doc : value) {
-                    AdminUserAdapter.UserItem item = doc.toObject(AdminUserAdapter.UserItem.class);
-                    item.id = doc.getId();
-                    allUserList.add(item);
-                }
-            }
-
-            // Fallback Mock Students if Firestore returns empty
-            if (allUserList.isEmpty()) {
-                AdminUserAdapter.UserItem m1 = new AdminUserAdapter.UserItem();
-                m1.id = "student-uid-101";
-                m1.fullName = "Juan Dela Cruz";
-                m1.email = "juandelacruz@student.edu.ph";
-                m1.studentId = "STU-4921";
-                m1.school = "University of the Philippines";
-                m1.course = "BS Information Technology";
-                m1.year = "4th Year";
-                m1.section = "IT41C1";
-                m1.status = "active";
-                allUserList.add(m1);
-
-                AdminUserAdapter.UserItem m2 = new AdminUserAdapter.UserItem();
-                m2.id = "student-uid-102";
-                m2.fullName = "Maria Santos";
-                m2.email = "mariasantos@student.edu.ph";
-                m2.studentId = "STU-8823";
-                m2.school = "University of the Philippines";
-                m2.course = "BS Computer Science";
-                m2.year = "3rd Year";
-                m2.section = "CS3A";
-                m2.status = "suspended";
-                m2.suspensionDuration = "7 Days";
-                m2.suspendedAt = System.currentTimeMillis() - 86400000L;
-                allUserList.add(m2);
-
-                AdminUserAdapter.UserItem m3 = new AdminUserAdapter.UserItem();
-                m3.id = "student-uid-103";
-                m3.fullName = "Pedro Penduko";
-                m3.email = "pedropenduko@student.edu.ph";
-                m3.studentId = "STU-1102";
-                m3.school = "University of the Philippines";
-                m3.course = "BS Information Systems";
-                m3.year = "2nd Year";
-                m3.section = "IS2B";
-                m3.status = "deactivated";
-                allUserList.add(m3);
-            }
-
-            if (tvTotalUsers != null) tvTotalUsers.setText(String.valueOf(allUserList.size()));
-            filterUserList(etSearchUsers != null ? etSearchUsers.getText().toString().trim() : "", currentStatusFilter);
-        });
+        db.collection("users").get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (isFinishing()) return;
+                    allUserList.clear();
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        AdminUserAdapter.UserItem item = new AdminUserAdapter.UserItem();
+                        item.id = doc.getId();
+                        item.fullName = doc.getString("fullName");
+                        if (item.fullName == null || item.fullName.trim().isEmpty()) {
+                            item.fullName = doc.getString("name");
+                        }
+                        if (item.fullName == null || item.fullName.trim().isEmpty()) {
+                            item.fullName = "Registered Student";
+                        }
+                        item.email = doc.getString("email");
+                        item.studentId = doc.getString("studentId");
+                        item.school = doc.getString("school");
+                        item.course = doc.getString("course");
+                        item.year = doc.getString("year");
+                        item.section = doc.getString("section");
+                        item.status = doc.getString("status") != null ? doc.getString("status") : "active";
+                        item.suspensionDuration = doc.getString("suspensionDuration");
+                        item.suspendedAt = doc.getLong("suspendedAt");
+                        allUserList.add(item);
+                    }
+                    if (allUserList.isEmpty()) {
+                        addMockUsers();
+                    }
+                    if (tvTotalUsers != null) tvTotalUsers.setText(String.valueOf(allUserList.size()));
+                    filterUserList(etSearchUsers != null ? etSearchUsers.getText().toString().trim() : "", currentStatusFilter);
+                })
+                .addOnFailureListener(e -> {
+                    allUserList.clear();
+                    addMockUsers();
+                    if (tvTotalUsers != null) tvTotalUsers.setText(String.valueOf(allUserList.size()));
+                    filterUserList(etSearchUsers != null ? etSearchUsers.getText().toString().trim() : "", currentStatusFilter);
+                });
 
         db.collection("schedules").get()
                 .addOnCompleteListener(task -> {
@@ -289,6 +271,46 @@ public class AdminDashboardActivity extends AppCompatActivity {
                         tvTotalSchedules.setText(String.valueOf(task.getResult().size()));
                     }
                 });
+    }
+
+    private void addMockUsers() {
+        AdminUserAdapter.UserItem m1 = new AdminUserAdapter.UserItem();
+        m1.id = "student-uid-101";
+        m1.fullName = "Juan Dela Cruz";
+        m1.email = "juandelacruz@student.edu.ph";
+        m1.studentId = "STU-4921";
+        m1.school = "University of the Philippines";
+        m1.course = "BS Information Technology";
+        m1.year = "4th Year";
+        m1.section = "IT41C1";
+        m1.status = "active";
+        allUserList.add(m1);
+
+        AdminUserAdapter.UserItem m2 = new AdminUserAdapter.UserItem();
+        m2.id = "student-uid-102";
+        m2.fullName = "Maria Santos";
+        m2.email = "mariasantos@student.edu.ph";
+        m2.studentId = "STU-8823";
+        m2.school = "University of the Philippines";
+        m2.course = "BS Computer Science";
+        m2.year = "3rd Year";
+        m2.section = "CS3A";
+        m2.status = "suspended";
+        m2.suspensionDuration = "7 Days";
+        m2.suspendedAt = System.currentTimeMillis() - 86400000L;
+        allUserList.add(m2);
+
+        AdminUserAdapter.UserItem m3 = new AdminUserAdapter.UserItem();
+        m3.id = "student-uid-103";
+        m3.fullName = "Pedro Penduko";
+        m3.email = "pedropenduko@student.edu.ph";
+        m3.studentId = "STU-1102";
+        m3.school = "University of the Philippines";
+        m3.course = "BS Information Systems";
+        m3.year = "2nd Year";
+        m3.section = "IS2B";
+        m3.status = "deactivated";
+        allUserList.add(m3);
     }
 
     private void showUserProfileAndModerationDialog(AdminUserAdapter.UserItem user) {
@@ -311,6 +333,24 @@ public class AdminDashboardActivity extends AppCompatActivity {
                 (user.school != null ? user.school : "No School") + " • " + (user.course != null ? user.course : "") + "\n" +
                 (user.studentId != null ? "Student ID: " + user.studentId : "ID: N/A") + " • " + (user.year != null ? user.year : "") + " " + (user.section != null ? user.section : "");
         tvDetails.setText(details);
+
+        // Fetch & List specific student's enrolled schedules
+        db.collection("schedules").whereEqualTo("userId", user.id).get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        StringBuilder sb = new StringBuilder("\n\n📅 Enrolled Schedules (" + queryDocumentSnapshots.size() + "):\n");
+                        for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                            String cName = doc.getString("className");
+                            String cTime = doc.getString("startTime");
+                            String cDate = doc.getString("dateString");
+                            sb.append("• ").append(cName != null ? cName : "Class")
+                              .append(" (").append(cTime != null ? cTime : "").append(") [").append(cDate != null ? cDate : "").append("]\n");
+                        }
+                        tvDetails.append(sb.toString().trim());
+                    } else {
+                        tvDetails.append("\n\n📅 Enrolled Schedules: No schedules plotted yet.");
+                    }
+                });
 
         if ("suspended".equalsIgnoreCase(currentStatus)) {
             String remainingTime = AdminUserAdapter.calculateRemainingSuspensionTime(user.suspensionDuration, user.suspendedAt);
@@ -355,6 +395,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
                     db.collection("users").document(user.id).update(updates)
                             .addOnSuccessListener(aVoid -> {
                                 Toast.makeText(this, "User suspended for " + duration, Toast.LENGTH_SHORT).show();
+                                loadAdminDataRealtime();
                             })
                             .addOnFailureListener(e -> Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
                 })
@@ -368,6 +409,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         db.collection("users").document(user.id).update(updates)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, successMsg, Toast.LENGTH_SHORT).show();
+                    loadAdminDataRealtime();
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
