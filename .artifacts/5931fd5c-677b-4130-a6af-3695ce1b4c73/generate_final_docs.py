@@ -24,22 +24,22 @@ font_small = get_font(13, bold=False)
 # =========================================================================
 
 # -------------------------------------------------------------------------
-# Diagram 1: Excel-style Visual Gantt Chart (gantt_chart.png)
+# Diagram 1: Excel-style Visual Gantt Chart (Aug 2026 - Nov 26, 2026)
 # -------------------------------------------------------------------------
-img_gantt = Image.new('RGB', (2200, 1100), color='#F8FAFC')
+img_gantt = Image.new('RGB', (2400, 1100), color='#F8FAFC')
 draw = ImageDraw.Draw(img_gantt)
 
 # Title Banner
-draw.rectangle([0, 0, 2200, 90], fill='#1D4ED8')
-draw.text((60, 25), "ESKWELA - SDLC Project Timeline & Visual Gantt Chart", fill='#FFFFFF', font=font_title)
+draw.rectangle([0, 0, 2400, 90], fill='#1D4ED8')
+draw.text((60, 25), "ESKWELA - SDLC Project Gantt Chart (August 2026 – November 26, 2026)", fill='#FFFFFF', font=font_title)
 
 # Header Row (Timeline Weeks)
 col_start_x = 650
-col_width = 100
-weeks = ["Feb W1", "Feb W2", "Feb W3", "Feb W4", "Mar W1", "Mar W2", "Mar W3", "Mar W4", "Apr W1", "Apr W2", "Apr W3", "Apr W4", "May W1", "May W2"]
+col_width = 105
+weeks = ["Aug W1", "Aug W2", "Aug W3", "Aug W4", "Sep W1", "Sep W2", "Sep W3", "Sep W4", "Oct W1", "Oct W2", "Oct W3", "Oct W4", "Nov W1", "Nov W2", "Nov W3", "Nov W4"]
 
 # Timeline Header Background
-draw.rectangle([0, 90, 2200, 150], fill='#1E293B')
+draw.rectangle([0, 90, 2400, 150], fill='#1E293B')
 draw.text((40, 110), "SDLC Task / Phase Deliverable", fill='#FFFFFF', font=font_bold)
 
 for i, w in enumerate(weeks):
@@ -47,15 +47,15 @@ for i, w in enumerate(weeks):
     draw.text((wx+10, 110), w, fill='#CBD5E1', font=get_font(12, bold=True))
     draw.line([wx, 150, wx, 1050], fill='#E2E8F0', width=2)
 
-# Tasks Data
+# Tasks Data (August 2026 - November 26, 2026)
 gantt_tasks = [
     ("1. Planning & Scope Definition", 0, 1, "#1D4ED8"),
     ("2. Database ERD & Schema Design", 2, 3, "#059669"),
     ("3. Android Java & ML Kit OCR Scanner", 4, 7, "#D97706"),
     ("4. AI Quiz & Leaderboard Engine", 8, 9, "#7C3AED"),
     ("5. Admin Center & OTA Update Engine", 10, 11, "#4F46E5"),
-    ("6. QA Suite Testing & UAT Execution", 12, 12, "#DB2777"),
-    ("7. Signed APK Release & Deployment", 13, 13, "#0D9488")
+    ("6. QA Suite Testing & UAT Execution", 12, 13, "#DB2777"),
+    ("7. Signed APK Release & Deployment", 14, 15, "#0D9488")
 ]
 
 start_y = 170
@@ -66,7 +66,7 @@ for idx, (task_title, start_w, end_w, bar_color) in enumerate(gantt_tasks):
 
     # Alternating row background
     bg_col = '#F1F5F9' if idx % 2 == 0 else '#FFFFFF'
-    draw.rectangle([20, curr_y-10, 2180, curr_y+70], fill=bg_col)
+    draw.rectangle([20, curr_y-10, 2380, curr_y+70], fill=bg_col)
 
     # Task Label
     draw.text((40, curr_y+15), task_title, fill='#0F172A', font=font_bold)
@@ -142,7 +142,6 @@ draw_dep_card(1150, 560, 950, 360, "4. Postman API Test Suite & Docs", "API Test
     "Documentation: Single PDF & DDL SQL creation script (schema.sql)"
 ])
 
-# Connections
 draw.line([1050, 340, 1150, 340], fill='#1D4ED8', width=4)
 draw.line([600, 520, 600, 560], fill='#1D4ED8', width=4)
 draw.line([1620, 520, 1620, 560], fill='#1D4ED8', width=4)
@@ -152,7 +151,7 @@ img_dep.save(dep_path)
 
 
 # =========================================================================
-# 2. REPORTLAB PDF BUILDER WITH EMBEDDED GRAPHICS
+# 2. REPORTLAB PDF BUILDER WITH UPDATED AUGUST-NOVEMBER 2026 GANTT CHART
 # =========================================================================
 styles = getSampleStyleSheet()
 
@@ -205,12 +204,14 @@ final_story.append(Paragraph("<b>Significance:</b> ESKWELA eliminates manual tim
 
 # 2. Complete SDLC Process
 final_story.append(Paragraph("2. Complete Software Development Life Cycle (SDLC)", h2_style))
-final_story.append(Paragraph("The development of ESKWELA followed the <b>Agile Iterative SDLC Framework</b> across five structured phases:", body_style))
-final_story.append(Paragraph("• <b>Phase 1: Planning & Requirements Elicitation</b> — Gathered student pain points, defined functional requirements for timetable parsing, AI quiz generation, and admin control.", body_style))
-final_story.append(Paragraph("• <b>Phase 2: Architectural & Database Design</b> — Modeled NoSQL document collections in Firebase Firestore (`users`, `schedules`, `tasks`, `ai_quizzes`, `announcements`, `focus_sessions`, `study_notes`), mapped relational DDL schemas, and designed UI wireframes.", body_style))
-final_story.append(Paragraph("• <b>Phase 3: Native Mobile Implementation</b> — Developed Android Java activities, integrated Google ML Kit Vision Text Recognition, configured Firebase Auth/Firestore, implemented GitHub REST API OTA engine, and enforced Material 3 theming.", body_style))
-final_story.append(Paragraph("• <b>Phase 4: Software Testing & Quality Assurance</b> — Executed 80 unit, integration, and UAT test cases covering OCR scanning, time conflict prevention, admin role isolation, and dark mode contrast.", body_style))
-final_story.append(Paragraph("• <b>Phase 5: Deployment & Maintenance</b> — Published signed release APKs (`app-release.apk`) on GitHub Releases and established OTA update channels.", body_style))
+final_story.append(Paragraph("The development of ESKWELA was initiated in <b>August 2026</b> and completed on <b>November 26, 2026</b>, following the <b>Agile Iterative SDLC Framework</b> across seven structured phases:", body_style))
+final_story.append(Paragraph("• <b>Phase 1: Planning & Requirements Elicitation</b> (Aug 01, 2026 – Aug 15, 2026) — Gathered student pain points, defined functional requirements for timetable parsing, AI quiz generation, and admin control.", body_style))
+final_story.append(Paragraph("• <b>Phase 2: Architectural & Database Design</b> (Aug 16, 2026 – Aug 31, 2026) — Modeled NoSQL document collections in Firebase Firestore (`users`, `schedules`, `tasks`, `ai_quizzes`, `announcements`, `focus_sessions`, `study_notes`), mapped relational DDL schemas, and designed UI wireframes.", body_style))
+final_story.append(Paragraph("• <b>Phase 3: Android Java & ML Kit OCR Implementation</b> (Sep 01, 2026 – Sep 30, 2026) — Developed Android Java activities, integrated Google ML Kit Vision Text Recognition, configured Firebase Auth/Firestore, implemented RegEx OCR parser.", body_style))
+final_story.append(Paragraph("• <b>Phase 4: AI Quiz & Leaderboard Engine</b> (Oct 01, 2026 – Oct 15, 2026) — Developed course practice quiz generator, step-by-step answer explanations, and live student ranking leaderboard.", body_style))
+final_story.append(Paragraph("• <b>Phase 5: Admin Control Center & OTA Update</b> (Oct 16, 2026 – Oct 31, 2026) — Built Admin Dashboard, student directory search, status filters, timed suspension countdowns, and GitHub REST API update checker.", body_style))
+final_story.append(Paragraph("• <b>Phase 6: QA Suite Testing & UAT Execution</b> (Nov 01, 2026 – Nov 15, 2026) — Executed 80 unit, integration, and UAT test cases covering OCR scanning, time conflict prevention, admin role isolation, and dark mode contrast.", body_style))
+final_story.append(Paragraph("• <b>Phase 7: Signed APK Release & Final Deployment</b> (Nov 16, 2026 – Nov 26, 2026) — Published signed release APKs (`app-release.apk`) on GitHub Releases and established OTA update channels.", body_style))
 
 final_story.append(PageBreak())
 
@@ -246,12 +247,37 @@ final_story.append(PageBreak())
 
 # 4. Visual Gantt Chart & Deployment Plan Architecture
 final_story.append(Paragraph("4. Visual Gantt Chart & Deployment Plan Graphics", h2_style))
-final_story.append(Paragraph("<b>4.1 SDLC Project Timeline Visual Gantt Chart:</b>", body_style))
-final_story.append(RLImage(gantt_path, width=540, height=270))
-final_story.append(Spacer(1, 15))
+final_story.append(Paragraph("<b>4.1 SDLC Project Timeline Visual Gantt Chart (August 2026 – November 26, 2026):</b>", body_style))
+final_story.append(RLImage(gantt_path, width=540, height=247))
+final_story.append(Spacer(1, 10))
+
+gantt_data = [
+    ["Phase", "Task / Deliverable", "Duration", "Start Date", "End Date", "Status"],
+    ["1. Planning", "Requirements Elicitation & Scope Definition", "2 Weeks", "Aug 01, 2026", "Aug 15, 2026", "COMPLETED"],
+    ["2. Design", "UI/UX Wireframing & Firestore Database ERD", "2 Weeks", "Aug 16, 2026", "Aug 31, 2026", "COMPLETED"],
+    ["3. Development", "Android Java Core Activities & ML Kit OCR", "4 Weeks", "Sep 01, 2026", "Sep 30, 2026", "COMPLETED"],
+    ["3. Development", "AI Quiz Generator & Leaderboard Engine", "2 Weeks", "Oct 01, 2026", "Oct 15, 2026", "COMPLETED"],
+    ["3. Development", "Admin Control Center & OTA Update Engine", "2 Weeks", "Oct 16, 2026", "Oct 31, 2026", "COMPLETED"],
+    ["4. Testing", "Functional, API Integration & UAT Testing", "2 Weeks", "Nov 01, 2026", "Nov 15, 2026", "COMPLETED"],
+    ["5. Deployment", "Signed APK Release & Final Deployment", "2 Weeks", "Nov 16, 2026", "Nov 26, 2026", "COMPLETED"]
+]
+
+t_gantt = Table(gantt_data, colWidths=[80, 190, 60, 75, 75, 60])
+t_gantt.setStyle(TableStyle([
+    ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#DBEAFE')),
+    ('TEXTCOLOR', (0,0), (-1,0), colors.HexColor('#1E3A8A')),
+    ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+    ('FONTSIZE', (0,0), (-1,-1), 7.5),
+    ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#93C5FD')),
+    ('TOPPADDING', (0,0), (-1,-1), 4),
+    ('BOTTOMPADDING', (0,0), (-1,-1), 4),
+    ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+]))
+final_story.append(t_gantt)
+final_story.append(Spacer(1, 10))
 
 final_story.append(Paragraph("<b>4.2 Visual System Deployment Architecture:</b>", body_style))
 final_story.append(RLImage(dep_path, width=540, height=245))
 
 doc_final.build(final_story)
-print("Complete Final System Documentation PDF with Visual Gantt & Deployment Graphics generated successfully.")
+print("Complete Final System Documentation PDF with August 2026 - November 26, 2026 Gantt Chart generated successfully.")
