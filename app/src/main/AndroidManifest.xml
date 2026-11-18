@@ -44,6 +44,7 @@
         <activity android:name=".TasksActivity" />
         <activity android:name=".StudyActivity" />
         <activity android:name=".AdminDashboardActivity" />
+        <activity android:name=".AdminControlActivity" />
         <activity android:name=".AiQuizActivity" />
         <activity android:name=".AnnouncementActivity" />
 
