@@ -253,17 +253,6 @@ public class MyScheduleActivity extends AppCompatActivity implements ScheduleCar
         if (mAuth.getCurrentUser() == null) return;
         String userId = mAuth.getCurrentUser().getUid();
 
-        String dayOfWeekUpper = "";
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            Date d = sdf.parse(date);
-            if (d != null) {
-                dayOfWeekUpper = new SimpleDateFormat("EEEE", Locale.getDefault()).format(d).toUpperCase();
-            }
-        } catch (Exception ignored) {}
-
-        final String finalDayOfWeek = dayOfWeekUpper;
-
         db.collection("schedules")
                 .whereEqualTo("userId", userId)
                 .get()
@@ -274,23 +263,8 @@ public class MyScheduleActivity extends AppCompatActivity implements ScheduleCar
                             ScheduleCardAdapter.ScheduleItem item = document.toObject(ScheduleCardAdapter.ScheduleItem.class);
                             item.id = document.getId();
 
-                            boolean matchesDate = (item.dateString != null && item.dateString.startsWith(date));
-                            boolean matchesDayName = (!finalDayOfWeek.isEmpty() && (
-                                    (item.dateString != null && item.dateString.toUpperCase().contains(finalDayOfWeek)) ||
-                                    (item.instructor != null && item.instructor.toUpperCase().contains(finalDayOfWeek)) ||
-                                    (item.className != null && item.className.toUpperCase().contains(finalDayOfWeek))
-                            ));
-
-                            if (matchesDate || matchesDayName) {
-                                dailyList.add(item);
-                            }
-                        }
-
-                        // If day list is empty for a specific day, fallback gracefully to user's enrolled classes
-                        if (dailyList.isEmpty() && task.getResult() != null && !task.getResult().isEmpty()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                ScheduleCardAdapter.ScheduleItem item = document.toObject(ScheduleCardAdapter.ScheduleItem.class);
-                                item.id = document.getId();
+                            // Strict date matching: ONLY show classes scheduled on this specific date
+                            if (item.dateString != null && (item.dateString.equals(date) || item.dateString.startsWith(date))) {
                                 dailyList.add(item);
                             }
                         }
