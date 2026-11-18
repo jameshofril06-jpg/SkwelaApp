@@ -218,6 +218,7 @@ public class ProfileActivity extends AppCompatActivity {
             if (itemId == R.id.nav_home) {
                 if (isAdminUser) {
                     startActivity(new Intent(ProfileActivity.this, AdminDashboardActivity.class));
+                    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
                     finish();
                     return true;
                 } else {
@@ -306,7 +307,13 @@ public class ProfileActivity extends AppCompatActivity {
                             }
 
                             if (AccountGuard.isAdmin(email, role)) {
-                                if (cardAdmin != null) cardAdmin.setVisibility(View.VISIBLE);
+                                if (cardAdmin != null) {
+                                    cardAdmin.setVisibility(View.VISIBLE);
+                                    cardAdmin.setOnClickListener(v -> {
+                                        startActivity(new Intent(ProfileActivity.this, AdminControlActivity.class));
+                                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                                    });
+                                }
                                 View rowOffline = findViewById(R.id.rowOffline);
                                 if (rowOffline != null) rowOffline.setVisibility(View.GONE);
                                 View rowReminders = findViewById(R.id.rowReminders);

@@ -100,7 +100,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="Manage system broadcasts, user moderation, and academic oversight."
+                        android:text="Manage system broadcasts and official announcement logs."
                         android:textColor="#E2E8F0"
                         android:textSize="13sp" />
                 </LinearLayout>
@@ -168,68 +168,6 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Quick Action: Open Control Center -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardOpenControlCenter"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cardPostAnnouncement">
-
-                <LinearLayout
-                    android:id="@+id/btnOpenControlCenter"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_avatar_circle"
-                        android:gravity="center"
-                        android:text="👥"
-                        android:textSize="20sp" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="User Moderation &amp; Control Center"
-                            android:textColor="@color/text_primary"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Search students, suspend, or archive accounts"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_arrow_right" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
             <!-- Announcements Log Header -->
             <TextView
                 android:id="@+id/tvAnnounceHeader"
@@ -241,7 +179,7 @@
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cardOpenControlCenter" />
+                app:layout_constraintTop_toBottomOf="@+id/cardPostAnnouncement" />
 
             <!-- RecyclerView for Announcements -->
             <androidx.recyclerview.widget.RecyclerView
