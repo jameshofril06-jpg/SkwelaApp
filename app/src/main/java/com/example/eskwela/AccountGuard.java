@@ -38,11 +38,26 @@ public final class AccountGuard {
     }
 
     public static boolean blockIfRestricted(AppCompatActivity activity, FirebaseAuth auth, DocumentSnapshot doc) {
-        if (doc != null && doc.exists() && isRestricted(doc.getString("status"))) {
+        if (doc == null || !doc.exists()) {
+            showDeletedAndLogout(activity, auth);
+            return true;
+        }
+        if (isRestricted(doc.getString("status"))) {
             showRestrictedAndLogout(activity, auth, doc.getString("status"));
             return true;
         }
         return false;
+    }
+
+    public static void showDeletedAndLogout(AppCompatActivity activity, FirebaseAuth auth) {
+        if (activity.isFinishing()) return;
+        auth.signOut();
+        new AlertDialog.Builder(activity)
+                .setTitle("Account Deleted ❌")
+                .setMessage("Your ESKWELA user account does not exist or has been removed from the database. Please contact the administrator.")
+                .setPositiveButton("OK", (dialog, which) -> goLogin(activity))
+                .setCancelable(false)
+                .show();
     }
 
     public static void showRestrictedAndLogout(AppCompatActivity activity, FirebaseAuth auth, String status) {

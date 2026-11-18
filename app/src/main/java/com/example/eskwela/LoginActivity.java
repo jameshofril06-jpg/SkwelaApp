@@ -89,7 +89,7 @@ public class LoginActivity extends AppCompatActivity {
                                     .addOnFailureListener(e -> {
                                         if (isFinishing()) return;
                                         setLoading(false);
-                                        goToDashboard(email, null);
+                                        AccountGuard.showDeletedAndLogout(LoginActivity.this, mAuth);
                                     });
                         } else {
                             setLoading(false);

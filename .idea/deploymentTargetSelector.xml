@@ -2,7 +2,7 @@
 <project version="4">
   <component name="deploymentTargetSelector">
     <selectionStates>
-      <SelectionState runConfigName="Eskwela v.1.0.6">
+      <SelectionState runConfigName="Eskwela">
         <option name="selectionMode" value="DROPDOWN" />
         <DropdownSelection timestamp="2026-11-18T02:35:48.995437500Z">
           <Target type="DEFAULT_BOOT">
