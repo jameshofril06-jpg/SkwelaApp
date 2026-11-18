@@ -253,6 +253,17 @@ public class MyScheduleActivity extends AppCompatActivity implements ScheduleCar
         if (mAuth.getCurrentUser() == null) return;
         String userId = mAuth.getCurrentUser().getUid();
 
+        String targetDayName = "";
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Date d = sdf.parse(date);
+            if (d != null) {
+                targetDayName = new SimpleDateFormat("EEEE", Locale.getDefault()).format(d).toUpperCase();
+            }
+        } catch (Exception ignored) {}
+
+        final String dayName = targetDayName;
+
         db.collection("schedules")
                 .whereEqualTo("userId", userId)
                 .get()
@@ -263,8 +274,16 @@ public class MyScheduleActivity extends AppCompatActivity implements ScheduleCar
                             ScheduleCardAdapter.ScheduleItem item = document.toObject(ScheduleCardAdapter.ScheduleItem.class);
                             item.id = document.getId();
 
-                            // Strict date matching: ONLY show classes scheduled on this specific date
-                            if (item.dateString != null && (item.dateString.equals(date) || item.dateString.startsWith(date))) {
+                            boolean matchesDate = (item.dateString != null && (item.dateString.equals(date) || item.dateString.startsWith(date)));
+                            boolean matchesRecurringDay = (!dayName.isEmpty() && item.instructor != null && (
+                                    (dayName.equals("MONDAY") && item.instructor.toUpperCase().contains("MTH")) ||
+                                    (dayName.equals("THURSDAY") && item.instructor.toUpperCase().contains("MTH")) ||
+                                    (dayName.equals("TUESDAY") && item.instructor.toUpperCase().contains("TF")) ||
+                                    (dayName.equals("FRIDAY") && item.instructor.toUpperCase().contains("TF")) ||
+                                    item.instructor.toUpperCase().contains(dayName)
+                            ));
+
+                            if (matchesDate || matchesRecurringDay) {
                                 dailyList.add(item);
                             }
                         }
