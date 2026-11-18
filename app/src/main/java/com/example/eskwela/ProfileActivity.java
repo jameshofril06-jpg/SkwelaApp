@@ -199,6 +199,11 @@ public class ProfileActivity extends AppCompatActivity {
         finish();
     }
 
+    private void openAdminControlCenter() {
+        startActivity(new Intent(ProfileActivity.this, AdminControlActivity.class));
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+    }
+
     private void setupBottomNavigation() {
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setSelectedItemId(R.id.nav_profile);
@@ -309,10 +314,11 @@ public class ProfileActivity extends AppCompatActivity {
                             if (AccountGuard.isAdmin(email, role)) {
                                 if (cardAdmin != null) {
                                     cardAdmin.setVisibility(View.VISIBLE);
-                                    cardAdmin.setOnClickListener(v -> {
-                                        startActivity(new Intent(ProfileActivity.this, AdminControlActivity.class));
-                                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                                    });
+                                    cardAdmin.setOnClickListener(v -> openAdminControlCenter());
+                                }
+                                View btnAdminControl = findViewById(R.id.btnAdminControlDashboard);
+                                if (btnAdminControl != null) {
+                                    btnAdminControl.setOnClickListener(v -> openAdminControlCenter());
                                 }
                                 View rowOffline = findViewById(R.id.rowOffline);
                                 if (rowOffline != null) rowOffline.setVisibility(View.GONE);
