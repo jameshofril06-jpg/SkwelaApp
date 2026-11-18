@@ -13,7 +13,6 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -29,22 +28,22 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 public class MyScheduleActivity extends AppCompatActivity implements ScheduleCardAdapter.OnScheduleLongClickListener {
 
-    private TextView tvSubtitle;
-    private LinearLayout datesContainer;
-    private RecyclerView rvDailySchedule;
-    private TextView tvEmptyState;
-    private ScheduleCardAdapter adapter;
-    private List<ScheduleCardAdapter.ScheduleItem> dailyList = new ArrayList<>();
-
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
 
-    private String selectedDateString;
+    private TextView tvSubtitle, tvEmptyState;
+    private LinearLayout datesContainer;
+    private RecyclerView rvDailySchedule;
+    private ScheduleCardAdapter adapter;
+
+    private final List<ScheduleCardAdapter.ScheduleItem> dailyList = new ArrayList<>();
+    private String selectedDateString; // Format: yyyy-MM-dd
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +68,7 @@ public class MyScheduleActivity extends AppCompatActivity implements ScheduleCar
         tvEmptyState = findViewById(R.id.tvEmptyState);
 
         rvDailySchedule.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new ScheduleCardAdapter(dailyList, this); // Pass 'this' for delete listener
+        adapter = new ScheduleCardAdapter(dailyList, this);
         rvDailySchedule.setAdapter(adapter);
 
         View cardScanBanner = findViewById(R.id.cardScanStudyLoadBanner);
@@ -143,19 +142,35 @@ public class MyScheduleActivity extends AppCompatActivity implements ScheduleCar
                         }
                         adapter.notifyDataSetChanged();
                         tvEmptyState.setVisibility(dailyList.isEmpty() ? View.VISIBLE : View.GONE);
-                        tvSubtitle.setText("All Week Classes (" + dailyList.size() + ")");
+                        if (tvSubtitle != null) tvSubtitle.setText("All Week Classes (" + dailyList.size() + ")");
                     }
                 });
     }
 
     private void fetchAllSchedulesForMonth() {
-        fetchAllSchedulesForWeek();
+        if (mAuth.getCurrentUser() == null) return;
+        String userId = mAuth.getCurrentUser().getUid();
+
+        db.collection("schedules")
+                .whereEqualTo("userId", userId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        dailyList.clear();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            ScheduleCardAdapter.ScheduleItem item = document.toObject(ScheduleCardAdapter.ScheduleItem.class);
+                            item.id = document.getId();
+                            dailyList.add(item);
+                        }
+                        adapter.notifyDataSetChanged();
+                        tvEmptyState.setVisibility(dailyList.isEmpty() ? View.VISIBLE : View.GONE);
+                        if (tvSubtitle != null) tvSubtitle.setText("All Month Classes (" + dailyList.size() + ")");
+                    }
+                });
     }
 
     private void generateRealTimeDates() {
         Calendar cal = Calendar.getInstance();
-
-        // Set calendar to Monday of the current week
         cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
 
         SimpleDateFormat dayFormat = new SimpleDateFormat("EEE", Locale.getDefault());
@@ -168,7 +183,6 @@ public class MyScheduleActivity extends AppCompatActivity implements ScheduleCar
         Calendar todayCal = Calendar.getInstance();
         selectedDateString = dbFormat.format(todayCal.getTime());
 
-        // Loop for 7 days (Mon - Sun)
         for (int i = 0; i < 7; i++) {
             final String currentDbDate = dbFormat.format(cal.getTime());
             String dayName = dayFormat.format(cal.getTime());
@@ -197,14 +211,12 @@ public class MyScheduleActivity extends AppCompatActivity implements ScheduleCar
             dateLayout.addView(tvDay);
             dateLayout.addView(tvNum);
 
-            // Style
             if (currentDbDate.equals(selectedDateString)) {
                 styleSelectedDate(dateLayout, tvDay, tvNum);
             } else {
                 styleUnselectedDate(dateLayout, tvDay, tvNum);
             }
 
-            // Click Listener
             dateLayout.setOnClickListener(v -> {
                 for (int j = 0; j < datesContainer.getChildCount(); j++) {
                     LinearLayout child = (LinearLayout) datesContainer.getChildAt(j);
@@ -220,7 +232,7 @@ public class MyScheduleActivity extends AppCompatActivity implements ScheduleCar
         }
 
         cal.add(Calendar.DAY_OF_MONTH, -1);
-        tvSubtitle.setText(startOfWeek + " – " + subtitleFormat.format(cal.getTime()));
+        if (tvSubtitle != null) tvSubtitle.setText(startOfWeek + " – " + subtitleFormat.format(cal.getTime()));
 
         fetchScheduleForDate(selectedDateString);
     }
@@ -241,6 +253,17 @@ public class MyScheduleActivity extends AppCompatActivity implements ScheduleCar
         if (mAuth.getCurrentUser() == null) return;
         String userId = mAuth.getCurrentUser().getUid();
 
+        String dayOfWeekUpper = "";
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Date d = sdf.parse(date);
+            if (d != null) {
+                dayOfWeekUpper = new SimpleDateFormat("EEEE", Locale.getDefault()).format(d).toUpperCase();
+            }
+        } catch (Exception ignored) {}
+
+        final String finalDayOfWeek = dayOfWeekUpper;
+
         db.collection("schedules")
                 .whereEqualTo("userId", userId)
                 .get()
@@ -250,7 +273,24 @@ public class MyScheduleActivity extends AppCompatActivity implements ScheduleCar
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             ScheduleCardAdapter.ScheduleItem item = document.toObject(ScheduleCardAdapter.ScheduleItem.class);
                             item.id = document.getId();
-                            if (item.dateString != null && item.dateString.startsWith(date)) {
+
+                            boolean matchesDate = (item.dateString != null && item.dateString.startsWith(date));
+                            boolean matchesDayName = (!finalDayOfWeek.isEmpty() && (
+                                    (item.dateString != null && item.dateString.toUpperCase().contains(finalDayOfWeek)) ||
+                                    (item.instructor != null && item.instructor.toUpperCase().contains(finalDayOfWeek)) ||
+                                    (item.className != null && item.className.toUpperCase().contains(finalDayOfWeek))
+                            ));
+
+                            if (matchesDate || matchesDayName) {
+                                dailyList.add(item);
+                            }
+                        }
+
+                        // If day list is empty for a specific day, fallback gracefully to user's enrolled classes
+                        if (dailyList.isEmpty() && task.getResult() != null && !task.getResult().isEmpty()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                ScheduleCardAdapter.ScheduleItem item = document.toObject(ScheduleCardAdapter.ScheduleItem.class);
+                                item.id = document.getId();
                                 dailyList.add(item);
                             }
                         }
@@ -264,69 +304,63 @@ public class MyScheduleActivity extends AppCompatActivity implements ScheduleCar
     // Handle long press to delete with professional validation
     @Override
     public void onScheduleLongClick(ScheduleCardAdapter.ScheduleItem item, int position) {
-        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
-        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
         layout.setPadding(48, 24, 48, 24);
 
         TextView tvWarning = new TextView(this);
-        String code = item.classCode != null && !item.classCode.isEmpty() ? item.classCode : "CONFIRM";
-        tvWarning.setText("⚠️ Warning: Removing " + (item.className != null ? item.className : "this class") + " (" + code + ") is permanent.\n\nPlease type the Class Code (" + code + ") below to confirm deletion:");
-        tvWarning.setTextColor(0xFF0F172A);
-        tvWarning.setTextSize(14f);
+        tvWarning.setText("⚠️ WARNING: Deleting this class will remove it from your schedule.\n\nTo confirm deletion, please type the exact Class Code below:");
+        tvWarning.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
+        tvWarning.setTextSize(14);
+
+        final EditText etConfirmCode = new EditText(this);
+        etConfirmCode.setHint("e.g. " + (item.classCode != null && !item.classCode.isEmpty() ? item.classCode : item.className));
+        etConfirmCode.setPadding(32, 24, 32, 24);
+        etConfirmCode.setBackgroundResource(R.drawable.bg_input_field);
+        etConfirmCode.setSingleLine(true);
+
         layout.addView(tvWarning);
+        layout.addView(etConfirmCode);
 
-        EditText etConfirm = new EditText(this);
-        etConfirm.setHint("Type class code (" + code + ") to confirm...");
-        etConfirm.setPadding(24, 24, 24, 24);
-        layout.addView(etConfirm);
+        final String expectedCode = item.classCode != null && !item.classCode.isEmpty() ? item.classCode.trim() : item.className.trim();
 
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle("Professional Class Deletion")
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Scheduled Class")
                 .setView(layout)
-                .setPositiveButton("Confirm Delete", null)
-                .setNegativeButton("Cancel", null)
-                .create();
+                .setPositiveButton("Delete Class", (dialog, which) -> {
+                    String inputCode = etConfirmCode.getText().toString().trim();
+                    if (inputCode.equalsIgnoreCase(expectedCode)) {
+                        deleteScheduleItem(item, position);
+                    } else {
+                        Toast.makeText(this, "Class Code mismatch. Deletion cancelled.", Toast.LENGTH_LONG).show();
+                    }
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
 
-        dialog.setOnShowListener(d -> {
-            Button positiveBtn = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            positiveBtn.setOnClickListener(v -> {
-                String input = etConfirm.getText().toString().trim();
-                String expectedCode = code.trim();
-
-                if (!input.equalsIgnoreCase(expectedCode)) {
-                    Toast.makeText(this, "Validation failed: Entered code does not match (" + expectedCode + ")", Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                dialog.dismiss();
-                db.collection("schedules").document(item.id).delete()
-                        .addOnSuccessListener(aVoid -> {
-                            dailyList.remove(position);
-                            adapter.notifyItemRemoved(position);
-                            adapter.notifyItemRangeChanged(position, dailyList.size());
-                            tvEmptyState.setVisibility(dailyList.isEmpty() ? View.VISIBLE : View.GONE);
-                            Toast.makeText(this, "Class successfully removed from schedule", Toast.LENGTH_SHORT).show();
-                        })
-                        .addOnFailureListener(e -> Toast.makeText(this, "Error deleting class: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-            });
-        });
-
-        dialog.show();
+    private void deleteScheduleItem(ScheduleCardAdapter.ScheduleItem item, int position) {
+        if (item.id != null && !item.id.isEmpty()) {
+            db.collection("schedules").document(item.id).delete()
+                    .addOnSuccessListener(aVoid -> {
+                        dailyList.remove(position);
+                        adapter.notifyItemRemoved(position);
+                        tvEmptyState.setVisibility(dailyList.isEmpty() ? View.VISIBLE : View.GONE);
+                        Toast.makeText(this, "Class deleted successfully 🗑️", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> Toast.makeText(this, "Failed to delete: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+        }
     }
 
     private void setupAddButton() {
-        CardView btnAddSchedule = findViewById(R.id.btnAddSchedule);
-        btnAddSchedule.setOnClickListener(v -> {
-            Intent intent = new Intent(MyScheduleActivity.this, AddClassActivity.class);
-            intent.putExtra("SELECTED_DATE", selectedDateString);
-            startActivity(intent);
-        });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        fetchScheduleForDate(selectedDateString);
+        View btnAddSchedule = findViewById(R.id.btnAddSchedule);
+        if (btnAddSchedule != null) {
+            btnAddSchedule.setOnClickListener(v -> {
+                Intent intent = new Intent(MyScheduleActivity.this, AddClassActivity.class);
+                intent.putExtra("SELECTED_DATE", selectedDateString);
+                startActivity(intent);
+            });
+        }
     }
 
     private void setupBottomNavigation() {
