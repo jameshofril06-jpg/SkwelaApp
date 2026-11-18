@@ -129,28 +129,18 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void showAboutAppDialog() {
-        String currentVersion = "1.1.7";
+        String currentVersion = "1.2.9";
         try {
             currentVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
         } catch (Exception ignored) {}
 
         String aboutMsg = "🎓 ESKWELA v" + currentVersion + "\n\n" +
-                "Smart Student Productivity & Academic Management System designed for students and academic administrators.\n\n" +
-                "🚀 What's New & Changelog (v" + currentVersion + "):\n" +
-                "• 👁️ Show/Hide Password Toggle: Interactive eye icon on password inputs for secure viewing.\n" +
-                "• 🖼️ User Profile Picture Picker: Select custom avatar photos from gallery stored directly in Firestore.\n" +
-                "• 👤 Admin Profile Access & Navigation: Seamless access from Admin Control Center toolbar to Profile (Edit profile, Dark theme, OTA updates, About this app, Logout).\n" +
-                "• 📢 Admin Home Announcements: Admin Home tab displays broadcast announcements management exclusively.\n" +
-                "• 📅 Strict Date-Specific Schedule Filtering: Timetable views filter classes strictly by selected date.\n" +
-                "• 🤖 Enrolled Study Load AI Quiz Generator & Ranking Leaderboard.\n" +
-                "• ⏳ Admin User Suspension Time Tracking (e.g. 6h 42m remaining).\n" +
-                "• ⏱️ Focus Session Presets (2m, 5m, 10m, 15m, 25m, 45m, 60m).\n" +
-                "• 🌙 Global Dark Mode Text Contrast Fixes across all screens.\n" +
-                "• ⚠️ Time Schedule Conflict Detection & Code-Validated Class Deletion.\n\n" +
+                "Smart Student Productivity & Academic Management System designed for higher-education students and academic administrators.\n\n" +
+                "Features include OCR study load scanning, interactive schedule calendar, AI-assisted practice quizzes, global student leaderboards, Pomodoro focus timers, study notes, and secure administrator user moderation.\n\n" +
                 "© 2025 ESKWELA Team. All rights reserved.";
 
         new AlertDialog.Builder(this)
-                .setTitle("About ESKWELA & Changelog (v" + currentVersion + ")")
+                .setTitle("About ESKWELA (v" + currentVersion + ")")
                 .setMessage(aboutMsg)
                 .setPositiveButton("Close", (dialog, which) -> dialog.dismiss())
                 .show();
