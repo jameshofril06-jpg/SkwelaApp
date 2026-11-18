@@ -209,7 +209,7 @@ public class ScheduleActivity extends AppCompatActivity {
         classData.put("dateString", dateString);
         classData.put("className", className);
         classData.put("classCode", classCode);
-        classData.put("school", "University");
+        classData.put("school", "ACLC College of Mandaue");
         classData.put("startTime", startTime);
         classData.put("endTime", endTime);
         classData.put("room", room);

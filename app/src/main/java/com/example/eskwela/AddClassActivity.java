@@ -62,6 +62,9 @@ public class AddClassActivity extends AppCompatActivity {
         EditText etClassName = findViewById(R.id.etClassName);
         EditText etClassCode = findViewById(R.id.etClassCode);
         EditText etSchool = findViewById(R.id.etAddSchool);
+        if (etSchool != null) {
+            etSchool.setText("ACLC College of Mandaue");
+        }
         spinnerClassDay = findViewById(R.id.spinnerClassDay);
         EditText etStartTime = findViewById(R.id.etStartTime);
         EditText etEndTime = findViewById(R.id.etEndTime);
