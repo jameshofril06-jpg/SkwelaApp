@@ -1,4 +1,5 @@
 import os
+from PIL import Image, ImageDraw, ImageFont
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, Image as RLImage
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -6,6 +7,153 @@ from reportlab.lib import colors
 
 artifact_dir = "C:/Users/JAMES/Documents/GitHub/SkwelaApp/.artifacts/5931fd5c-677b-4130-a6af-3695ce1b4c73"
 
+def get_font(size, bold=False):
+    try:
+        font_path = "C:/Windows/Fonts/arialbd.ttf" if bold else "C:/Windows/Fonts/arial.ttf"
+        return ImageFont.truetype(font_path, size)
+    except:
+        return ImageFont.load_default()
+
+font_title = get_font(28, bold=True)
+font_header = get_font(20, bold=True)
+font_bold = get_font(15, bold=True)
+font_small = get_font(13, bold=False)
+
+# =========================================================================
+# 1. GENERATE VISUAL GANTT CHART & DEPLOYMENT PLAN PNG DIAGRAMS
+# =========================================================================
+
+# -------------------------------------------------------------------------
+# Diagram 1: Excel-style Visual Gantt Chart (gantt_chart.png)
+# -------------------------------------------------------------------------
+img_gantt = Image.new('RGB', (2200, 1100), color='#F8FAFC')
+draw = ImageDraw.Draw(img_gantt)
+
+# Title Banner
+draw.rectangle([0, 0, 2200, 90], fill='#1D4ED8')
+draw.text((60, 25), "ESKWELA - SDLC Project Timeline & Visual Gantt Chart", fill='#FFFFFF', font=font_title)
+
+# Header Row (Timeline Weeks)
+col_start_x = 650
+col_width = 100
+weeks = ["Feb W1", "Feb W2", "Feb W3", "Feb W4", "Mar W1", "Mar W2", "Mar W3", "Mar W4", "Apr W1", "Apr W2", "Apr W3", "Apr W4", "May W1", "May W2"]
+
+# Timeline Header Background
+draw.rectangle([0, 90, 2200, 150], fill='#1E293B')
+draw.text((40, 110), "SDLC Task / Phase Deliverable", fill='#FFFFFF', font=font_bold)
+
+for i, w in enumerate(weeks):
+    wx = col_start_x + (i * col_width)
+    draw.text((wx+10, 110), w, fill='#CBD5E1', font=get_font(12, bold=True))
+    draw.line([wx, 150, wx, 1050], fill='#E2E8F0', width=2)
+
+# Tasks Data
+gantt_tasks = [
+    ("1. Planning & Scope Definition", 0, 1, "#1D4ED8"),
+    ("2. Database ERD & Schema Design", 2, 3, "#059669"),
+    ("3. Android Java & ML Kit OCR Scanner", 4, 7, "#D97706"),
+    ("4. AI Quiz & Leaderboard Engine", 8, 9, "#7C3AED"),
+    ("5. Admin Center & OTA Update Engine", 10, 11, "#4F46E5"),
+    ("6. QA Suite Testing & UAT Execution", 12, 12, "#DB2777"),
+    ("7. Signed APK Release & Deployment", 13, 13, "#0D9488")
+]
+
+start_y = 170
+row_h = 120
+
+for idx, (task_title, start_w, end_w, bar_color) in enumerate(gantt_tasks):
+    curr_y = start_y + (idx * row_h)
+
+    # Alternating row background
+    bg_col = '#F1F5F9' if idx % 2 == 0 else '#FFFFFF'
+    draw.rectangle([20, curr_y-10, 2180, curr_y+70], fill=bg_col)
+
+    # Task Label
+    draw.text((40, curr_y+15), task_title, fill='#0F172A', font=font_bold)
+
+    # Timeline Bar
+    bx1 = col_start_x + (start_w * col_width) + 5
+    bx2 = col_start_x + ((end_w + 1) * col_width) - 5
+    by1 = curr_y + 10
+    by2 = curr_y + 50
+
+    # Bar Shadow & Fill
+    draw.rectangle([bx1+3, by1+3, bx2+3, by2+3], fill='#94A3B8')
+    draw.rectangle([bx1, by1, bx2, by2], fill=bar_color)
+    draw.text((bx1+15, by1+10), "100% COMPLETED", fill='#FFFFFF', font=get_font(12, bold=True))
+
+gantt_path = os.path.join(artifact_dir, "gantt_chart.png")
+img_gantt.save(gantt_path)
+
+
+# -------------------------------------------------------------------------
+# Diagram 2: Visual Deployment Architecture Plan (deployment_plan_chart.png)
+# -------------------------------------------------------------------------
+img_dep = Image.new('RGB', (2200, 1000), color='#F8FAFC')
+draw = ImageDraw.Draw(img_dep)
+
+draw.rectangle([0, 0, 2200, 90], fill='#1D4ED8')
+draw.text((60, 25), "ESKWELA - System Environment Deployment Architecture", fill='#FFFFFF', font=font_title)
+
+# Environment Cards
+def draw_dep_card(x, y, width, height, title, subtitle, badge, items):
+    draw.rectangle([x+5, y+5, x+width+5, y+height+5], fill='#CBD5E1')
+    draw.rectangle([x, y, x+width, y+height], fill='#FFFFFF', outline='#0F172A', width=3)
+    draw.rectangle([x, y, x+width, y+50], fill='#1E293B')
+
+    draw.text((x+15, y+12), title, fill='#FFFFFF', font=font_bold)
+
+    # Status Badge
+    draw.rectangle([x+width-150, y+10, x+width-15, y+40], fill='#15803D')
+    draw.text((x+width-140, y+16), badge, fill='#FFFFFF', font=get_font(12, bold=True))
+
+    draw.text((x+15, y+65), subtitle, fill='#1D4ED8', font=get_font(13, bold=True))
+
+    cy = y + 100
+    for it in items:
+        draw.text((x+15, cy), "• " + it, fill='#1E293B', font=font_small)
+        cy += 32
+
+draw_dep_card(100, 160, 950, 360, "1. Android Mobile Devices (Client App)", "Target Environment: Native Android Devices (API 24+)", "LIVE / READY", [
+    "Executable Artifact: app-release.apk (v1.2.3)",
+    "Target SDK: Android 36 (Java 11 Runtime Engine)",
+    "Storage & Cache: Local SharedPreferences & Offline Firestore",
+    "Permissions: Camera (OCR), Storage Access & Package Installer"
+])
+
+draw_dep_card(1150, 160, 950, 360, "2. Google Firebase Cloud Infrastructure", "Backend Environment: Cloud Firestore & Firebase Auth", "LIVE / DEPLOYED", [
+    "Auth Service: Email/Password Session Tokens & Account Guard",
+    "NoSQL Database: Firestore (users, schedules, tasks, ai_quizzes, etc.)",
+    "Security Rules: Role-based document access controls",
+    "Analytics: Live Leaderboard ranking queries"
+])
+
+draw_dep_card(100, 560, 950, 360, "3. GitHub Releases & OTA Server", "Distribution Channel: GitHub CDN (jameshofril06-jpg/SkwelaApp)", "LIVE / PUBLIC", [
+    "Release Tag: v1.2.3 (Build 123)",
+    "OTA Endpoint: api.github.com/repos/.../releases",
+    "Payload Asset: app-release.apk (50.0 MB)",
+    "Update Mechanism: DownloadManager & FileProvider installer"
+])
+
+draw_dep_card(1150, 560, 950, 360, "4. Postman API Test Suite & Docs", "API Testing Suite: Postman Collection v2.1", "VERIFIED", [
+    "Exported JSON: Documentation/Pre-Fi/eskwela_postman_collection.json",
+    "Endpoints Covered: Firebase Auth, Firestore REST API & GitHub API",
+    "QA Test Suite: 80 Executed Test Cases (software_testing_qa_suite.pdf)",
+    "Documentation: Single PDF & DDL SQL creation script (schema.sql)"
+])
+
+# Connections
+draw.line([1050, 340, 1150, 340], fill='#1D4ED8', width=4)
+draw.line([600, 520, 600, 560], fill='#1D4ED8', width=4)
+draw.line([1620, 520, 1620, 560], fill='#1D4ED8', width=4)
+
+dep_path = os.path.join(artifact_dir, "deployment_plan_chart.png")
+img_dep.save(dep_path)
+
+
+# =========================================================================
+# 2. REPORTLAB PDF BUILDER WITH EMBEDDED GRAPHICS
+# =========================================================================
 styles = getSampleStyleSheet()
 
 title_style = ParagraphStyle(
@@ -37,171 +185,6 @@ body_style = ParagraphStyle(
     leading=11
 )
 
-table_header_style = ParagraphStyle(
-    'TableHeaderStyle',
-    parent=styles['Normal'],
-    fontName='Helvetica-Bold',
-    fontSize=7.5,
-    textColor=colors.HexColor('#1E3A8A')
-)
-
-table_body_style = ParagraphStyle(
-    'TableBodyStyle',
-    parent=styles['Normal'],
-    fontName='Helvetica',
-    fontSize=7.5,
-    textColor=colors.HexColor('#0F172A'),
-    leading=9.5
-)
-
-code_style = ParagraphStyle(
-    'CodeStyle',
-    parent=styles['Normal'],
-    fontName='Courier',
-    fontSize=7.5,
-    textColor=colors.HexColor('#0F172A'),
-    leading=9
-)
-
-# =========================================================================
-# 1. GENERATE SOFTWARE TESTING & QA SUITE PDF (30 TEST CASES - ACCURATE)
-# =========================================================================
-qa_pdf_path = os.path.join(artifact_dir, "software_testing_qa_suite.pdf")
-doc_qa = SimpleDocTemplate(qa_pdf_path, pagesize=letter, rightMargin=36, leftMargin=36, topMargin=36, bottomMargin=36)
-
-qa_story = []
-qa_story.append(Paragraph("ESKWELA Software Testing & Quality Assurance (QA) Suite", title_style))
-qa_story.append(Paragraph("<b>Project:</b> ESKWELA Android Mobile Application &nbsp;|&nbsp; <b>QA Lead:</b> Software Testing & QA Engineer", body_style))
-qa_story.append(Paragraph("<b>Code Repository Link:</b> https://github.com/jameshofril06-jpg/SkwelaApp", body_style))
-qa_story.append(Paragraph("<b>Postman Collection Link:</b> Documentation/Pre-Fi/eskwela_postman_collection.json", body_style))
-qa_story.append(Paragraph("<b>Total Executed Test Cases:</b> 30 Current System Test Cases (18 Functional, 8 Integration/API, 4 UAT Scripts)", body_style))
-qa_story.append(Spacer(1, 8))
-
-qa_story.append(Paragraph("1. Executive Test Plan & QA Strategy", h2_style))
-qa_story.append(Paragraph("This document outlines the software quality assurance test suite for <b>ESKWELA</b>, containing 30 documented test cases based strictly on current production functionality (including gender avatar assignment, show/hide password toggle, dynamic OCR scanner, date-specific timetable filtering, study notes, admin isolation, and live OTA updates).", body_style))
-
-def make_qa_table(title, rows):
-    qa_story.append(Paragraph(f"<b>{title}</b>", body_style))
-    table_data = [[
-        Paragraph("TC ID", table_header_style),
-        Paragraph("Module", table_header_style),
-        Paragraph("Test Condition / Step Description", table_header_style),
-        Paragraph("Expected Verification Result", table_header_style),
-        Paragraph("Status", table_header_style)
-    ]]
-    for r in rows:
-        status_color = '#15803D' if r[4] == 'PASSED' else '#B91C1C'
-        status_style = ParagraphStyle('StatusStyle', parent=table_body_style, fontName='Helvetica-Bold', textColor=colors.HexColor(status_color))
-        table_data.append([
-            Paragraph(r[0], table_body_style),
-            Paragraph(r[1], table_body_style),
-            Paragraph(r[2], table_body_style),
-            Paragraph(r[3], table_body_style),
-            Paragraph(r[4], status_style)
-        ])
-    t = Table(table_data, colWidths=[45, 90, 195, 150, 60])
-    t.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#DBEAFE')),
-        ('TEXTCOLOR', (0,0), (-1,0), colors.HexColor('#1E3A8A')),
-        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#93C5FD')),
-        ('TOPPADDING', (0,0), (-1,-1), 3),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 3),
-        ('VALIGN', (0,0), (-1,-1), 'TOP'),
-    ]))
-    qa_story.append(t)
-    qa_story.append(Spacer(1, 8))
-
-qa_story.append(Paragraph("2. Functional Testing Suite (18 Current Test Cases)", h2_style))
-make_qa_table("Functional Test Suite (TC-01 to TC-18)", [
-    ["TC-01", "Registration", "Register student account and select Gender (Male/Female)", "Account created, gender avatar icon assigned", "PASSED"],
-    ["TC-02", "Login", "Enter valid registered credentials in Login Activity", "Authenticated successfully, opens Home Dashboard", "PASSED"],
-    ["TC-03", "Password Toggle", "Tap eye icon on password input field", "Toggles visibility between hidden dots and plain text", "PASSED"],
-    ["TC-04", "Profile Setup", "Enter Full Name, School, Course, Year, Section", "Profile document saved in Firestore", "PASSED"],
-    ["TC-05", "Gender Avatar", "View Profile screen for Male/Female/Admin account", "Renders male student 👨‍🎓, female student 👩‍🎓, or admin 👔 avatar icon", "PASSED"],
-    ["TC-06", "Account Guard", "Attempt login with suspended student status", "Blocked with restriction notice, session terminated", "PASSED"],
-    ["TC-07", "Admin Auth", "Login using administrator email credentials", "AccountGuard redirects directly to Admin Dashboard", "PASSED"],
-    ["TC-08", "Admin Isolation", "Admin attempts accessing student schedule/tasks tabs", "Access restricted; admin bottom nav shows Home & Profile only", "PASSED"],
-    ["TC-09", "Logout", "Tap Logout button in Profile settings", "Displays confirmation dialog, revokes session upon confirmation", "PASSED"],
-    ["TC-10", "Dark Mode", "Toggle Dark Theme switch in Profile settings", "App appearance instantly flips to dark theme with high-contrast text", "PASSED"],
-    ["TC-11", "OTA Check", "Tap 'Check for update (OTA)' in Profile settings", "Queries GitHub releases API and displays release notes", "PASSED"],
-    ["TC-12", "OCR Scanner", "Scan study load document via Camera or Gallery", "ML Kit RegEx parser extracts courses and auto-plots to timetable", "PASSED"],
-    ["TC-13", "Day View", "Tap specific date tab on schedule calendar", "Displays strictly classes scheduled for that specific date", "PASSED"],
-    ["TC-14", "Time Conflict", "Add class overlapping existing class time", "Displays ⚠️ Conflict warning with override option", "PASSED"],
-    ["TC-15", "Class Deletion", "Long press class card and type matching Class Code", "Validates code and deletes class from schedule", "PASSED"],
-    ["TC-16", "Task Manager", "Create task with priority, date, and course link", "Task saved, rendered in list with priority badge", "PASSED"],
-    ["TC-17", "AI Quiz Runner", "Select study load course and complete practice quiz", "Generates course questions, tracks score, shows explanations", "PASSED"],
-    ["TC-18", "Study Notes", "Tap 'Study Notes' card and create course reviewer note", "Saves note in Firestore study_notes collection", "PASSED"]
-])
-
-qa_story.append(PageBreak())
-
-qa_story.append(Paragraph("3. Integration & REST API Test Suite (8 Test Cases)", h2_style))
-make_qa_table("Integration & REST API Testing (INT-01 to INT-08)", [
-    ["INT-01", "Firebase Auth API", "POST /v1/accounts:signUp with email/pass", "Returns HTTP 200 OK with idToken and refreshToken", "PASSED"],
-    ["INT-02", "Firebase Auth API", "POST /v1/accounts:signInWithPassword", "Returns HTTP 200 OK with authenticated user UID", "PASSED"],
-    ["INT-03", "Firestore Users API", "GET /documents/users/{userId}", "Returns user profile document JSON fields", "PASSED"],
-    ["INT-04", "Firestore Users API", "PATCH /documents/users/{userId} status='suspended'", "Updates user status and suspensionDuration in Firestore", "PASSED"],
-    ["INT-05", "Firestore Schedules", "POST /documents:runQuery for schedules dateString", "Returns JSON array of enrolled classes for date", "PASSED"],
-    ["INT-06", "Firestore Tasks API", "POST /documents/tasks (Add Task)", "Creates task document with priority and course link", "PASSED"],
-    ["INT-07", "Firestore Notes API", "POST /documents/study_notes (Add Note)", "Stores course reviewer note document", "PASSED"],
-    ["INT-08", "GitHub Releases API", "GET api.github.com/repos/.../releases", "Returns HTTP 200 OK JSON array of release tags and assets", "PASSED"]
-])
-
-qa_story.append(Paragraph("4. User Acceptance Testing (UAT) Scripts (4 Test Cases)", h2_style))
-make_qa_table("User Acceptance Testing (UAT) Scenario Scripts (UAT-01 to UAT-04)", [
-    ["UAT-01", "Student Onboarding", "Register ➔ Select Gender ➔ Setup Profile ➔ Scan Timetable", "Student successfully completes onboarding flow", "PASSED"],
-    ["UAT-02", "Schedule Filtering", "View Home Dashboard (Today's Classes) ➔ Switch Day Tabs", "Dashboard and schedule tabs filter classes by specific date", "PASSED"],
-    ["UAT-03", "AI Quiz & Reviewer", "Take course-specific AI Quiz ➔ View Leaderboard ➔ Add Study Note", "Quiz completed, score saved, and reviewer note created", "PASSED"],
-    ["UAT-04", "Admin Dashboard", "Admin logs in ➔ Post broadcast ➔ Moderate student status", "Admin broadcast posted and user moderation executed", "PASSED"]
-])
-
-qa_story.append(Spacer(1, 10))
-qa_story.append(Paragraph("5. Initial Bug Tracking Log & Resolution Matrix", h2_style))
-
-def make_bug_table(rows):
-    table_data = [[
-        Paragraph("Bug ID", table_header_style),
-        Paragraph("Description / Defect", table_header_style),
-        Paragraph("Severity", table_header_style),
-        Paragraph("Root Cause Analysis", table_header_style),
-        Paragraph("Resolution / Fix Applied", table_header_style),
-        Paragraph("Status", table_header_style)
-    ]]
-    for r in rows:
-        table_data.append([
-            Paragraph(r[0], table_body_style),
-            Paragraph(r[1], table_body_style),
-            Paragraph(r[2], table_body_style),
-            Paragraph(r[3], table_body_style),
-            Paragraph(r[4], table_body_style),
-            Paragraph(r[5], table_body_style)
-        ])
-    t = Table(table_data, colWidths=[45, 110, 50, 140, 145, 50])
-    t.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#FECDD3')),
-        ('TEXTCOLOR', (0,0), (-1,0), colors.HexColor('#881337')),
-        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#FDA4AF')),
-        ('TOPPADDING', (0,0), (-1,-1), 4),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
-        ('VALIGN', (0,0), (-1,-1), 'TOP'),
-    ]))
-    qa_story.append(t)
-
-make_bug_table([
-    ["BUG-01", "Scanned study load did not reflect on specific day tabs", "HIGH", "Schedules were only seeded for specific dates instead of full weekdays.", "Updated ScheduleActivity to plot study load across specific weekdays.", "RESOLVED"],
-    ["BUG-02", "OTA update download failed with HTTP 404", "HIGH", "DownloadManager failed on GitHub's /releases/latest/ 302 redirect.", "Switched to GitHub /releases API index 0 and added cache-busting timestamp.", "RESOLVED"],
-    ["BUG-03", "Text unreadable when editing profile in Dark Mode", "MEDIUM", "Profile setup layout contained hardcoded dark hex text colors.", "Replaced hardcoded hex colors with dynamic @color/text_primary tokens.", "RESOLVED"],
-    ["BUG-04", "Time schedule overlap allowed duplicate class booking", "MEDIUM", "AddClassActivity lacked start/end time overlap validation.", "Implemented parseTimeToMinutes() and overlap check with warning popup.", "RESOLVED"],
-    ["BUG-05", "Admin user could access student schedule/tasks tabs", "HIGH", "Role access guard lacked strict navigation redirection for admin users.", "Implemented AccountGuard.redirectIfAdmin() routing admins exclusively to Admin Center.", "RESOLVED"]
-])
-
-doc_qa.build(qa_story)
-print("QA Suite PDF (30 Test Cases - Current System) generated successfully.")
-
-
-# =========================================================================
-# 2. GENERATE COMPLETE FINAL SYSTEM DOCUMENTATION PDF (LETTER SIZE)
-# =========================================================================
 final_pdf_path = os.path.join(artifact_dir, "final_system_documentation.pdf")
 doc_final = SimpleDocTemplate(final_pdf_path, pagesize=letter, rightMargin=36, leftMargin=36, topMargin=36, bottomMargin=36)
 
@@ -261,54 +244,14 @@ final_story.append(Spacer(1, 10))
 
 final_story.append(PageBreak())
 
-# 4. Gantt Chart & Deployment Plan Matrix
-final_story.append(Paragraph("4. Gantt Chart & Deployment Plan Matrix", h2_style))
-
-gantt_data = [
-    ["Phase", "Task / Deliverable", "Duration", "Start Date", "End Date", "Status"],
-    ["1. Planning", "Requirements Elicitation & Scope Definition", "2 Weeks", "Feb 01, 2025", "Feb 14, 2025", "COMPLETED"],
-    ["2. Design", "UI/UX Wireframing & Firestore Database ERD", "2 Weeks", "Feb 15, 2025", "Feb 28, 2025", "COMPLETED"],
-    ["3. Development", "Android Java Core Activities & ML Kit OCR", "4 Weeks", "Mar 01, 2025", "Mar 28, 2025", "COMPLETED"],
-    ["3. Development", "AI Quiz Generator & Leaderboard Engine", "2 Weeks", "Mar 29, 2025", "Apr 11, 2025", "COMPLETED"],
-    ["3. Development", "Admin Control Center & OTA Update Helper", "2 Weeks", "Apr 12, 2025", "Apr 25, 2025", "COMPLETED"],
-    ["4. Testing", "Functional, API Integration & UAT Testing", "2 Weeks", "Apr 26, 2025", "May 05, 2025", "COMPLETED"],
-    ["5. Deployment", "APK Compilation, Signing & GitHub Release", "1 Week", "May 06, 2025", "May 12, 2025", "COMPLETED"]
-]
-
-t_gantt = Table(gantt_data, colWidths=[80, 190, 60, 75, 75, 60])
-t_gantt.setStyle(TableStyle([
-    ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#DBEAFE')),
-    ('TEXTCOLOR', (0,0), (-1,0), colors.HexColor('#1E3A8A')),
-    ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-    ('FONTSIZE', (0,0), (-1,-1), 8),
-    ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#93C5FD')),
-    ('TOPPADDING', (0,0), (-1,-1), 5),
-    ('BOTTOMPADDING', (0,0), (-1,-1), 5),
-    ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-]))
-final_story.append(t_gantt)
+# 4. Visual Gantt Chart & Deployment Plan Architecture
+final_story.append(Paragraph("4. Visual Gantt Chart & Deployment Plan Graphics", h2_style))
+final_story.append(Paragraph("<b>4.1 SDLC Project Timeline Visual Gantt Chart:</b>", body_style))
+final_story.append(RLImage(gantt_path, width=540, height=270))
 final_story.append(Spacer(1, 15))
 
-final_story.append(Paragraph("<b>Deployment Plan Matrix:</b>", body_style))
-deploy_data = [
-    ["Target Environment", "Artifact / Executable", "Hosting Server / Distribution Channel", "Access Credentials"],
-    ["Production Mobile", "app-release.apk (v1.2.3)", "GitHub Releases / In-App OTA Update Engine", "Public Android Installation"],
-    ["Cloud Database", "Firestore Rules & Schema", "Google Firebase Console (eskwela-450eb)", "Firebase Auth Service Account"],
-    ["REST API Services", "Postman Collection v2.1", "Documentation/Pre-Fi/eskwela_postman_collection.json", "API Key / Token Headers"]
-]
-
-t_deploy = Table(deploy_data, colWidths=[100, 130, 180, 130])
-t_deploy.setStyle(TableStyle([
-    ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#FEF3C7')),
-    ('TEXTCOLOR', (0,0), (-1,0), colors.HexColor('#B45309')),
-    ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-    ('FONTSIZE', (0,0), (-1,-1), 8),
-    ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#FDE68A')),
-    ('TOPPADDING', (0,0), (-1,-1), 5),
-    ('BOTTOMPADDING', (0,0), (-1,-1), 5),
-    ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-]))
-final_story.append(t_deploy)
+final_story.append(Paragraph("<b>4.2 Visual System Deployment Architecture:</b>", body_style))
+final_story.append(RLImage(dep_path, width=540, height=245))
 
 doc_final.build(final_story)
-print("Complete Final System Documentation PDF generated successfully.")
+print("Complete Final System Documentation PDF with Visual Gantt & Deployment Graphics generated successfully.")
