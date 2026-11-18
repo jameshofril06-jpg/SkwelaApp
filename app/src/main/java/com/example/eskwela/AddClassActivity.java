@@ -191,9 +191,10 @@ public class AddClassActivity extends AppCompatActivity {
 
     private int parseTimeToMinutes(String timeStr) {
         try {
+            if (timeStr == null || timeStr.trim().isEmpty()) return 0;
             String clean = timeStr.trim().toUpperCase();
-            boolean isPm = clean.contains("PM") || clean.contains("P");
-            boolean isAm = clean.contains("AM") || clean.contains("A");
+            boolean isPm = clean.contains("PM") || (clean.contains("P") && !clean.contains("AM"));
+            boolean isAm = clean.contains("AM") || (clean.contains("A") && !clean.contains("PM"));
 
             String digits = clean.replaceAll("[^0-9:]", "");
             String[] hm = digits.split(":");
