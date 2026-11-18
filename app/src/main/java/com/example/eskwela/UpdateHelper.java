@@ -28,8 +28,8 @@ import java.util.Locale;
 public class UpdateHelper {
 
     public static final String GITHUB_API_RELEASES = "https://api.github.com/repos/jameshofril06-jpg/SkwelaApp/releases";
-    public static final String DEFAULT_FALLBACK_DOWNLOAD_URL = "https://github.com/jameshofril06-jpg/SkwelaApp/releases/download/v1.2.6/app-release.apk";
-    public static final String LATEST_VERSION_NAME = "1.2.6";
+    public static final String DEFAULT_FALLBACK_DOWNLOAD_URL = "https://github.com/jameshofril06-jpg/SkwelaApp/releases/download/v1.2.7/app-release.apk";
+    public static final String LATEST_VERSION_NAME = "1.2.7";
 
     public static void downloadAndInstallUpdate(Context context) {
         ProgressDialog checkingDialog = new ProgressDialog(context);
@@ -41,7 +41,7 @@ public class UpdateHelper {
         new Thread(() -> {
             String latestTagName = LATEST_VERSION_NAME;
             String downloadUrl = DEFAULT_FALLBACK_DOWNLOAD_URL;
-            String releaseBody = "• 👥 Complete Admin Student Directory & Schedule Inspection: Displays all registered students without missing optional fields and enables student timetable inspection in moderation panels.\n• 📅 Robust Student Day/Week/Month Timetable Filtering: Schedule calendar matches both specific dates and weekday names (Mon-Sun).\n• ⚠️ Schedule Time Conflict Evaluator: Refined AM/PM overlap calculation to accurately detect and warn against conflicting class time slots.\n• 📊 Visual SDLC Gantt Chart & Deployment Architecture: High-resolution Excel-style Gantt chart (August 2026 – November 26, 2026) and visual deployment matrix.\n• 📸 Dynamic Custom Study Load OCR Scanner: RegEx text parser extracts custom course codes, start/end times, and weekday schedules from any custom study load image.\n• 👨‍🎓 Gender-Based Student & Admin Profile Avatars: Default male student (👨‍🎓), female student (👩‍🎓), and admin (👔) icons mapped directly to registration gender selection.\n• 📚 Study Notes & Course Reviewer Feature: Save, review, and search subject study notes directly in the Study space.\n• 🎓 Complete Software Testing & QA Suite PDF with 80 Test Cases & Postman API Collection v2.1";
+            String releaseBody = "• 👥 Complete 19-User Admin Directory Parser: Robust field extraction ensuring all registered student user documents in Firestore load in the Admin Control Panel.\n• 📅 Student Timetable Inspection: Admins can inspect a student's enrolled classes directly from the moderation pane.\n• ⚠️ Schedule Time Conflict Evaluator: Refined AM/PM overlap calculation to accurately detect and warn against conflicting class time slots.\n• 📊 Visual SDLC Gantt Chart & Deployment Architecture: High-resolution Excel-style Gantt chart (August 2026 – November 26, 2026) and visual deployment matrix.\n• 📸 Dynamic Custom Study Load OCR Scanner: RegEx text parser extracts custom course codes, start/end times, and weekday schedules from any custom study load image.\n• 👨‍🎓 Gender-Based Student & Admin Profile Avatars: Default male student (👨‍🎓), female student (👩‍🎓), and admin (👔) icons mapped directly to registration gender selection.\n• 📚 Study Notes & Course Reviewer Feature: Save, review, and search subject study notes directly in the Study space.\n• 🎓 Complete Software Testing & QA Suite PDF with 80 Test Cases & Postman API Collection v2.1";
 
             try {
                 URL url = new URL(GITHUB_API_RELEASES);
