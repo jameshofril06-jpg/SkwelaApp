@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="Eskwela v.1.0.6">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-11-04T06:20:55.794796800Z">
+        <DropdownSelection timestamp="2026-11-18T02:35:48.995437500Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\JAMES\.android\avd\Medium_Phone.avd" />
+              <DeviceId pluginId="Wireless" identifier="serviceName=adb-1b07ed0b-JCckFg" />
             </handle>
           </Target>
         </DropdownSelection>
