@@ -174,7 +174,7 @@ public class DashboardActivity extends AppCompatActivity {
                     }
                 });
 
-        // 2. Fetch Schedule (Today's classes with graceful upcoming week fallback)
+        // 2. Fetch Schedule (Strictly Today's Classes Only)
         db.collection("schedules")
                 .whereEqualTo("userId", userId)
                 .get()
@@ -186,14 +186,6 @@ public class DashboardActivity extends AppCompatActivity {
                             ScheduleCardAdapter.ScheduleItem item = document.toObject(ScheduleCardAdapter.ScheduleItem.class);
                             item.id = document.getId();
                             if (item.dateString != null && item.dateString.startsWith(todayDateString)) {
-                                todayClasses.add(item);
-                            }
-                        }
-
-                        if (todayClasses.isEmpty() && task.getResult() != null && !task.getResult().isEmpty()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                ScheduleCardAdapter.ScheduleItem item = document.toObject(ScheduleCardAdapter.ScheduleItem.class);
-                                item.id = document.getId();
                                 todayClasses.add(item);
                             }
                         }
